@@ -1,0 +1,39 @@
+{
+  "course": "Solo Learn",
+  "updated": "2026-05-25",
+  "items": [
+    {
+      "id": 1,
+      "language": "JavaScript",
+      "title": "DOM y eventos",
+      "level": "Base",
+      "tags": ["dom", "eventos", "interfaz"],
+      "stats": {
+        "xp": 60,
+        "completed": false
+      }
+    },
+    {
+      "id": 2,
+      "language": "JavaScript",
+      "title": "JSON local con fetch",
+      "level": "Intermedio",
+      "tags": ["fetch", "json", "arrays"],
+      "stats": {
+        "xp": 95,
+        "completed": false
+      }
+    },
+    {
+      "id": 3,
+      "language": "Java",
+      "title": "Colecciones y genéricos",
+      "level": "Intermedio",
+      "tags": ["list", "map", "datos"],
+      "stats": {
+        "xp": 90,
+        "completed": true
+      }
+    }
+  ]
+}

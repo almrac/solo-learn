@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Solo Learn Java + JavaScript</title>
+    <meta
+      name="description"
+      content="Ruta personal gamificada para aprender Java y JavaScript desde cero hasta avanzado."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="header">
+      <a class="header__brand" href="#top" aria-label="Solo Learn">
+        <span class="header__brand-mark">SL</span>
+        <strong class="header__brand-name">Solo Learn</strong>
+      </a>
+      <nav class="header__nav" aria-label="Navegación principal">
+        <a href="#roadmap">Ruta</a>
+        <a href="#lessons">Lecciones</a>
+        <a href="#practice">Práctica</a>
+        <button id="focusModeButton" type="button" aria-pressed="false">Enfoque</button>
+      </nav>
+      <div class="header__stats" aria-label="Resumen de progreso">
+        <div class="header__stat">
+          <span class="header__stat-value" id="xpValue">0</span>
+          <small class="header__stat-label">XP</small>
+        </div>
+        <div class="header__stat">
+          <span class="header__stat-value" id="levelValue">1</span>
+          <small class="header__stat-label">Nivel</small>
+        </div>
+        <div class="header__stat">
+          <span class="header__stat-value" id="completedValue">0</span>
+          <small class="header__stat-label">Completadas</small>
+        </div>
+        <div class="header__stat">
+          <span class="header__stat-value" id="streakValue">0</span>
+          <small class="header__stat-label">Racha</small>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero__copy">
+          <p class="eyebrow">Ruta privada de estudio</p>
+          <h1>Solo Learn</h1>
+          <h2>Java y JavaScript con práctica diaria hasta final de verano.</h2>
+          <p>
+            Un sistema personal para estudiar sin dispersarte: lecciones cortas,
+            retos, práctica ejecutable y progreso guardado en tu navegador.
+          </p>
+          <div class="hero__actions">
+            <button class="button button--primary" id="continueButton" type="button">Continuar ruta</button>
+            <button class="button button--ghost" id="resetButton" type="button">Reiniciar</button>
+          </div>
+        </div>
+        <div class="hero__console" aria-hidden="true">
+          <div class="hero__console-bar">
+            <span class="hero__console-dot"></span>
+            <span class="hero__console-dot"></span>
+            <span class="hero__console-dot"></span>
+          </div>
+          <pre><code>class Aprendiz {
+  public static void main(String[] args) {
+    System.out.println("Practica diaria");
+  }
+}
+
+const meta = "avanzado";
+const progreso = retos.filter(r => r.done);</code></pre>
+        </div>
+      </section>
+
+      <section class="roadmap" id="roadmap" aria-label="Plan hasta final de verano">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Objetivo verano</p>
+            <h2>Ruta junio-agosto</h2>
+          </div>
+          <p class="section-heading__text">
+            El foco no es acumular teoría: cada fase combina base, práctica y una entrega
+            pequeña para ganar soltura antes de septiembre.
+          </p>
+        </div>
+        <div class="roadmap__grid" id="planGrid"></div>
+      </section>
+
+      <section class="dashboard" id="lessons" aria-label="Panel de aprendizaje">
+        <aside class="dashboard__sidebar">
+          <div class="active-track" id="activeTrack"></div>
+
+          <div class="progress-summary">
+            <div class="progress-summary__label">
+              <span>Progreso total</span>
+              <strong id="progressText">0%</strong>
+            </div>
+            <div class="progress-summary__track">
+              <span id="progressBar"></span>
+            </div>
+          </div>
+
+          <div class="track-progress" id="trackProgress"></div>
+
+          <div class="next-session" id="nextSession"></div>
+
+          <div class="review-box" id="reviewBox"></div>
+
+          <div class="language-tabs" role="tablist" aria-label="Lenguajes">
+            <button class="language-tabs__button is-active" type="button" data-track="java">Java</button>
+            <button class="language-tabs__button" type="button" data-track="javascript">JavaScript</button>
+          </div>
+
+          <div class="level-filters" aria-label="Filtros de nivel">
+            <button class="level-filters__button is-active" type="button" data-filter="all">Todo</button>
+            <button class="level-filters__button" type="button" data-filter="Cero">Cero</button>
+            <button class="level-filters__button" type="button" data-filter="Base">Base</button>
+            <button class="level-filters__button" type="button" data-filter="Intermedio">Intermedio</button>
+            <button class="level-filters__button" type="button" data-filter="Avanzado">Avanzado</button>
+          </div>
+
+          <div class="storage-tools">
+            <button class="storage-tools__button" id="exportButton" type="button">Exportar progreso</button>
+            <label class="storage-tools__label" for="importInput">Importar progreso</label>
+            <input class="storage-tools__input" id="importInput" type="file" accept="application/json">
+            <p class="storage-tools__status" id="storageStatus" role="status"></p>
+          </div>
+        </aside>
+
+        <section class="lessons">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" id="trackLabel">Java</p>
+              <h2 id="trackTitle">Fundamentos y backend</h2>
+            </div>
+            <p class="section-heading__text" id="trackSummary">
+              Sintaxis, orientación a objetos, colecciones, testing y bases para Spring.
+            </p>
+          </div>
+
+          <div class="lessons__grid" id="lessonGrid" aria-live="polite"></div>
+        </section>
+      </section>
+
+      <section class="study" aria-label="Lección activa">
+        <p class="study__eyebrow">Estás aprendiendo ahora</p>
+        <div class="study__header">
+          <div>
+            <p class="eyebrow" id="studyLevel">Cero</p>
+            <h2 id="studyTitle">Variables, tipos y consola</h2>
+          </div>
+          <div class="study__actions">
+            <button id="markReadButton" type="button">Marcar teoría</button>
+            <button id="markPracticeButton" type="button">Marcar práctica</button>
+            <button class="button button--primary" id="finishLessonButton" type="button">Finalizar lección</button>
+          </div>
+        </div>
+
+        <div class="study__progress" id="studyProgress" aria-label="Progreso de la lección activa"></div>
+
+        <div class="study__layout">
+          <article class="study__content">
+            <h3>Qué vas a aprender</h3>
+            <p id="studyTheory"></p>
+
+            <h3>Pasos de estudio</h3>
+            <ol id="studySteps"></ol>
+
+            <div class="study__notes">
+              <label for="studyNotes">Notas personales</label>
+              <textarea id="studyNotes" placeholder="Dudas, resumen propio, errores que no quieres repetir..."></textarea>
+              <button id="saveNotesButton" type="button">Guardar notas</button>
+            </div>
+          </article>
+
+          <article class="code-lab">
+            <div class="code-lab__header">
+              <h3>Ejemplo</h3>
+              <span id="studyLanguage">Java</span>
+            </div>
+            <pre><code id="studyExample"></code></pre>
+            <div class="code-lab__practice">
+              <h3>Práctica</h3>
+              <p id="studyPractice"></p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="runner" id="practice" aria-label="Laboratorio JavaScript">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Laboratorio</p>
+            <h2>Práctica ejecutable de JavaScript</h2>
+          </div>
+          <p class="section-heading__text">
+            Usa este espacio para probar funciones pequeñas. Para Java, mantén la práctica
+            como diseño y pseudocódigo hasta ejecutarlo en tu IDE.
+          </p>
+        </div>
+        <div class="runner__layout">
+          <div class="runner__editor">
+            <label for="jsRunnerInput">Código</label>
+            <textarea id="jsRunnerInput" spellcheck="false"></textarea>
+            <div class="runner__actions">
+              <button class="button button--primary" id="runJsButton" type="button">Ejecutar JS</button>
+              <button id="loadPracticeButton" type="button">Cargar práctica activa</button>
+              <button id="clearRunnerButton" type="button">Limpiar salida</button>
+            </div>
+          </div>
+          <div class="runner__output">
+            <div class="code-lab__header">
+              <h3>Salida</h3>
+              <span>console</span>
+            </div>
+            <pre><code id="jsRunnerOutput">Pulsa Ejecutar JS para ver el resultado.</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="challenge" aria-label="Reto activo">
+        <div>
+          <p class="eyebrow">Reto rápido</p>
+          <h2 id="challengeTitle">Selecciona una lección</h2>
+          <p class="challenge__prompt" id="challengePrompt">Cada lección incluye una pregunta para desbloquear XP extra.</p>
+        </div>
+        <form class="challenge__form" id="challengeForm">
+          <div id="challengeOptions" class="challenge__options"></div>
+          <button class="button button--primary" type="submit">Comprobar</button>
+          <p id="challengeFeedback" class="feedback" role="status"></p>
+        </form>
+      </section>
+
+      <section class="achievements" aria-label="Logros">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Gamificación</p>
+            <h2>Logros</h2>
+          </div>
+          <p class="section-heading__text">Se desbloquean automáticamente al completar partes de la ruta.</p>
+        </div>
+        <div class="achievements__grid" id="achievementGrid"></div>
+      </section>
+    </main>
+
+    <script src="data.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
+</html>
