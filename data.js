@@ -1,6 +1,8 @@
 const learningRoot = typeof window === "undefined" ? globalThis : window;
 
 learningRoot.LEARNING_DATA = {
+  // "tracks" define la ruta principal de aprendizaje.
+  // Cada lenguaje tiene sus lecciones base y metadatos de navegación.
   tracks: {
     java: {
       label: "Java",
@@ -123,6 +125,8 @@ learningRoot.LEARNING_DATA = {
     },
   },
 
+  // "lessonDetails" amplía cada lección con teoría, ejemplo y práctica.
+  // Aquí separamos contenido de la lógica de la app.
   lessonDetails: {
     "java-variables": details(
       "Java es estricto con los tipos: antes de usar un dato tienes que decidir qué representa. Empieza practicando con int, double, boolean, char y String para entender cómo el compilador protege tu código.",
@@ -399,6 +403,7 @@ function render() {
     ),
   },
 
+  // El roadmap une varias lecciones en fases de estudio más grandes.
   studyPlan: [
     {
       dates: "Junio · Semanas 1-2",
@@ -426,6 +431,8 @@ function render() {
     },
   ],
 
+  // Los ejercicios evaluables viven como datos.
+  // Eso permite añadir nuevas prácticas sin tocar mucho app.js.
   exercises: {
     "js-values": exercise({
       prompt: "Implementa una función pura `crearResumen(nombre, nivel, xp)` que devuelva una frase legible.",
@@ -692,8 +699,8 @@ function render() {
     }),
   },
 
-  // Easter egg metadata: each block explains a real concept used in app.js,
-  // where it appears, and which lesson covers the same idea explicitly.
+  // Easter egg pedagógico:
+  // documenta partes reales de app.js y las conecta con la ruta de estudio.
   appBlueprint: [
     blueprint(
       "Estado global",
@@ -778,6 +785,7 @@ function render() {
   ],
 };
 
+// Factoría pequeña para no repetir la misma estructura en cada lección.
 function lesson(id, level, title, xp, goals, prompt, options, answer) {
   return {
     id,
@@ -793,6 +801,7 @@ function lesson(id, level, title, xp, goals, prompt, options, answer) {
   };
 }
 
+// Otra factoría: separa el "qué enseña" una lección de la lógica de render.
 function details(theory, steps, example, practice) {
   return {
     theory,
@@ -806,7 +815,7 @@ function exercise(config) {
   return config;
 }
 
-// Small data helper so the blueprint stays readable where it is declared.
+// Igual que lesson() y details(), esto hace más legible la definición del blueprint.
 function blueprint(title, concept, where, lessonId, phase, howToLearn, tags, prerequisites) {
   return {
     title,

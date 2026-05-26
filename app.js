@@ -89,9 +89,13 @@ const defaultState = {
   xp: 0,
 };
 
+// "state" es el objeto central de la app:
+// guarda qué sabe la interfaz en este momento.
+// Este patrón se estudia sobre todo en la lección js-state.
 let state = loadState();
 
-// Centralize DOM lookups once; the app is fully rerendered from state.
+// Aquí agrupamos referencias al DOM para no repetir querySelector todo el rato.
+// Esto conecta con js-dom: seleccionar elementos y trabajar con ellos.
 const elements = {
   xpValue: document.querySelector("#xpValue"),
   levelValue: document.querySelector("#levelValue"),
@@ -162,7 +166,8 @@ const elements = {
   storageStatus: document.querySelector("#storageStatus"),
 };
 
-// Hidden trigger for the app.js learning blueprint panel.
+// Easter egg: contador de toques sobre el logo para abrir la radiografía técnica.
+// Sirve también como ejemplo de eventos, estado simple y temporizadores.
 let brandTapCount = 0;
 let brandTapTimer = null;
 
@@ -170,6 +175,7 @@ render();
 
 elements.tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
+    // Al cambiar de track actualizamos state y después repintamos la interfaz.
     state.activeTrack = tab.dataset.track;
     state.activeLessonId = firstVisibleLesson()?.id ?? tracks[state.activeTrack].lessons[0].id;
     persist();
@@ -195,6 +201,7 @@ elements.lessonSort.addEventListener("change", () => {
 });
 
 elements.focusModeButton.addEventListener("click", () => {
+  // classList.toggle es una forma muy común de encender/apagar modos visuales.
   document.body.classList.toggle("focus-mode");
   const isFocusMode = document.body.classList.contains("focus-mode");
   elements.focusModeButton.textContent = isFocusMode ? "Salir" : "Enfoque";
@@ -455,7 +462,8 @@ function render() {
   renderStudyPanel();
   renderChallenge();
   renderAchievements();
-  // The blueprint explains how this app.js maps to the learning path.
+  // Esta llamada alimenta el easter egg que explica cómo se relaciona app.js
+  // con la ruta de aprendizaje de JavaScript.
   renderBlueprint();
 }
 
@@ -575,6 +583,8 @@ function renderLessons() {
 
   elements.lessonGrid.innerHTML = lessons
     .map((lesson) => {
+      // Cada tarjeta se genera a partir de datos.
+      // Aquí se ve muy claro el patrón "array -> map -> HTML".
       const isCompleted = state.completed.includes(lesson.id);
       const isActive = state.activeLessonId === lesson.id;
       const hasRead = state.readLessons.includes(lesson.id);
@@ -653,6 +663,8 @@ function renderStudyPanel() {
 }
 
 function renderStudyProgress(lesson) {
+  // Construimos los pasos como datos primero y luego los pintamos.
+  // Esto hace más fácil añadir o quitar pasos sin tocar demasiado HTML.
   const steps = [
     {
       label: "Teoría",
@@ -925,6 +937,7 @@ function runJavaScriptPractice() {
 
   const output = [];
   const sandboxConsole = {
+    // Simulamos console.log para capturar la salida dentro de la app.
     log: (...values) => output.push(values.map(formatConsoleValue).join(" ")),
     warn: (...values) => output.push(`Aviso: ${values.map(formatConsoleValue).join(" ")}`),
     error: (...values) => output.push(`Error: ${values.map(formatConsoleValue).join(" ")}`),
@@ -1141,7 +1154,8 @@ function evaluateDomExercise(lesson, exercise, code) {
   Promise.all(
     exercise.tests.map(async (test) => {
       const context = await executeDomCode(code, elements.jsRunnerHtml.value);
-      // Replay user-like actions inside the preview and assert against the live DOM.
+      // Simulamos acciones de usuario dentro del preview: click, submit, escribir.
+      // Esto es útil para entender cómo se prueban interfaces.
       for (const action of test.actions ?? []) {
         runDomAction(context.win, context.doc, action);
       }
@@ -1205,6 +1219,8 @@ async function executeDomCode(code, html) {
 
   const win = elements.runnerPreview.contentWindow;
   const doc = elements.runnerPreview.contentDocument;
+  // Ejecutamos el código dentro del contexto del iframe para que trabaje
+  // con su propio document y no con el document principal de la app.
   const evaluator = win.Function("console", `"use strict";\n${code}`);
   const result = evaluator(sandboxConsole);
   if (result && typeof result.then === "function") {
@@ -1394,7 +1410,8 @@ function toggleBlueprintPanel(forceOpen) {
   }
 }
 
-// Resolve whether the user already has the conceptual base to understand a block from app.js.
+// Este helper revisa si ya completaste la base previa para entender
+// un bloque técnico concreto del propio app.js.
 function blueprintPrerequisites(item) {
   const entries = (item.prerequisites ?? []).map((lessonId) => findLesson(lessonId)).filter(Boolean);
   const completed = entries.filter((lesson) => state.completed.includes(lesson.id));
@@ -1423,7 +1440,8 @@ function blueprintPrerequisites(item) {
   };
 }
 
-// Recommend the next lesson by project impact, not just by original track order.
+// En vez de recomendar "la siguiente en la lista", calculamos
+// qué lección desbloquea más comprensión útil del proyecto.
 function recommendNextLesson() {
   const pendingLessons = allLessons().filter((lesson) => !state.completed.includes(lesson.id));
   if (!pendingLessons.length) return null;
@@ -1435,7 +1453,9 @@ function recommendNextLesson() {
   return ranked[0];
 }
 
-// Score lessons by how many project concepts they unlock and how well they fit current progress.
+// Esta puntuación mezcla varias señales:
+// conceptos que desbloquea, continuidad con la ruta activa
+// y progreso parcial ya hecho.
 function scoreLessonRecommendation(lesson) {
   const lessonBlueprints = appBlueprint.filter((item) => item.lessonId === lesson.id);
   const unlockedConcepts = lessonBlueprints.filter((item) => blueprintPrerequisites(item).pending.length === 0).length;
