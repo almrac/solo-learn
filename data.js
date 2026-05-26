@@ -111,6 +111,11 @@ learningRoot.LEARNING_DATA = {
           "Transformar datos cargados",
           "Pintar resultados",
         ], "Si una función necesita esperar datos antes de pintar el DOM, ¿qué palabra suele aparecer dentro de una función async?", ["await", "return", "break"], "await"),
+        lesson("js-ui-states", "Intermedio", "Estados de carga, vacío y error", 115, [
+          "Loading states",
+          "Empty states",
+          "Manejo de errores",
+        ], "Si una carga remota falla, ¿qué conviene hacer además de registrar el error?", ["Ocultar toda la UI", "Mostrar un mensaje útil", "Recargar la página siempre"], "Mostrar un mensaje útil"),
         lesson("js-json-fetch", "Intermedio", "JSON local con fetch", 95, [
           "fetch a un archivo JSON",
           "Recorrer arrays de objetos",
@@ -414,6 +419,31 @@ document.querySelector("#featuredList").innerHTML = html;`,
 }`,
       "Carga datos de una fuente asíncrona, filtra solo algunos items y píntalos en una lista del DOM.",
     ),
+    "js-ui-states": details(
+      "Una interfaz no solo debe funcionar cuando llegan datos. También tiene que explicar qué pasa mientras espera, cuando no hay resultados y cuando ocurre un error. Este patrón aparece en cualquier frontend serio.",
+      ["Muestra un estado de carga antes de esperar datos.", "Si no llegan items útiles, enseña un mensaje vacío.", "Si falla la carga, captura el error y pinta un mensaje claro."],
+      `async function cargarCursos(fetchItems) {
+  const status = document.querySelector("#status");
+  const list = document.querySelector("#courseList");
+
+  status.textContent = "Cargando...";
+  list.innerHTML = "";
+
+  try {
+    const data = await fetchItems();
+    if (data.items.length === 0) {
+      status.textContent = "No hay resultados.";
+      return;
+    }
+
+    status.textContent = "Resultados listos.";
+    list.innerHTML = data.items.map((item) => \`<li>\${item.title}</li>\`).join("");
+  } catch (error) {
+    status.textContent = "No se pudieron cargar los cursos.";
+  }
+}`,
+      "Crea una carga asíncrona que muestre estado de carga, vacío o error y pinte una lista solo cuando haya datos.",
+    ),
     "js-json-fetch": details(
       "Un archivo JSON local te permite practicar consumo de datos sin depender de una API externa. La clave es entender la forma de los datos: objetos con propiedades, arrays de objetos y propiedades anidadas.",
       ["Carga data/study-items.json con fetch.", "Convierte la respuesta con response.json().", "Recorre data.items con map o forEach y genera un item HTML por cada objeto."],
@@ -527,7 +557,7 @@ function render() {
       dates: "Julio",
       title: "Construcción real",
       goal: "Colecciones, estado, módulos, asincronía y pequeños proyectos semanales.",
-      lessonIds: ["java-collections", "java-exceptions", "js-async", "js-json-to-dom", "js-fetch-to-dom", "js-json-fetch", "js-modules", "js-state", "js-data-to-dom"],
+      lessonIds: ["java-collections", "java-exceptions", "js-async", "js-json-to-dom", "js-fetch-to-dom", "js-ui-states", "js-json-fetch", "js-modules", "js-state", "js-data-to-dom"],
     },
     {
       dates: "Agosto",
@@ -1005,6 +1035,80 @@ function render() {
         },
       ],
     }),
+    "js-ui-states": exercise({
+      mode: "dom",
+      family: "Asincronía y DOM",
+      difficulty: "Intermedio",
+      practiceType: "Async",
+      prompt: "Implementa `cargarCursos(fetchItems)` para gestionar carga, vacío y error en la interfaz.",
+      checklist: [
+        "Muestra `Cargando...` al empezar.",
+        "Si no hay items, deja `#courseList` vacía y muestra `No hay resultados.`.",
+        "Si todo va bien, pinta `<li>` con `title | level` y muestra `Resultados listos.`.",
+        "Si falla la carga, muestra `No se pudieron cargar los cursos.`.",
+      ],
+      starterHtml: `<section>
+  <p id="status">Sin cargar</p>
+  <ul id="courseList"></ul>
+</section>`,
+      starter: `async function cargarCursos(fetchItems) {
+  const status = document.querySelector("#status");
+  const list = document.querySelector("#courseList");
+
+  // Gestiona carga, exito, vacio y error.
+}`,
+      functionName: "cargarCursos",
+      tests: [
+        {
+          label: "Pinta resultados al cargar datos",
+          actions: [
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                items: [
+                  { title: "map y filter", level: "Base" },
+                  { title: "Estado local", level: "Intermedio" },
+                ],
+              })],
+            },
+          ],
+          assertions: [
+            { type: "text", selector: "#status", expected: "Resultados listos." },
+            { type: "count", selector: "#courseList li", expected: 2 },
+            { type: "text", selector: "#courseList li:first-child", expected: "map y filter | Base" },
+          ],
+        },
+        {
+          label: "Muestra estado vacio si no llegan items",
+          actions: [
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({ items: [] })],
+            },
+          ],
+          assertions: [
+            { type: "text", selector: "#status", expected: "No hay resultados." },
+            { type: "count", selector: "#courseList li", expected: 0 },
+          ],
+        },
+        {
+          label: "Muestra error si la carga falla",
+          actions: [
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => { throw new Error("fallo de red"); }],
+            },
+          ],
+          assertions: [
+            { type: "text", selector: "#status", expected: "No se pudieron cargar los cursos." },
+            { type: "count", selector: "#courseList li", expected: 0 },
+          ],
+        },
+      ],
+    }),
     "js-json-fetch": exercise({
       family: "JSON y utilidades",
       difficulty: "Intermedio",
@@ -1214,6 +1318,121 @@ function render() {
     ),
   },
 
+  projectBriefs: {
+    "java-oop": projectBrief(
+      "Modela una biblioteca pequeña con objetos reales.",
+      "Definir clases con atributos privados y comportamientos claros para dejar atrás soluciones planas con variables sueltas.",
+      [
+        "Crea una clase `Book` con título, autor y disponibilidad.",
+        "Añade métodos como `borrow()` y `giveBack()`.",
+        "Instancia varios libros y muestra su estado desde `main`.",
+      ],
+      [
+        "Clase `Book`",
+        "Métodos de comportamiento",
+        "Pequeña demo en `main`",
+      ],
+    ),
+    "java-collections": projectBrief(
+      "Construye un registro de progreso por lenguaje usando colecciones.",
+      "Pasar de variables sueltas a estructuras que permitan crecer: listas de tareas y mapas de XP por categoría.",
+      [
+        "Usa `ArrayList` para tareas pendientes o completadas.",
+        "Usa `HashMap` para asociar lenguaje con XP acumulado.",
+        "Muestra un resumen final recorriendo ambas estructuras.",
+      ],
+      [
+        "Lista de tareas",
+        "Mapa de XP",
+        "Resumen por consola",
+      ],
+    ),
+    "java-testing": projectBrief(
+      "Refactoriza una utilidad de validación y cúbrela con JUnit.",
+      "Separar lógica de validación de entrada, escribir tests de caso normal, borde y error, y dejar una API pequeña y clara.",
+      [
+        "Diseña una clase `TaskValidator` con una responsabilidad concreta.",
+        "Escribe al menos tres tests: válido, vacío y demasiado corto.",
+        "Refactoriza nombres o duplicaciones después de que los tests pasen.",
+      ],
+      [
+        "Clase de validación",
+        "Suite JUnit",
+        "Notas breves sobre decisiones de diseño",
+      ],
+    ),
+    "java-spring-intro": projectBrief(
+      "Diseña una API REST mínima para tareas de estudio.",
+      "Levantar una estructura básica con `Controller`, `Service` y una lista en memoria para exponer tareas por HTTP.",
+      [
+        "Define una entidad simple `Task` con `id`, `title` y `done`.",
+        "Crea un endpoint GET para listar tareas y un POST para crear una nueva.",
+        "Separa la lógica de negocio en un `Service` para no dejar todo en el controlador.",
+      ],
+      [
+        "Modelo simple",
+        "Controller con endpoints",
+        "Service con lógica básica",
+      ],
+    ),
+    "js-components": projectBrief(
+      "Extrae una tarjeta de práctica reutilizable a partir de datos.",
+      "Tomar un bloque repetido de UI, convertirlo en una función que recibe datos y devuelve HTML consistente.",
+      [
+        "Detecta qué estructura HTML se repite.",
+        "Crea una función `renderPracticeCard(item)` que devuelva una tarjeta completa.",
+        "Úsala con `map` para pintar varias tarjetas desde un array.",
+      ],
+      [
+        "Función de render",
+        "Array de datos de ejemplo",
+        "Renderizado de varias tarjetas",
+      ],
+    ),
+    "js-fetch-to-dom": projectBrief(
+      "Carga y pinta una lista filtrada desde datos asíncronos.",
+      "Unir `async/await`, filtrado de datos y renderizado básico para montar una vista útil de verdad.",
+      [
+        "Crea una función async que espere datos de `fetchItems`.",
+        "Filtra solo los items que interesan.",
+        "Pinta una lista final con `title` y `level` en el DOM.",
+      ],
+      [
+        "Función async",
+        "Lista renderizada",
+        "Filtro aplicado",
+      ],
+    ),
+    "js-ui-states": projectBrief(
+      "Diseña una vista resiliente con carga, vacío y error.",
+      "Evitar que la interfaz solo funcione en el caso feliz y enseñar a comunicar estados reales al usuario.",
+      [
+        "Muestra un mensaje de carga antes de esperar datos.",
+        "Pinta un mensaje vacío si no hay items.",
+        "Captura errores y muestra un mensaje útil sin romper la vista.",
+      ],
+      [
+        "Estado de carga",
+        "Estado vacío",
+        "Estado de error",
+      ],
+    ),
+    "js-project": projectBrief(
+      "Construye un dashboard de estudio conectado a JSON local.",
+      "Unir fetch, filtrado, renderizado, estado local y persistencia en una app pequeña pero completa desplegable en GitHub Pages.",
+      [
+        "Carga datos desde un JSON local con `fetch`.",
+        "Permite filtrar por lenguaje o dificultad sin recargar.",
+        "Guarda una preferencia o progreso simple en `localStorage`.",
+      ],
+      [
+        "Vista principal con lista",
+        "Filtros activos",
+        "Persistencia local",
+      ],
+    ),
+  },
+
   // Easter egg pedagógico:
   // documenta partes reales de app.js y las conecta con la ruta de estudio.
   appBlueprint: [
@@ -1276,6 +1495,16 @@ function render() {
       "Se trabaja en `js-async` y se consolida en `js-json-fetch`, donde ya consumes datos y transformas la respuesta.",
       ["async", "await", "fetch"],
       ["js-values", "js-objects"],
+    ),
+    blueprint(
+      "Estados de interfaz",
+      "Mensajes de carga, vacío y error para que la UI explique qué está pasando.",
+      "Cuando una práctica asíncrona necesita informar si está cargando, si no hay resultados o si la petición falla.",
+      "js-ui-states",
+      "Intermedio",
+      "Se introduce en `js-ui-states` y se reutiliza después cada vez que cargas datos reales y los pintas en el DOM.",
+      ["loading", "empty", "error"],
+      ["js-async", "js-dom", "js-fetch-to-dom"],
     ),
     blueprint(
       "Manipulación de DOM real",
@@ -1353,5 +1582,14 @@ function guide(prompt, input, output, checklist, family, difficulty, practiceTyp
     family,
     difficulty,
     practiceType,
+  };
+}
+
+function projectBrief(summary, outcome, milestones, deliverables) {
+  return {
+    summary,
+    outcome,
+    milestones,
+    deliverables,
   };
 }

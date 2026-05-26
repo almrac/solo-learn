@@ -19,9 +19,12 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - Lección integradora para pasar de datos filtrados a interfaz renderizada.
 - Lección específica para pasar de JSON local ya parseado a interfaz renderizada.
 - Lección integradora de flujo async para pasar de `fetch` a renderizado en DOM.
+- Lección y ejercicio evaluable para gestionar estados de carga, vacío y error en interfaces con datos asíncronos.
 - Problemas guiados de Java con entrada, salida esperada y checklist de resolución.
 - Cobertura ampliada de problemas guiados Java para métodos, colecciones, excepciones y testing.
 - Cobertura guiada ampliada también para interfaces/herencia y primera arquitectura con Spring.
+- Mini proyectos guiados en lecciones avanzadas de Java y JavaScript para empujar hacia entregables reales.
+- Mini proyectos guiados ampliados también a varias lecciones intermedias para dar continuidad entre ejercicios y entregables.
 - Banco de práctica por familias y dificultad, adaptado a la ruta activa.
 - El banco de práctica puede filtrarse por familia, dificultad y estado.
 - El banco de práctica también puede filtrarse por tipo: función, DOM, async, consola, testing o arquitectura.

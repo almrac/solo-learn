@@ -158,7 +158,15 @@ El estado vive en `app.js` bajo `state` y contiene, al menos:
 - `JavaScript` sí tiene ejecución en navegador
 - `Java` se trabaja de momento como teoría, práctica guiada, pseudocódigo y
   diseño de ejercicios, no como ejecución real en la app
+- Las lecciones avanzadas pueden incluir mini proyectos guiados con hitos y
+  entregables
+- También conviene usar mini proyectos en lecciones intermedias cuando ayuden a
+  conectar sintaxis con entregables reales
 - `fetch` y manejo de JSON forman parte explícita del temario
+- Los estados de interfaz (`loading`, `empty`, `error`) forman parte explícita
+  de la ruta `JavaScript`
+- Hay interés explícito en reutilizar problemas simples en niveles superiores
+  para reescribirlos con mejor diseño, escalabilidad y arquitectura
 - La app es privada y pensada para una sola persona
 
 ## Deuda y siguiente foco razonable
@@ -166,10 +174,10 @@ El estado vive en `app.js` bajo `state` y contiene, al menos:
 Lo más importante que sigue faltando es ampliar la capa de “entrenamiento
 evaluable”. En términos prácticos:
 
-1. extender los ejercicios de `JavaScript` a más temas
-2. práctica de DOM con preview real
-3. ejercicios Java más estructurados con entradas, salidas y checklist
-4. mejor analítica de errores para repaso
+1. extender los ejercicios de `JavaScript` a más temas de interfaz y datos
+2. enriquecer la ruta `Java` con más práctica estructurada y proyectos
+3. mejor analítica de errores para repaso
+4. modularizar `app.js` cuando el coste de mantenimiento ya lo pida
 
 ## Reglas para futuros agentes
 

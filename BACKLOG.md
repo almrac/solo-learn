@@ -127,13 +127,37 @@ Java:
 - gestor de notas
 - mini CRUD en memoria
 
-### 10. Módulo de testing
+### 10. Ejercicios evolutivos por nivel
+
+Objetivo:
+reutilizar un problema sencillo en varios niveles y rehacerlo con mejor diseño
+y más escalabilidad.
+
+Ejemplos:
+
+- empezar con una solución básica usando `prompt`, `if` y variables simples
+- retomarlo después con funciones separadas
+- volver a plantearlo con objetos, colecciones o clases
+- en niveles altos, rediseñarlo con capas, DTOs, validación y tests si aplica
+
+Casos claros:
+
+- cálculo de salario según antigüedad
+- gestor simple de notas
+- carrito o lista de tareas
+- filtros sobre datos cargados con `fetch`
+
+Valor:
+enseña que programar bien no es solo “resolver”, sino mejorar estructura,
+legibilidad, extensibilidad y mantenibilidad según crece el problema.
+
+### 11. Módulo de testing
 
 - tests de funciones JS
 - introducción a JUnit en Java
 - casos normales y casos límite
 
-### 11. Ruta hacia backend con Spring
+### 12. Ruta hacia backend con Spring
 
 - DTOs
 - controllers
@@ -141,7 +165,7 @@ Java:
 - validación
 - endpoints REST
 
-### 12. Historial y calendario
+### 13. Historial y calendario
 
 - días estudiados
 - tiempo aproximado
@@ -149,7 +173,7 @@ Java:
 
 ## Largo plazo
 
-### 13. Sincronización opcional
+### 14. Sincronización opcional
 
 Opciones candidatas:
 
@@ -160,7 +184,7 @@ Opciones candidatas:
 
 No hacerlo hasta que el modelo de progreso esté más maduro.
 
-### 14. Refactor modular del frontend
+### 15. Refactor modular del frontend
 
 Separar claramente:
 
@@ -171,7 +195,7 @@ Separar claramente:
 - evaluación
 - persistencia
 
-### 15. Modo examen
+### 16. Modo examen
 
 - límite de tiempo
 - sin ayudas

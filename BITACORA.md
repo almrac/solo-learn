@@ -388,6 +388,48 @@ o sesión futura.
 - Las familias muestran ya porcentaje de avance y barra visual
 - El banco añade una acción rápida para restablecer filtros y orden
 
+## Fase 46 — Estados de interfaz en JavaScript
+
+- Se añadió la lección `js-ui-states`
+- La ruta JS cubre ahora de forma explícita:
+  - loading state
+  - empty state
+  - error state
+- Se añadió un ejercicio DOM evaluable para pintar esos estados con una carga async
+- La radiografía técnica también enlaza ya este concepto como parte de la app real
+
+## Fase 47 — Mini proyectos guiados
+
+- Se añadió un bloque de mini proyecto dentro de la lección activa
+- Las lecciones avanzadas pueden enseñar ahora:
+  - un objetivo de entrega
+  - hitos
+  - entregables esperados
+- Primeras lecciones cubiertas:
+  - `java-testing`
+  - `java-spring-intro`
+  - `js-components`
+  - `js-project`
+
+## Fase 48 — Backlog pedagógico de evolución por niveles
+
+- Se añadió al backlog la línea de ejercicios evolutivos
+- La idea es retomar problemas simples en niveles superiores para:
+  - separar funciones
+  - modelar mejor datos
+  - introducir clases, colecciones o capas
+  - reforzar mantenibilidad y escalabilidad
+
+## Fase 49 — Mini proyectos intermedios
+
+- La capa de mini proyectos ya no queda solo en el tramo final
+- Se añadieron briefs también para:
+  - `java-oop`
+  - `java-collections`
+  - `js-fetch-to-dom`
+  - `js-ui-states`
+- Esto mejora el puente entre práctica puntual y entregables más reales
+
 ## Fase 28 — Reglas semanales visibles
 
 - El plan diario ahora muestra reglas concretas de ritmo semanal

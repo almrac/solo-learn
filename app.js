@@ -1,6 +1,6 @@
 const STORAGE_KEY = "solo-learn-progress-v2";
 const LEGACY_STORAGE_KEY = "solo-learn-progress-v1";
-const { tracks, lessonDetails, studyPlan, exercises, javaPracticeGuides, appBlueprint } = window.LEARNING_DATA;
+const { tracks, lessonDetails, studyPlan, exercises, javaPracticeGuides, projectBriefs, appBlueprint } = window.LEARNING_DATA;
 
 const achievements = [
   {
@@ -143,6 +143,11 @@ const elements = {
   studyGuidedInput: document.querySelector("#studyGuidedInput"),
   studyGuidedOutput: document.querySelector("#studyGuidedOutput"),
   studyGuidedChecklist: document.querySelector("#studyGuidedChecklist"),
+  studyProject: document.querySelector("#studyProject"),
+  studyProjectSummary: document.querySelector("#studyProjectSummary"),
+  studyProjectOutcome: document.querySelector("#studyProjectOutcome"),
+  studyProjectMilestones: document.querySelector("#studyProjectMilestones"),
+  studyProjectDeliverables: document.querySelector("#studyProjectDeliverables"),
   markReadButton: document.querySelector("#markReadButton"),
   markPracticeButton: document.querySelector("#markPracticeButton"),
   finishLessonButton: document.querySelector("#finishLessonButton"),
@@ -776,6 +781,7 @@ function renderStudyPanel() {
   const details = lessonDetails[lesson.id];
   const exercise = exercises[lesson.id];
   const guidedProblem = javaPracticeGuides[lesson.id];
+  const projectBrief = projectBriefs[lesson.id];
   const isRead = state.readLessons.includes(lesson.id);
   const isPracticed = state.practiceDone.includes(lesson.id);
   const isCompleted = state.completed.includes(lesson.id);
@@ -803,6 +809,7 @@ function renderStudyPanel() {
   renderStudyProgress(lesson);
   renderStudyExercise(lesson, exercise, isExerciseSolved);
   renderGuidedProblem(guidedProblem);
+  renderProjectBrief(projectBrief);
 
   elements.markReadButton.textContent = isRead ? "Teoría leída" : "Marcar teoría";
   elements.markReadButton.disabled = isRead;
@@ -893,6 +900,27 @@ function renderGuidedProblem(problem) {
   elements.studyGuidedInput.textContent = problem.input;
   elements.studyGuidedOutput.textContent = problem.output;
   elements.studyGuidedChecklist.innerHTML = problem.checklist
+    .map((item) => `<li>${escapeHtml(item)}</li>`)
+    .join("");
+}
+
+function renderProjectBrief(projectBrief) {
+  if (!projectBrief) {
+    elements.studyProject.hidden = true;
+    elements.studyProjectSummary.textContent = "";
+    elements.studyProjectOutcome.textContent = "";
+    elements.studyProjectMilestones.innerHTML = "";
+    elements.studyProjectDeliverables.innerHTML = "";
+    return;
+  }
+
+  elements.studyProject.hidden = false;
+  elements.studyProjectSummary.textContent = projectBrief.summary;
+  elements.studyProjectOutcome.textContent = projectBrief.outcome;
+  elements.studyProjectMilestones.innerHTML = projectBrief.milestones
+    .map((item) => `<li>${escapeHtml(item)}</li>`)
+    .join("");
+  elements.studyProjectDeliverables.innerHTML = projectBrief.deliverables
     .map((item) => `<li>${escapeHtml(item)}</li>`)
     .join("");
 }
