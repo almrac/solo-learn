@@ -261,6 +261,28 @@ const progreso = retos.filter(r => r.done);</code></pre>
                   <button id="studyEvolutionJump" type="button">Abrir base previa</button>
                 </div>
               </div>
+              <div class="study-exercise" id="studyEvolutionCase" hidden>
+                <div class="study-exercise__header">
+                  <h3>Caso evolutivo guiado</h3>
+                  <span id="studyEvolutionCaseTag"></span>
+                </div>
+                <p id="studyEvolutionCaseSummary"></p>
+                <div class="study-guided">
+                  <div>
+                    <strong>Versión base</strong>
+                    <p id="studyEvolutionCaseBase"></p>
+                  </div>
+                  <div>
+                    <strong>Versión avanzada</strong>
+                    <p id="studyEvolutionCaseAdvanced"></p>
+                  </div>
+                </div>
+                <pre><code id="studyEvolutionCaseStarter"></code></pre>
+                <ul id="studyEvolutionCaseChecklist"></ul>
+                <div class="study__actions">
+                  <button id="studyEvolutionCaseLoad" type="button">Cargar caso en laboratorio</button>
+                </div>
+              </div>
             </div>
           </article>
         </div>
@@ -355,6 +377,12 @@ const progreso = retos.filter(r => r.done);</code></pre>
               <option value="all">Todo</option>
               <option value="evolves">Escala después</option>
               <option value="standalone">Autocontenida</option>
+            </select>
+          </label>
+          <label class="practice-bank__filter">
+            <span>Fase evolutiva</span>
+            <select id="practicePhaseFilter">
+              <option value="all">Todas</option>
             </select>
           </label>
           <label class="practice-bank__filter">

@@ -185,6 +185,12 @@ El estado vive en `app.js` bajo `state` y contiene, al menos:
 - Ese onboarding ya es adaptativo según el estado real del progreso
 - La tarjeta `Siguiente sesión` comparte ya la misma lógica de base previa /
   escalada
+- Algunas lecciones ya incluyen un `caso evolutivo guiado` como material de
+  práctica real, no solo planificación
+- El caso de salario por antigüedad ya se extiende a una tercera fase con
+  colecciones, filtros y agregados
+- Esa progresión ya se expone también en el banco mediante etiquetas de fase
+- El banco ya soporta también filtrado directo por fase evolutiva
 - La app es privada y pensada para una sola persona
 
 ## Deuda y siguiente foco razonable

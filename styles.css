@@ -261,13 +261,17 @@ button:disabled {
 
 .lessons__heading-tools {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
   gap: var(--space-3);
-  justify-items: end;
+  justify-items: stretch;
 }
 
 .lessons__sort {
   display: inline-grid;
-  gap: var(--space-1);
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: var(--space-2);
   justify-items: start;
   color: var(--muted);
   font-size: 0.92rem;
@@ -772,14 +776,22 @@ pre {
 }
 
 .section-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-5);
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: start;
+  gap: var(--space-3);
   margin-bottom: var(--space-7);
 }
 
-.section-heading > p {
-  max-width: 28.75rem;
+.section-heading > :first-child {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.section-heading > p,
+.section-heading__text {
+  max-width: 100%;
+  width: 100%;
 }
 
 .roadmap__grid,
@@ -1165,6 +1177,10 @@ pre {
   background: var(--panel);
 }
 
+.code-lab__practice > .study-exercise {
+  margin-top: 0;
+}
+
 .study-exercise__header,
 .runner__exercise-header {
   display: flex;
@@ -1197,6 +1213,17 @@ pre {
   color: var(--muted);
 }
 
+.study-exercise p,
+.study-exercise li {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.study-exercise strong {
+  color: var(--forest);
+}
+
 .study-guided {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1219,6 +1246,16 @@ pre {
   margin: var(--space-2) 0 0;
   padding-left: var(--space-4);
   color: var(--muted);
+}
+
+.study-exercise pre {
+  margin: 0;
+  overflow: auto;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  background: var(--keylime);
+  color: var(--ink);
 }
 
 .runner {
@@ -1402,6 +1439,12 @@ pre {
 .practice-card__badge {
   background: var(--slate);
   color: var(--white);
+}
+
+.practice-card__phase {
+  background: var(--panel);
+  color: var(--forest);
+  border: var(--border-width) solid var(--line);
 }
 
 .practice-card__evolution-state {

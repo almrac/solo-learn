@@ -495,6 +495,39 @@ o sesión futura.
   - progreso inicial
   - trabajo por progresión y ejercicios evolutivos
 
+## Fase 59 — Primer caso evolutivo real
+
+- Se añadió un caso evolutivo guiado sobre salario por antigüedad
+- Primeras lecciones cubiertas:
+  - `js-state`
+  - `java-oop`
+- En JavaScript el caso puede cargarse en el laboratorio
+- En Java queda como caso de diseño orientado a modelado y responsabilidad
+
+## Fase 60 — Tercera fase del caso evolutivo
+
+- El caso de salario por antigüedad se amplió a una fase de colección y resumen
+- Nuevas lecciones cubiertas:
+  - `js-components`
+  - `java-collections`
+- El foco pasa de un solo empleado a:
+  - filtrar varios empleados
+  - renderizar o resumir resultados
+  - calcular agregados globales
+
+## Fase 61 — Fase evolutiva visible en el banco
+
+- El banco de práctica muestra ya la fase del caso evolutivo
+- Fases visibles por ahora:
+  - `Base`
+  - `Refactor`
+  - `Colección y resumen`
+
+## Fase 62 — Filtro por fase evolutiva y ajuste de encabezados
+
+- El banco añade un filtro específico para entrenar por fase evolutiva
+- Se ajustó la maquetación de `.section-heading` para separar mejor bloques de texto y controles
+
 ## Fase 28 — Reglas semanales visibles
 
 - El plan diario ahora muestra reglas concretas de ritmo semanal

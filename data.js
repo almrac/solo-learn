@@ -1480,6 +1480,126 @@ function render() {
     ),
   },
 
+  evolutionCases: {
+    "js-state": evolutionCase(
+      "Base",
+      "Salario por antigüedad",
+      "Partes de un cálculo puntual con `if` y lo conviertes en una pequeña pieza de estado y renderizado.",
+      "Pides antigüedad y salario, aplicas un 20% si supera 10 años y un 10% en caso contrario.",
+      "Trabajas con varios empleados, calculas su salario ajustado con una función pura y renderizas el resultado en una lista.",
+      [
+        "Extrae una función `calculateAdjustedSalary(employee)`.",
+        "Recorre un array de empleados en vez de trabajar con una sola variable.",
+        "Devuelve una nueva estructura con salario ajustado y pinta el resultado.",
+      ],
+      `const employees = [
+  { name: "Ana", years: 12, salary: 1800 },
+  { name: "Luis", years: 4, salary: 1600 },
+];
+
+function calculateAdjustedSalary(employee) {
+  const rate = employee.years > 10 ? 0.2 : 0.1;
+  return Math.round(employee.salary * (1 + rate));
+}
+
+function buildSalarySummary(list) {
+  return list.map((employee) => ({
+    ...employee,
+    adjustedSalary: calculateAdjustedSalary(employee),
+  }));
+}`,
+      true,
+    ),
+    "js-components": evolutionCase(
+      "Colección y resumen",
+      "Salario por antigüedad",
+      "El mismo problema ya no se queda en calcular un dato: ahora filtras empleados, generas tarjetas y sacas un resumen global.",
+      "Calculas el salario ajustado de varios empleados y guardas el resultado en un array nuevo.",
+      "Filtras solo ciertos empleados, renderizas una tarjeta por cada uno y calculas el coste total ajustado para mostrarlo en la interfaz.",
+      [
+        "Reutiliza una función pura para calcular el salario ajustado.",
+        "Crea una función `renderEmployeeCard(employee)` que devuelva HTML.",
+        "Calcula un resumen global, por ejemplo el coste total ajustado o cuántos empleados superan 10 años.",
+      ],
+      `const employees = [
+  { name: "Ana", years: 12, salary: 1800, area: "Frontend" },
+  { name: "Luis", years: 4, salary: 1600, area: "Backend" },
+  { name: "Marta", years: 15, salary: 2100, area: "Frontend" },
+];
+
+function calculateAdjustedSalary(employee) {
+  const rate = employee.years > 10 ? 0.2 : 0.1;
+  return Math.round(employee.salary * (1 + rate));
+}
+
+function renderEmployeeCard(employee) {
+  return \`<li>\${employee.name} | \${employee.area} | \${calculateAdjustedSalary(employee)} EUR</li>\`;
+}
+
+function buildFrontendPayroll(list) {
+  const frontendEmployees = list.filter((employee) => employee.area === "Frontend");
+  const totalAdjusted = frontendEmployees.reduce(
+    (total, employee) => total + calculateAdjustedSalary(employee),
+    0,
+  );
+
+  return {
+    html: frontendEmployees.map(renderEmployeeCard).join(""),
+    totalAdjusted,
+  };
+}`,
+      true,
+    ),
+    "java-oop": evolutionCase(
+      "Refactor",
+      "Salario por antigüedad",
+      "El mismo problema deja de ser una condición aislada y pasa a vivir dentro de un objeto con responsabilidad clara.",
+      "Lees antigüedad y salario, aplicas una condición y escribes el resultado por consola.",
+      "Creas una clase `Employee` con atributos privados y un método `calculateAdjustedSalary()` que encapsula la regla.",
+      [
+        "Define los atributos `name`, `years` y `salary`.",
+        "Mueve la regla de subida a un método de instancia.",
+        "Evita números mágicos usando constantes o nombres expresivos.",
+      ],
+      `public class Employee {
+  private String name;
+  private int years;
+  private double salary;
+
+  public double calculateAdjustedSalary() {
+    double rate = years > 10 ? 0.20 : 0.10;
+    return salary * (1 + rate);
+  }
+}`,
+      false,
+    ),
+    "java-collections": evolutionCase(
+      "Colección y resumen",
+      "Salario por antigüedad",
+      "La regla ya está encapsulada en `Employee`; ahora el problema real es trabajar con una colección y sacar conclusiones útiles.",
+      "Cada empleado sabe calcular su salario ajustado con un método propio.",
+      "Recorres una lista de empleados, filtras por antigüedad o área, calculas salarios ajustados y produces un resumen global.",
+      [
+        "Usa `ArrayList<Employee>` como estructura principal.",
+        "Recorre la colección para acumular coste total ajustado.",
+        "Separa en métodos distintos: filtrar, resumir y mostrar resultados.",
+      ],
+      `List<Employee> employees = new ArrayList<>();
+employees.add(new Employee("Ana", 12, 1800));
+employees.add(new Employee("Luis", 4, 1600));
+employees.add(new Employee("Marta", 15, 2100));
+
+double totalAdjusted = 0;
+
+for (Employee employee : employees) {
+  totalAdjusted += employee.calculateAdjustedSalary();
+}
+
+System.out.println("Coste total ajustado: " + totalAdjusted);`,
+      false,
+    ),
+  },
+
   // Easter egg pedagógico:
   // documenta partes reales de app.js y las conecta con la ruta de estudio.
   appBlueprint: [
@@ -1648,5 +1768,18 @@ function evolutionBrief(fromLessonId, fromTitle, basicVersion, advancedVersion, 
     basicVersion,
     advancedVersion,
     upgrades,
+  };
+}
+
+function evolutionCase(phase, title, summary, baseVersion, advancedVersion, checklist, starter, canLoadRunner) {
+  return {
+    phase,
+    title,
+    summary,
+    baseVersion,
+    advancedVersion,
+    checklist,
+    starter,
+    canLoadRunner,
   };
 }

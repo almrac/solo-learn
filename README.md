@@ -35,6 +35,10 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - La sidebar incluye una guía rápida inicial para entender cómo usar la app al entrar por primera vez.
 - Esa guía inicial ya se adapta al estado real: primera vez, progreso inicial o trabajo por progresión/evolución.
 - `Siguiente sesión` ya entiende también `Base previa` y `Escalada`, no solo desbloqueos generales.
+- La lección activa puede incluir ya casos evolutivos guiados con versión base, versión avanzada y starter de código.
+- El primer caso evolutivo ya tiene también una tercera fase: pasar de un empleado individual a colecciones, filtros y resúmenes.
+- El banco de práctica muestra ya la fase evolutiva de esos casos: `Base`, `Refactor` o `Colección y resumen`.
+- El banco puede filtrarse también por fase evolutiva para entrenar solo una capa de progresión.
 - Banco de práctica por familias y dificultad, adaptado a la ruta activa.
 - El banco de práctica puede filtrarse por familia, dificultad y estado.
 - El banco de práctica también puede filtrarse por tipo: función, DOM, async, consola, testing o arquitectura.

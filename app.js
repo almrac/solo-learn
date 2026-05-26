@@ -1,6 +1,6 @@
 const STORAGE_KEY = "solo-learn-progress-v2";
 const LEGACY_STORAGE_KEY = "solo-learn-progress-v1";
-const { tracks, lessonDetails, studyPlan, exercises, javaPracticeGuides, projectBriefs, evolutionBriefs, appBlueprint } = window.LEARNING_DATA;
+const { tracks, lessonDetails, studyPlan, exercises, javaPracticeGuides, projectBriefs, evolutionBriefs, evolutionCases, appBlueprint } = window.LEARNING_DATA;
 
 const achievements = [
   {
@@ -81,6 +81,7 @@ const defaultState = {
   practiceTypeFilter: "all",
   practiceStatusFilter: "all",
   practiceEvolutionFilter: "all",
+  practicePhaseFilter: "all",
   practiceSort: "pending",
   activeLessonId: "java-variables",
   completed: [],
@@ -157,6 +158,14 @@ const elements = {
   studyEvolutionAdvanced: document.querySelector("#studyEvolutionAdvanced"),
   studyEvolutionUpgrades: document.querySelector("#studyEvolutionUpgrades"),
   studyEvolutionJump: document.querySelector("#studyEvolutionJump"),
+  studyEvolutionCase: document.querySelector("#studyEvolutionCase"),
+  studyEvolutionCaseTag: document.querySelector("#studyEvolutionCaseTag"),
+  studyEvolutionCaseSummary: document.querySelector("#studyEvolutionCaseSummary"),
+  studyEvolutionCaseBase: document.querySelector("#studyEvolutionCaseBase"),
+  studyEvolutionCaseAdvanced: document.querySelector("#studyEvolutionCaseAdvanced"),
+  studyEvolutionCaseStarter: document.querySelector("#studyEvolutionCaseStarter"),
+  studyEvolutionCaseChecklist: document.querySelector("#studyEvolutionCaseChecklist"),
+  studyEvolutionCaseLoad: document.querySelector("#studyEvolutionCaseLoad"),
   markReadButton: document.querySelector("#markReadButton"),
   markPracticeButton: document.querySelector("#markPracticeButton"),
   finishLessonButton: document.querySelector("#finishLessonButton"),
@@ -193,6 +202,7 @@ const elements = {
   practiceTypeFilter: document.querySelector("#practiceTypeFilter"),
   practiceStatusFilter: document.querySelector("#practiceStatusFilter"),
   practiceEvolutionFilter: document.querySelector("#practiceEvolutionFilter"),
+  practicePhaseFilter: document.querySelector("#practicePhaseFilter"),
   practiceSort: document.querySelector("#practiceSort"),
   practiceResetFilters: document.querySelector("#practiceResetFilters"),
   closeBlueprintButton: document.querySelector("#closeBlueprintButton"),
@@ -279,6 +289,12 @@ elements.practiceEvolutionFilter.addEventListener("change", () => {
   render();
 });
 
+elements.practicePhaseFilter.addEventListener("change", () => {
+  state.practicePhaseFilter = elements.practicePhaseFilter.value || "all";
+  persist();
+  render();
+});
+
 elements.practiceSort.addEventListener("change", () => {
   state.practiceSort = ["pending", "impact", "difficulty", "family"].includes(elements.practiceSort.value)
     ? elements.practiceSort.value
@@ -293,6 +309,7 @@ elements.practiceResetFilters.addEventListener("click", () => {
   state.practiceTypeFilter = "all";
   state.practiceStatusFilter = "all";
   state.practiceEvolutionFilter = "all";
+  state.practicePhaseFilter = "all";
   state.practiceSort = "pending";
   persist();
   render();
@@ -306,6 +323,15 @@ elements.studyEvolutionJump.addEventListener("click", () => {
   persist();
   render();
   document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
+});
+
+elements.studyEvolutionCaseLoad.addEventListener("click", () => {
+  const lessonId = elements.studyEvolutionCaseLoad.dataset.caseLesson;
+  const evolutionCase = evolutionCases[lessonId];
+  if (!lessonId || !evolutionCase?.canLoadRunner) return;
+  elements.jsRunnerInput.value = evolutionCase.starter;
+  elements.jsRunnerOutput.textContent = "Caso evolutivo cargado. Completa la transformación y ejecuta o adapta el código.";
+  document.querySelector(".runner").scrollIntoView({ behavior: "smooth" });
 });
 
 elements.focusModeButton.addEventListener("click", () => {
@@ -893,6 +919,7 @@ function renderStudyPanel() {
   const guidedProblem = javaPracticeGuides[lesson.id];
   const projectBrief = projectBriefs[lesson.id];
   const evolutionBrief = evolutionBriefs[lesson.id];
+  const evolutionCase = evolutionCases[lesson.id];
   const isRead = state.readLessons.includes(lesson.id);
   const isPracticed = state.practiceDone.includes(lesson.id);
   const isCompleted = state.completed.includes(lesson.id);
@@ -922,6 +949,7 @@ function renderStudyPanel() {
   renderGuidedProblem(guidedProblem);
   renderProjectBrief(projectBrief);
   renderEvolutionBrief(evolutionBrief);
+  renderEvolutionCase(evolutionCase, lesson.id);
 
   elements.markReadButton.textContent = isRead ? "Teoría leída" : "Marcar teoría";
   elements.markReadButton.disabled = isRead;
@@ -1058,6 +1086,35 @@ function renderEvolutionBrief(evolutionBrief) {
   elements.studyEvolutionJump.dataset.lessonBase = evolutionBrief.fromLessonId;
 }
 
+function renderEvolutionCase(evolutionCase, lessonId) {
+  if (!evolutionCase) {
+    elements.studyEvolutionCase.hidden = true;
+    elements.studyEvolutionCaseTag.textContent = "";
+    elements.studyEvolutionCaseSummary.textContent = "";
+    elements.studyEvolutionCaseBase.textContent = "";
+    elements.studyEvolutionCaseAdvanced.textContent = "";
+    elements.studyEvolutionCaseStarter.textContent = "";
+    elements.studyEvolutionCaseChecklist.innerHTML = "";
+    elements.studyEvolutionCaseLoad.dataset.caseLesson = "";
+    return;
+  }
+
+  elements.studyEvolutionCase.hidden = false;
+  elements.studyEvolutionCaseTag.textContent = `${evolutionCase.title} · ${evolutionCase.phase}`;
+  elements.studyEvolutionCaseSummary.textContent = evolutionCase.summary;
+  elements.studyEvolutionCaseBase.textContent = evolutionCase.baseVersion;
+  elements.studyEvolutionCaseAdvanced.textContent = evolutionCase.advancedVersion;
+  elements.studyEvolutionCaseStarter.textContent = evolutionCase.starter;
+  elements.studyEvolutionCaseChecklist.innerHTML = evolutionCase.checklist
+    .map((item) => `<li>${escapeHtml(item)}</li>`)
+    .join("");
+  elements.studyEvolutionCaseLoad.dataset.caseLesson = lessonId;
+  elements.studyEvolutionCaseLoad.disabled = !evolutionCase.canLoadRunner;
+  elements.studyEvolutionCaseLoad.textContent = evolutionCase.canLoadRunner
+    ? "Cargar caso en laboratorio"
+    : "Caso de diseño";
+}
+
 function renderChallenge() {
   const lesson = findLesson(state.activeLessonId) ?? visibleLessons()[0];
   if (!lesson) return;
@@ -1118,6 +1175,7 @@ function renderPracticeBank() {
           <span class="badge">${escapeHtml(entry.family)}</span>
           <span class="badge">${escapeHtml(entry.difficulty)}</span>
           ${entry.hasEvolution ? '<span class="badge practice-card__badge">Escala después</span>' : ""}
+          ${entry.evolutionPhase ? `<span class="badge practice-card__phase">${escapeHtml(entry.evolutionPhase)}</span>` : ""}
           ${entry.hasEvolution ? `<span class="badge practice-card__evolution-state">${entry.evolutionBaseCovered ? "Base cubierta" : "Base pendiente"}</span>` : ""}
           <span class="badge practice-card__status practice-card__status--${entry.progressState.key}">${escapeHtml(entry.progressState.label)}</span>
         </div>
@@ -1170,6 +1228,7 @@ function renderPracticeBankSpotlight(entries) {
         <span class="badge">${escapeHtml(recommended.family)}</span>
         <span class="badge">${escapeHtml(recommended.difficulty)}</span>
         ${recommended.hasEvolution ? '<span class="badge practice-card__badge">Escala después</span>' : ""}
+        ${recommended.evolutionPhase ? `<span class="badge practice-card__phase">${escapeHtml(recommended.evolutionPhase)}</span>` : ""}
         ${recommended.hasEvolution ? `<span class="badge practice-card__evolution-state">${recommended.evolutionBaseCovered ? "Base cubierta" : "Base pendiente"}</span>` : ""}
         <span class="badge">${escapeHtml(recommended.progressState.label)}</span>
       </div>
@@ -1189,6 +1248,7 @@ function renderPracticeBankFilters(entries) {
   const families = ["all", ...new Set(entries.map((entry) => entry.family))];
   const difficulties = ["all", ...new Set(entries.map((entry) => entry.difficulty))];
   const types = ["all", ...new Set(entries.map((entry) => entry.practiceType))];
+  const phases = ["all", ...new Set(entries.map((entry) => entry.evolutionPhase).filter(Boolean))];
 
   elements.practiceFamilyFilter.innerHTML = families
     .map((family) => `<option value="${escapeHtml(family)}">${family === "all" ? "Todas" : escapeHtml(family)}</option>`)
@@ -1198,6 +1258,9 @@ function renderPracticeBankFilters(entries) {
     .join("");
   elements.practiceTypeFilter.innerHTML = types
     .map((type) => `<option value="${escapeHtml(type)}">${type === "all" ? "Todos" : escapeHtml(type)}</option>`)
+    .join("");
+  elements.practicePhaseFilter.innerHTML = phases
+    .map((phase) => `<option value="${escapeHtml(phase)}">${phase === "all" ? "Todas" : escapeHtml(phase)}</option>`)
     .join("");
 
   elements.practiceFamilyFilter.value = families.includes(state.practiceFamilyFilter)
@@ -1211,6 +1274,9 @@ function renderPracticeBankFilters(entries) {
     : "all";
   elements.practiceStatusFilter.value = state.practiceStatusFilter;
   elements.practiceEvolutionFilter.value = state.practiceEvolutionFilter;
+  elements.practicePhaseFilter.value = phases.includes(state.practicePhaseFilter)
+    ? state.practicePhaseFilter
+    : "all";
   elements.practiceSort.value = state.practiceSort;
 }
 
@@ -1228,8 +1294,11 @@ function filterPracticeBankEntries(entries) {
       state.practiceEvolutionFilter === "all" ||
       (state.practiceEvolutionFilter === "evolves" && entry.hasEvolution) ||
       (state.practiceEvolutionFilter === "standalone" && !entry.hasEvolution);
+    const phaseMatch =
+      state.practicePhaseFilter === "all" ||
+      entry.evolutionPhase === state.practicePhaseFilter;
 
-    return familyMatch && difficultyMatch && typeMatch && statusMatch && evolutionMatch;
+    return familyMatch && difficultyMatch && typeMatch && statusMatch && evolutionMatch && phaseMatch;
   });
 }
 
@@ -2582,6 +2651,9 @@ function normalizeState(value) {
   const practiceEvolutionFilter = ["all", "evolves", "standalone"].includes(value?.practiceEvolutionFilter)
     ? value.practiceEvolutionFilter
     : defaultState.practiceEvolutionFilter;
+  const practicePhaseFilter = typeof value?.practicePhaseFilter === "string"
+    ? value.practicePhaseFilter
+    : defaultState.practicePhaseFilter;
   const practiceSort = ["pending", "impact", "difficulty", "family"].includes(value?.practiceSort)
     ? value.practiceSort
     : defaultState.practiceSort;
@@ -2596,6 +2668,7 @@ function normalizeState(value) {
     practiceTypeFilter,
     practiceStatusFilter,
     practiceEvolutionFilter,
+    practicePhaseFilter,
     practiceSort,
     activeLessonId: trackLessonIds.includes(value?.activeLessonId)
       ? value.activeLessonId
@@ -2716,6 +2789,7 @@ function getPracticeBankEntries(trackId) {
           target: "practice",
           isDone: state.solvedExercises.includes(lessonId),
           hasEvolution: Boolean(evolution),
+          evolutionPhase: evolutionCases[lessonId]?.phase ?? "",
           evolutionBaseLessonId: evolution?.fromLessonId ?? "",
           evolutionSourceTitle: evolution?.fromTitle ?? "",
           evolutionBaseCovered: evolution ? isLessonCovered(evolution.fromLessonId) : false,
@@ -2744,6 +2818,7 @@ function getPracticeBankEntries(trackId) {
         target: "study",
         isDone: state.practiceDone.includes(lessonId) || state.completed.includes(lessonId),
         hasEvolution: Boolean(evolution),
+        evolutionPhase: evolutionCases[lessonId]?.phase ?? "",
         evolutionBaseLessonId: evolution?.fromLessonId ?? "",
         evolutionSourceTitle: evolution?.fromTitle ?? "",
         evolutionBaseCovered: evolution ? isLessonCovered(evolution.fromLessonId) : false,
