@@ -545,6 +545,33 @@ o sesión futura.
 - El resumen por fase evolutiva marca ahora cuál concentra más deuda útil
 - La prioridad pondera más lo empezado que lo completamente nuevo
 
+## Fase 66 — Apoyo mental por lección
+
+- Se añadió una capa pedagógica breve a cada lección
+- Cada lección puede mostrar:
+  - idea clave
+  - lógica
+  - mnemotecnia
+  - error típico
+
+## Fase 67 — Foco mental en el plan diario
+
+- Cada tarea del plan de hoy muestra ahora su foco principal
+- Focos usados por ahora:
+  - `Concepto`
+  - `Logica`
+  - `Error tipico`
+  - `Transferencia`
+
+## Fase 68 — Patron de dificultad predominante
+
+- La app detecta ahora si domina:
+  - deuda conceptual
+  - deuda de logica
+  - arrastre de error tipico
+  - transferencia pendiente
+- Esa señal ya ajusta `Siguiente sesión` y aparece también en el `Plan de hoy`
+
 ## Fase 28 — Reglas semanales visibles
 
 - El plan diario ahora muestra reglas concretas de ritmo semanal

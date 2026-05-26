@@ -539,6 +539,36 @@ function render() {
     ),
   },
 
+  learningSupports: {
+    "java-variables": support("Tipo = significado del dato.", "Primero decide que representa; luego elige el tipo.", "texto String, entero int, decimal double, si/no boolean.", "Elegir tipos por costumbre y no por significado."),
+    "java-methods": support("Un metodo es una tarea con nombre.", "Divide el problema en pasos pequenos reutilizables.", "entrada -> proceso -> return.", "Meter toda la logica en main."),
+    "java-control": support("Controlar es decidir y repetir.", "if decide, switch elige, for y while repiten.", "si / caso / repetir.", "Condiciones duplicadas o mal ordenadas."),
+    "java-arrays": support("Un array guarda muchos datos del mismo tipo.", "Indice para acceder, bucle para recorrer.", "caja de casillas numeradas.", "Salirte del indice valido."),
+    "java-oop": support("Una clase modela una cosa del dominio.", "Datos privados, comportamiento publico.", "sustantivo + acciones.", "Crear clases que solo guardan datos y no expresan comportamiento."),
+    "java-inheritance": support("Herencia reutiliza; interfaz expresa capacidad.", "Pregunta primero que sabe hacer, no de quien hereda.", "es-un vs puede-hacer.", "Usar herencia donde bastaba una interfaz."),
+    "java-collections": support("Colecciones = datos que crecen.", "List ordena, Set evita repetidos, Map busca por clave.", "lista / unicos / clave-valor.", "Seguir usando arrays cuando el problema ya pide dinamismo."),
+    "java-exceptions": support("Excepcion = flujo de error separado.", "Valida antes; captura solo lo que sepas tratar.", "try lo intenta, catch lo explica.", "Capturar Exception para todo y ocultar el problema."),
+    "java-testing": support("Test = confianza para cambiar.", "Caso normal, borde y error minimo.", "preparar / ejecutar / comprobar.", "Probar demasiado a la vez."),
+    "java-spring-intro": support("Spring separa HTTP, reglas y datos.", "Controller recibe, Service decide, Repository persiste.", "entra / decide / guarda.", "Meter toda la logica dentro del controller."),
+    "js-values": support("Una variable guarda estado temporal.", "Const para fijo, let para cambio, funcion para reuse.", "const quieto, let cambia.", "Usar variables globales por comodidad."),
+    "js-objects": support("Objeto = una cosa con propiedades.", "Array agrupa; objeto nombra.", "lista de cosas, cosa con nombre.", "Confundir cuando usar array y cuando objeto."),
+    "js-array-methods": support("Transformar datos es trabajo real de JS.", "map transforma, filter descarta, reduce resume.", "map/filter/reduce = transformar/filtrar/resumir.", "Usar map cuando querias filter o viceversa."),
+    "js-render-lists": support("Frontend = datos a HTML.", "Recibe array, conviertelo en etiquetas, inserta.", "array -> map -> join -> DOM.", "Pintar dentro del bucle en vez de construir una salida clara."),
+    "js-dom": support("El DOM es la pagina como objetos.", "Selecciona, escucha, cambia.", "buscar / escuchar / actualizar.", "No guardar referencia al nodo que usas varias veces."),
+    "js-forms": support("Formulario = entrada con validacion.", "Lee datos, limpia texto, valida, muestra feedback.", "leer / validar / responder.", "Confiar en que el usuario siempre escribira bien."),
+    "js-async": support("Async espera trabajo lento.", "Primero espera, luego transforma, despues muestra.", "await = para aqui hasta tener dato.", "Olvidar try/catch y dejar fallos mudos."),
+    "js-json-to-dom": support("JSON ya parseado tambien necesita seleccion.", "No pintes todo: filtra antes de renderizar.", "leer / filtrar / pintar.", "Recorrer la estructura sin entender su forma."),
+    "js-fetch-to-dom": support("Fetch a DOM = flujo frontend completo.", "Carga, filtra, transforma y renderiza.", "traer / elegir / mostrar.", "Pintar antes de tener realmente los datos."),
+    "js-ui-states": support("Una UI buena explica que pasa.", "Carga, vacio y error son parte del flujo, no excepciones raras.", "cargando / vacio / error / datos.", "Pensar solo en el caso feliz."),
+    "js-json-fetch": support("Fetch + JSON = datos reales de trabajo.", "Respuesta -> json() -> array -> transformacion.", "fetch / json / items.", "Querer usar la respuesta sin convertirla."),
+    "js-modules": support("Modulo = responsabilidad separada.", "Cada archivo deberia tener una razon clara para existir.", "exporta poco, importa justo.", "Crear modulos arbitrarios sin frontera real."),
+    "js-state": support("Estado = lo que la app sabe ahora.", "Cambias datos, luego repintas interfaz.", "state -> render.", "Modificar cosas por varios sitios sin control."),
+    "js-data-to-dom": support("Datos a DOM es una tuberia.", "Filtra, transforma, inserta.", "entrada -> decision -> salida.", "Mezclar demasiadas decisiones dentro del template."),
+    "js-testing": support("Testear es aislar comportamiento.", "Primero prueba funciones puras; luego UI.", "caso normal / borde / error.", "Querer probar interfaz compleja sin separar logica."),
+    "js-components": support("Componente = pieza reutilizable con datos claros.", "Recibe datos, devuelve interfaz coherente.", "pieza pequena repetible.", "Crear componentes que saben demasiado."),
+    "js-project": support("Proyecto = integrar todo con criterio.", "Arquitectura simple, datos reales, errores tratados, deploy.", "funciona / se entiende / se mantiene.", "Perseguir features antes de cerrar un flujo completo."),
+  },
+
   // El roadmap une varias lecciones en fases de estudio más grandes.
   studyPlan: [
     {
@@ -1781,5 +1811,14 @@ function evolutionCase(phase, title, summary, baseVersion, advancedVersion, chec
     checklist,
     starter,
     canLoadRunner,
+  };
+}
+
+function support(concept, logic, mnemonic, mistake) {
+  return {
+    concept,
+    logic,
+    mnemonic,
+    mistake,
   };
 }

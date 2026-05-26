@@ -1,6 +1,6 @@
 const STORAGE_KEY = "solo-learn-progress-v2";
 const LEGACY_STORAGE_KEY = "solo-learn-progress-v1";
-const { tracks, lessonDetails, studyPlan, exercises, javaPracticeGuides, projectBriefs, evolutionBriefs, evolutionCases, appBlueprint } = window.LEARNING_DATA;
+const { tracks, lessonDetails, learningSupports, studyPlan, exercises, javaPracticeGuides, projectBriefs, evolutionBriefs, evolutionCases, appBlueprint } = window.LEARNING_DATA;
 
 const achievements = [
   {
@@ -131,6 +131,7 @@ const elements = {
   studyLevel: document.querySelector("#studyLevel"),
   studyTitle: document.querySelector("#studyTitle"),
   studyTheory: document.querySelector("#studyTheory"),
+  studySupport: document.querySelector("#studySupport"),
   studySteps: document.querySelector("#studySteps"),
   studyProgress: document.querySelector("#studyProgress"),
   studyNotes: document.querySelector("#studyNotes"),
@@ -733,6 +734,7 @@ function getQuickstartGuide() {
 
 function renderNextSession() {
   const recommendation = recommendNextSession();
+  const pattern = getLearningDifficultyPattern();
   if (!recommendation) {
     elements.nextSession.innerHTML = `
       <p class="eyebrow">Siguiente sesión</p>
@@ -748,6 +750,7 @@ function renderNextSession() {
     <p class="eyebrow">Siguiente sesión</p>
     <h3>${nextLesson.title}</h3>
     <p>${track.label} · ${nextLesson.level} · ${nextLesson.xp} XP</p>
+    ${pattern ? `<p><strong>Foco actual:</strong> ${escapeHtml(pattern.label)}.</p>` : ""}
     <p><strong>${recommendation.kind}:</strong> ${escapeHtml(recommendation.reason)}</p>
     <button type="button" data-lesson-id="${nextLesson.id}" data-target="${recommendation.target}">${recommendation.target === "practice" ? "Abrir práctica" : "Abrir lección"}</button>
   `;
@@ -783,6 +786,7 @@ function renderDailyQueue() {
   const doneToday = state.dailyQueueLog[todayKey] ?? [];
   const sessionCompletedToday = state.completedDailySessions.includes(todayKey);
   const sessionProfile = getDailySessionProfile(queue);
+  const pattern = getLearningDifficultyPattern();
   const saturation = getDailySaturationState(
     allLessons()
       .filter((lesson) => exercises[lesson.id] && !state.solvedExercises.includes(lesson.id))
@@ -805,6 +809,7 @@ function renderDailyQueue() {
     <p class="eyebrow">Plan de hoy</p>
     <h3>${queue.length} ${queue.length === 1 ? "paso recomendado" : "pasos recomendados"}</h3>
     <p><strong>${sessionProfile.label}:</strong> ${sessionProfile.description}</p>
+    ${renderDifficultyPatternNotice(pattern)}
     ${renderSaturationNotice(saturation)}
     <p>${doneToday.length}/${queue.length} pasos marcados hoy</p>
     ${doneToday.length >= queue.length ? `<p>${sessionCompletedToday ? "Sesion de hoy cerrada." : "Sesion lista para cerrar."}</p>` : ""}
@@ -816,6 +821,7 @@ function renderDailyQueue() {
           <div class="daily-queue__item">
             <button type="button" data-lesson-id="${item.lesson.id}" data-target="${item.target}">
               <span class="daily-queue__kind">${item.kind}</span>
+              <span class="daily-queue__focus">${item.focus}</span>
               ${item.lesson.title}
               <small>${item.reason}</small>
             </button>
@@ -916,6 +922,7 @@ function renderStudyPanel() {
   if (!lesson) return;
 
   const details = lessonDetails[lesson.id];
+  const support = learningSupports[lesson.id];
   const exercise = exercises[lesson.id];
   const guidedProblem = javaPracticeGuides[lesson.id];
   const projectBrief = projectBriefs[lesson.id];
@@ -931,6 +938,7 @@ function renderStudyPanel() {
   elements.studyLevel.className = `eyebrow language-mark language-mark--${getTrackIdByLesson(lesson.id)}`;
   elements.studyTitle.textContent = lesson.title;
   elements.studyTheory.textContent = details.theory;
+  renderStudySupport(support);
   elements.studySteps.innerHTML = details.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("");
   elements.studyLanguage.textContent = tracks[getTrackIdByLesson(lesson.id)].label;
   elements.studyExample.textContent = details.example;
@@ -1007,6 +1015,34 @@ function renderStudyProgress(lesson) {
       `;
     })
     .join("");
+}
+
+function renderStudySupport(support) {
+  if (!support) {
+    elements.studySupport.innerHTML = "";
+    elements.studySupport.hidden = true;
+    return;
+  }
+
+  elements.studySupport.hidden = false;
+  elements.studySupport.innerHTML = `
+    <article class="study-support__card">
+      <strong>Idea clave</strong>
+      <p>${escapeHtml(support.concept)}</p>
+    </article>
+    <article class="study-support__card">
+      <strong>Logica</strong>
+      <p>${escapeHtml(support.logic)}</p>
+    </article>
+    <article class="study-support__card">
+      <strong>Mnemotecnia</strong>
+      <p>${escapeHtml(support.mnemonic)}</p>
+    </article>
+    <article class="study-support__card">
+      <strong>Error tipico</strong>
+      <p>${escapeHtml(support.mistake)}</p>
+    </article>
+  `;
 }
 
 function renderStudyExercise(lesson, exercise, isSolved) {
@@ -2088,6 +2124,35 @@ function recommendNextLesson() {
 }
 
 function recommendNextSession() {
+  const pattern = getLearningDifficultyPattern();
+  const failedLessons = state.failedChallenges
+    .filter((lessonId) => !state.solvedChallenges.includes(lessonId))
+    .map((lessonId) => findLesson(lessonId))
+    .filter(Boolean)
+    .sort((left, right) => scoreLessonRecommendation(right).score - scoreLessonRecommendation(left).score);
+  const pendingExercises = allLessons()
+    .filter((lesson) => exercises[lesson.id] && !state.solvedExercises.includes(lesson.id))
+    .filter((lesson) => state.readLessons.includes(lesson.id) || state.practiceDone.includes(lesson.id))
+    .sort((left, right) => scoreLessonRecommendation(right).score - scoreLessonRecommendation(left).score);
+
+  if (pattern?.key === "error" && failedLessons.length) {
+    return {
+      lesson: failedLessons[0],
+      kind: "Repaso",
+      target: "study",
+      reason: "Ahora mismo el atasco dominante es de error típico. Corregir ese arrastre te dará más retorno que abrir una pieza nueva.",
+    };
+  }
+
+  if (pattern?.key === "logic" && pendingExercises.length) {
+    return {
+      lesson: pendingExercises[0],
+      kind: "Tests",
+      target: "practice",
+      reason: "Ahora mismo predomina deuda de lógica. Conviene cerrar una práctica ya empezada y validar comportamiento.",
+    };
+  }
+
   const readyEvolutionTargets = Object.entries(evolutionBriefs)
     .filter(([lessonId]) => getTrackIdByLesson(lessonId) === state.activeTrack)
     .map(([lessonId, evolution]) => ({
@@ -2144,6 +2209,46 @@ function recommendNextSession() {
   };
 }
 
+function getLearningDifficultyPattern() {
+  const conceptDebt = allLessons()
+    .filter((lesson) => getTrackIdByLesson(lesson.id) === state.activeTrack)
+    .filter((lesson) => !state.readLessons.includes(lesson.id) && !state.completed.includes(lesson.id))
+    .length;
+  const logicDebt = allLessons()
+    .filter((lesson) => getTrackIdByLesson(lesson.id) === state.activeTrack)
+    .filter((lesson) => state.readLessons.includes(lesson.id) && !state.practiceDone.includes(lesson.id) && !state.solvedExercises.includes(lesson.id))
+    .length;
+  const errorDebt = state.failedChallenges
+    .filter((lessonId) => !state.solvedChallenges.includes(lessonId))
+    .map((lessonId) => findLesson(lessonId))
+    .filter((lesson) => lesson && getTrackIdByLesson(lesson.id) === state.activeTrack)
+    .length;
+  const transferDebt = Object.entries(evolutionBriefs)
+    .filter(([lessonId]) => getTrackIdByLesson(lessonId) === state.activeTrack)
+    .filter(([lessonId, evolution]) => isLessonCovered(evolution.fromLessonId) && !isLessonCovered(lessonId))
+    .length;
+
+  const candidates = [
+    { key: "concept", label: "deuda conceptual", count: conceptDebt },
+    { key: "logic", label: "deuda de logica", count: logicDebt * 2 },
+    { key: "error", label: "arrastre de error tipico", count: errorDebt * 3 },
+    { key: "transfer", label: "transferencia pendiente", count: transferDebt * 2 },
+  ].sort((left, right) => right.count - left.count);
+
+  return candidates[0]?.count ? candidates[0] : null;
+}
+
+function renderDifficultyPatternNotice(pattern) {
+  if (!pattern) return "";
+
+  return `
+    <div class="daily-queue__notice daily-queue__notice--focus">
+      <strong>Foco mental dominante: ${escapeHtml(pattern.label)}.</strong>
+      <p>La recomendación intenta reducir primero ese tipo de atasco.</p>
+    </div>
+  `;
+}
+
 // Esta puntuación mezcla varias señales:
 // conceptos que desbloquea, continuidad con la ruta activa
 // y progreso parcial ya hecho.
@@ -2188,7 +2293,14 @@ function buildDailyQueue() {
   const addItem = (lesson, kind, reason, target = "study", priority = 0) => {
     if (!lesson || seen.has(lesson.id)) return;
     seen.add(lesson.id);
-    items.push({ lesson, kind, reason, target, priority });
+    items.push({
+      lesson,
+      kind,
+      reason,
+      target,
+      priority,
+      focus: getLearningFocus(lesson, kind),
+    });
   };
 
   const recommendation = recommendNextLesson();
@@ -2411,6 +2523,17 @@ function determineDailySessionMode({ recommendation, evolutionBaseLessons, ready
   if (pendingExercises.length >= 2) return "consolidation";
   if (recommendation) return "unlock";
   return "mixed";
+}
+
+function getLearningFocus(lesson, kind) {
+  if (kind === "Repaso") return "Error tipico";
+  if (kind === "Escalada") return "Transferencia";
+  if (kind === "Base previa") return "Concepto";
+  if (kind === "Tests") return "Logica";
+
+  if (!state.readLessons.includes(lesson.id)) return "Concepto";
+  if (!state.practiceDone.includes(lesson.id)) return "Logica";
+  return "Transferencia";
 }
 
 function getDailySessionProfile(queue) {
