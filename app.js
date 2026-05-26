@@ -84,6 +84,8 @@ const defaultState = {
   practiceDone: [],
   solvedExercises: [],
   notes: {},
+  dailyQueueLog: {},
+  completedDailySessions: [],
   lastStudyDate: null,
   streak: 0,
   xp: 0,
@@ -105,6 +107,7 @@ const elements = {
   progressBar: document.querySelector("#progressBar"),
   trackProgress: document.querySelector("#trackProgress"),
   nextSession: document.querySelector("#nextSession"),
+  dailyQueue: document.querySelector("#dailyQueue"),
   reviewBox: document.querySelector("#reviewBox"),
   activeTrack: document.querySelector("#activeTrack"),
   focusModeButton: document.querySelector("#focusModeButton"),
@@ -243,6 +246,32 @@ elements.nextSession.addEventListener("click", (event) => {
   openLesson(button.dataset.lessonId);
   persist();
   render();
+  document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
+});
+
+elements.dailyQueue.addEventListener("click", (event) => {
+  const doneButton = event.target.closest("[data-daily-done]");
+  if (doneButton) {
+    markDailyQueueItemDone(doneButton.dataset.dailyDone);
+    persist();
+    render();
+    return;
+  }
+
+  const button = event.target.closest("button");
+  if (!button) return;
+
+  saveCurrentNotes();
+  openLesson(button.dataset.lessonId);
+  persist();
+  render();
+
+  if (button.dataset.target === "practice") {
+    loadActiveExercise();
+    document.querySelector(".runner").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+
   document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
 });
 
@@ -441,6 +470,7 @@ function render() {
   elements.progressBar.style.width = `${progress}%`;
   renderTrackProgress();
   renderNextSession();
+  renderDailyQueue();
   renderReviewBox();
 
   elements.tabs.forEach((tab) => {
@@ -538,6 +568,60 @@ function renderReviewBox() {
         return `<button type="button" data-lesson-id="${lesson.id}">${lesson.title}</button>`;
       })
       .join("")}
+  `;
+}
+
+function renderDailyQueue() {
+  const queue = buildDailyQueue();
+  const todayKey = getTodayKey();
+  const doneToday = state.dailyQueueLog[todayKey] ?? [];
+  const sessionCompletedToday = state.completedDailySessions.includes(todayKey);
+  const sessionProfile = getDailySessionProfile(queue);
+  const saturation = getDailySaturationState(
+    allLessons()
+      .filter((lesson) => exercises[lesson.id] && !state.solvedExercises.includes(lesson.id))
+      .filter((lesson) => state.readLessons.includes(lesson.id) || state.practiceDone.includes(lesson.id)),
+    state.failedChallenges
+      .filter((lessonId) => !state.solvedChallenges.includes(lessonId))
+      .map((lessonId) => findLesson(lessonId))
+      .filter(Boolean),
+  );
+  if (!queue.length) {
+    elements.dailyQueue.innerHTML = `
+      <p class="eyebrow">Plan de hoy</p>
+      <h3>Sesión libre</h3>
+      <p>Hoy no hay bloqueos críticos. Puedes avanzar por la ruta o repetir práctica.</p>
+    `;
+    return;
+  }
+
+  elements.dailyQueue.innerHTML = `
+    <p class="eyebrow">Plan de hoy</p>
+    <h3>${queue.length} ${queue.length === 1 ? "paso recomendado" : "pasos recomendados"}</h3>
+    <p><strong>${sessionProfile.label}:</strong> ${sessionProfile.description}</p>
+    ${renderSaturationNotice(saturation)}
+    <p>${doneToday.length}/${queue.length} pasos marcados hoy</p>
+    ${doneToday.length >= queue.length ? `<p>${sessionCompletedToday ? "Sesion de hoy cerrada." : "Sesion lista para cerrar."}</p>` : ""}
+    ${queue
+      .map((item) => {
+        const itemKey = dailyQueueItemKey(item);
+        const isDone = doneToday.includes(itemKey);
+        return `
+          <div class="daily-queue__item">
+            <button type="button" data-lesson-id="${item.lesson.id}" data-target="${item.target}">
+              <span class="daily-queue__kind">${item.kind}</span>
+              ${item.lesson.title}
+              <small>${item.reason}</small>
+            </button>
+            <div class="daily-queue__actions">
+              <span class="daily-queue__state">${isDone ? "Hecho hoy" : "Pendiente hoy"}</span>
+              <button class="daily-queue__done" type="button" data-daily-done="${itemKey}">${isDone ? "Marcado" : "Marcar"}</button>
+            </div>
+          </div>
+        `;
+      })
+      .join("")}
+    ${renderDailySessionFooter(queue.length, doneToday.length, sessionCompletedToday)}
   `;
 }
 
@@ -1461,15 +1545,18 @@ function scoreLessonRecommendation(lesson) {
   const unlockedConcepts = lessonBlueprints.filter((item) => blueprintPrerequisites(item).pending.length === 0).length;
   const blockedConcepts = appBlueprint.filter((item) => (item.prerequisites ?? []).includes(lesson.id));
   const blockedPending = blockedConcepts.filter((item) => blueprintPrerequisites(item).pending.some((entry) => entry.id === lesson.id));
+  const weeklyRules = getWeeklyPacingRules();
   const sameTrackBonus = getTrackIdByLesson(lesson.id) === state.activeTrack ? 1 : 0;
   const readBonus = state.readLessons.includes(lesson.id) ? 1 : 0;
   const practiceBonus = state.practiceDone.includes(lesson.id) ? 1 : 0;
+  const advancedPenalty = !weeklyRules.allowAdvanced && lesson.level === "Avanzado" ? 4 : 0;
   const score =
     unlockedConcepts * 5 +
     blockedPending.length * 4 +
     sameTrackBonus * 2 +
     readBonus +
-    practiceBonus;
+    practiceBonus -
+    advancedPenalty;
 
   let reason = "Siguiente paso natural dentro de la ruta.";
   if (blockedPending.length) {
@@ -1485,6 +1572,264 @@ function scoreLessonRecommendation(lesson) {
     score,
     reason,
   };
+}
+
+function buildDailyQueue() {
+  const items = [];
+  const seen = new Set();
+
+  const addItem = (lesson, kind, reason, target = "study", priority = 0) => {
+    if (!lesson || seen.has(lesson.id)) return;
+    seen.add(lesson.id);
+    items.push({ lesson, kind, reason, target, priority });
+  };
+
+  const recommendation = recommendNextLesson();
+  const pendingExercises = allLessons()
+    .filter((lesson) => exercises[lesson.id] && !state.solvedExercises.includes(lesson.id))
+    .filter((lesson) => state.readLessons.includes(lesson.id) || state.practiceDone.includes(lesson.id))
+    .sort((left, right) => scoreLessonRecommendation(right).score - scoreLessonRecommendation(left).score);
+
+  const failedLessons = state.failedChallenges
+    .filter((lessonId) => !state.solvedChallenges.includes(lessonId))
+    .map((lessonId) => findLesson(lessonId))
+    .filter(Boolean)
+    .sort((left, right) => scoreLessonRecommendation(right).score - scoreLessonRecommendation(left).score);
+
+  const saturation = getDailySaturationState(pendingExercises, failedLessons);
+  const sessionMode = determineDailySessionMode({
+    recommendation,
+    pendingExercises,
+    failedLessons,
+    saturation,
+  });
+
+  if (sessionMode === "review") {
+    failedLessons.slice(0, 2).forEach((lesson) => {
+      addItem(
+        lesson,
+        "Repaso",
+        "Tienes un reto fallado pendiente. Repetirlo ahora reduce olvido y arrastre.",
+        "study",
+        30,
+      );
+    });
+    pendingExercises.slice(0, 1).forEach((lesson) => {
+      addItem(
+        lesson,
+        "Tests",
+        "Después del repaso, conviene cerrar una práctica que ya está arrancada.",
+        "practice",
+        20,
+      );
+    });
+  } else if (sessionMode === "consolidation") {
+    pendingExercises.slice(0, 3).forEach((lesson) => {
+      addItem(
+        lesson,
+        "Tests",
+        "Ya empezaste esta lección. Cerrar el ejercicio consolida mejor el concepto.",
+        "practice",
+        30,
+      );
+    });
+  } else if (sessionMode === "unlock" && !saturation.blockNewTheory) {
+    if (recommendation) {
+      addItem(recommendation.lesson, "Desbloqueo", recommendation.reason, "study", 30);
+    }
+    pendingExercises.slice(0, 1).forEach((lesson) => {
+      addItem(
+        lesson,
+        "Tests",
+        "Añadir una validación práctica evita que el desbloqueo se quede solo en teoría.",
+        "practice",
+        15,
+      );
+    });
+  } else {
+    if (recommendation && !saturation.blockNewTheory) {
+      addItem(recommendation.lesson, "Desbloqueo", recommendation.reason, "study", 30);
+    }
+    pendingExercises.slice(0, 1).forEach((lesson) => {
+      addItem(
+        lesson,
+        "Tests",
+        "Ya empezaste esta lección. Cerrar el ejercicio consolida mejor el concepto.",
+        "practice",
+        20,
+      );
+    });
+    failedLessons.slice(0, 1).forEach((lesson) => {
+      addItem(
+        lesson,
+        "Repaso",
+        "Revisar un fallo reciente te ayuda a no arrastrarlo a la siguiente fase.",
+        "study",
+        10,
+      );
+    });
+  }
+
+  // Si faltan huecos, rellenamos con la mejor mezcla posible sin duplicar lecciones.
+  if (recommendation && !saturation.blockNewTheory) {
+    addItem(recommendation.lesson, "Desbloqueo", recommendation.reason, "study", 12);
+  }
+  pendingExercises.slice(0, 2).forEach((lesson) => {
+    addItem(
+      lesson,
+      "Tests",
+      "Cerrar una práctica abierta mantiene la sesión productiva.",
+      "practice",
+      11,
+    );
+  });
+  failedLessons.slice(0, 2).forEach((lesson) => {
+    addItem(
+      lesson,
+      "Repaso",
+      "Un repaso corto evita que el error se convierta en hábito.",
+      "study",
+      10,
+    );
+  });
+
+  return items
+    .sort((left, right) => right.priority - left.priority)
+    .slice(0, 3);
+}
+
+function determineDailySessionMode({ recommendation, pendingExercises, failedLessons, saturation }) {
+  if (saturation.blockNewTheory && failedLessons.length >= 1) return "review";
+  if (saturation.blockNewTheory) return "consolidation";
+  if (failedLessons.length >= 2) return "review";
+  if (pendingExercises.length >= 2) return "consolidation";
+  if (recommendation) return "unlock";
+  return "mixed";
+}
+
+function getDailySessionProfile(queue) {
+  const kinds = queue.map((item) => item.kind);
+  const counts = {
+    desbloqueo: kinds.filter((kind) => kind === "Desbloqueo").length,
+    tests: kinds.filter((kind) => kind === "Tests").length,
+    repaso: kinds.filter((kind) => kind === "Repaso").length,
+  };
+
+  if (counts.repaso >= 2) {
+    return {
+      label: "Sesion de repaso",
+      description: "Hoy conviene reparar errores recientes antes de seguir ampliando temas nuevos.",
+    };
+  }
+
+  if (counts.tests >= 2) {
+    return {
+      label: "Sesion de consolidacion",
+      description: "La prioridad es cerrar prácticas empezadas y convertir comprensión parcial en soltura.",
+    };
+  }
+
+  if (counts.desbloqueo >= 1 && counts.tests >= 1) {
+    return {
+      label: "Sesion mixta",
+      description: "Combina avance conceptual con validación práctica para no dejar huecos al crecer.",
+    };
+  }
+
+  if (counts.desbloqueo >= 1) {
+    return {
+      label: "Sesion de desbloqueo",
+      description: "Hoy toca estudiar piezas que abren más comprensión del proyecto completo.",
+    };
+  }
+
+  if (counts.tests >= 1) {
+    return {
+      label: "Practica intensiva",
+      description: "El foco está en resolver y validar código, no en abrir teoría nueva.",
+    };
+  }
+
+  return {
+    label: "Sesion ligera",
+    description: "Mantén continuidad sin forzar volumen: una pequeña mejora sigue contando.",
+  };
+}
+
+function getDailySaturationState(pendingExercises, failedLessons) {
+  const openPracticeDebt = pendingExercises.length;
+  const reviewDebt = failedLessons.length;
+  const blockNewTheory = openPracticeDebt >= 3 || reviewDebt >= 2;
+
+  return {
+    openPracticeDebt,
+    reviewDebt,
+    blockNewTheory,
+  };
+}
+
+function renderSaturationNotice(saturation) {
+  if (!saturation.blockNewTheory) return "";
+
+  const reasons = [];
+  if (saturation.openPracticeDebt >= 3) {
+    reasons.push(`${saturation.openPracticeDebt} practicas abiertas`);
+  }
+  if (saturation.reviewDebt >= 2) {
+    reasons.push(`${saturation.reviewDebt} repasos pendientes`);
+  }
+
+  return `
+    <div class="daily-queue__notice">
+      <strong>Hoy no conviene abrir teoria nueva.</strong>
+      <p>La cola prioriza cierre y repaso por deuda acumulada: ${escapeHtml(reasons.join(" y "))}.</p>
+    </div>
+  `;
+}
+
+function markDailyQueueItemDone(itemKey) {
+  const todayKey = getTodayKey();
+  const current = new Set(state.dailyQueueLog[todayKey] ?? []);
+
+  if (current.has(itemKey)) {
+    current.delete(itemKey);
+  } else {
+    current.add(itemKey);
+  }
+
+  state.dailyQueueLog[todayKey] = [...current];
+  pruneDailyQueueLog();
+  maybeCompleteDailySession();
+}
+
+function dailyQueueItemKey(item) {
+  return `${item.kind}:${item.lesson.id}:${item.target}`;
+}
+
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function pruneDailyQueueLog() {
+  const entries = Object.entries(state.dailyQueueLog)
+    .sort(([left], [right]) => right.localeCompare(left))
+    .slice(0, 14);
+  state.dailyQueueLog = Object.fromEntries(entries);
+}
+
+function maybeCompleteDailySession() {
+  const todayKey = getTodayKey();
+  const queue = buildDailyQueue();
+  if (!queue.length) return;
+
+  const doneToday = state.dailyQueueLog[todayKey] ?? [];
+  const allDone = queue.every((item) => doneToday.includes(dailyQueueItemKey(item)));
+  if (!allDone || state.completedDailySessions.includes(todayKey)) return;
+
+  state.completedDailySessions.unshift(todayKey);
+  state.completedDailySessions = state.completedDailySessions.slice(0, 14);
+  state.xp += 30;
+  recordStudyDay();
 }
 
 elements.blueprintGrid.addEventListener("click", (event) => {
@@ -1555,6 +1900,8 @@ function normalizeState(value) {
     practiceDone: cleanIds(value?.practiceDone, lessonIds),
     solvedExercises: cleanIds(value?.solvedExercises, lessonIds),
     notes: cleanNotes(value?.notes, lessonIds),
+    dailyQueueLog: cleanDailyQueueLog(value?.dailyQueueLog, lessonIds),
+    completedDailySessions: cleanDateArray(value?.completedDailySessions),
     lastStudyDate: typeof value?.lastStudyDate === "string" ? value.lastStudyDate : null,
     streak: Number.isFinite(value?.streak) ? Math.max(0, value.streak) : 0,
     xp: Number.isFinite(value?.xp) ? Math.max(0, value.xp) : 0,
@@ -1585,6 +1932,8 @@ function createDefaultState() {
     practiceDone: [],
     solvedExercises: [],
     notes: {},
+    dailyQueueLog: {},
+    completedDailySessions: [],
     lastStudyDate: null,
     streak: 0,
   };
@@ -1613,4 +1962,174 @@ function formatExerciseMismatch(expected, received) {
   }
 
   return `<p>Esperado: ${escapeHtml(formatConsoleValue(expected))}</p><p>Recibido: ${escapeHtml(formatConsoleValue(received))}</p>`;
+}
+
+function cleanDailyQueueLog(value, validIds) {
+  if (!value || typeof value !== "object") return {};
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([dateKey, items]) => typeof dateKey === "string" && Array.isArray(items))
+      .map(([dateKey, items]) => [
+        dateKey,
+        items.filter((item) => {
+          if (typeof item !== "string") return false;
+          const [, lessonId] = item.split(":");
+          return validIds.includes(lessonId);
+        }).slice(0, 10),
+      ])
+      .slice(0, 14),
+  );
+}
+
+function cleanDateArray(value) {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item) => typeof item === "string").slice(0, 14);
+}
+
+function renderDailySessionFooter(totalSteps, doneSteps, sessionCompletedToday) {
+  const history = state.completedDailySessions.slice(0, 5);
+  const weeklyProfile = getWeeklyStudyProfile();
+  const weeklyRules = getWeeklyPacingRules();
+
+  return `
+    <div class="daily-queue__footer">
+      <p>${sessionCompletedToday ? "Has ganado 30 XP por cerrar la sesión de hoy." : totalSteps && doneSteps >= totalSteps ? "Al marcar todo, ganas 30 XP extra hoy." : "Cierra la sesión diaria para ganar 30 XP extra."}</p>
+      <div class="daily-queue__weekly">
+        <strong>${weeklyProfile.label}</strong>
+        <p>${weeklyProfile.description}</p>
+        <p class="daily-queue__weekly-tip">${weeklyProfile.tip}</p>
+        <div class="daily-queue__weekly-rules">
+          <span>${weeklyRules.maxNewTheory} teoria nueva</span>
+          <span>${weeklyRules.maxPractice} practica foco</span>
+          <span>${weeklyRules.maxReview} repaso foco</span>
+          <span>${weeklyRules.allowAdvanced ? "Avanzado permitido" : "Avanzado mejor no"}</span>
+        </div>
+      </div>
+      ${
+        history.length
+          ? `<div class="daily-queue__history">
+              <strong>Ultimas sesiones</strong>
+              <div class="daily-queue__history-list">
+                ${history.map((day) => `<span>${escapeHtml(day)}</span>`).join("")}
+              </div>
+            </div>`
+          : ""
+      }
+    </div>
+  `;
+}
+
+function getWeeklyStudyProfile() {
+  const { closedCount, saturation } = getWeeklyContext();
+
+  if (saturation.blockNewTheory && closedCount <= 2) {
+    return {
+      label: "Semana de contencion",
+      description: "Conviene reducir frentes abiertos, cerrar práctica pendiente y recuperar ritmo antes de ampliar temario.",
+      tip: "No abras lecciones nuevas avanzadas. Prioriza una práctica y un repaso por sesión.",
+    };
+  }
+
+  if (saturation.blockNewTheory) {
+    return {
+      label: "Semana de limpieza",
+      description: "Vas estudiando, pero ahora mismo la prioridad semanal es vaciar deuda práctica y repasos abiertos.",
+      tip: "Mantén teoría nueva al mínimo hasta bajar la deuda de tests y repasos.",
+    };
+  }
+
+  if (closedCount >= 5) {
+    return {
+      label: "Semana fuerte",
+      description: "La constancia está alta. Puedes sostener avance nuevo sin perder demasiada calidad de práctica.",
+      tip: "Puedes permitirte una sesión de desbloqueo, pero cierra práctica el mismo día.",
+    };
+  }
+
+  if (closedCount >= 3) {
+    return {
+      label: "Semana estable",
+      description: "Hay buena continuidad. Mantén sesiones cortas pero cerradas para seguir sumando sin saturarte.",
+      tip: "Apunta a una lección principal y una validación práctica por sesión.",
+    };
+  }
+
+  return {
+    label: "Semana de reenganche",
+    description: "La prioridad no es volumen, sino recuperar ritmo con pasos pequeños y sesiones completas.",
+    tip: "Evita abrir varios frentes. Cierra una sola tarea útil cada día.",
+  };
+}
+
+function getRecentDateKeys(days) {
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - index);
+    return date.toISOString().slice(0, 10);
+  });
+}
+
+function getWeeklyPacingRules() {
+  const profile = getWeeklyStudyProfile();
+
+  if (profile.label === "Semana de contencion") {
+    return {
+      maxNewTheory: 0,
+      maxPractice: 1,
+      maxReview: 2,
+      allowAdvanced: false,
+    };
+  }
+
+  if (profile.label === "Semana de limpieza") {
+    return {
+      maxNewTheory: 0,
+      maxPractice: 2,
+      maxReview: 1,
+      allowAdvanced: false,
+    };
+  }
+
+  if (profile.label === "Semana fuerte") {
+    return {
+      maxNewTheory: 1,
+      maxPractice: 1,
+      maxReview: 1,
+      allowAdvanced: true,
+    };
+  }
+
+  if (profile.label === "Semana estable") {
+    return {
+      maxNewTheory: 1,
+      maxPractice: 1,
+      maxReview: 1,
+      allowAdvanced: true,
+    };
+  }
+
+  return {
+    maxNewTheory: 1,
+    maxPractice: 1,
+    maxReview: 1,
+    allowAdvanced: false,
+  };
+}
+
+function getWeeklyContext() {
+  const lastSevenDays = getRecentDateKeys(7);
+  const closedCount = lastSevenDays.filter((day) => state.completedDailySessions.includes(day)).length;
+  const pendingExercises = allLessons()
+    .filter((lesson) => exercises[lesson.id] && !state.solvedExercises.includes(lesson.id))
+    .filter((lesson) => state.readLessons.includes(lesson.id) || state.practiceDone.includes(lesson.id));
+  const failedLessons = state.failedChallenges.filter((lessonId) => !state.solvedChallenges.includes(lessonId));
+  const saturation = getDailySaturationState(pendingExercises, failedLessons);
+
+  return {
+    closedCount,
+    pendingExercises,
+    failedLessons,
+    saturation,
+  };
 }

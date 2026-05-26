@@ -14,11 +14,25 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - Ejercicios evaluables de JavaScript con tests automáticos en varias lecciones.
 - Preview DOM con HTML de prueba para practicar `DOM` y `formularios`.
 - Validación de renderizado de listas y contadores dentro del preview DOM.
+- Lección específica y ejercicio evaluable para `map`, `filter` y `reduce`.
+- Lección puente para pintar listas desde datos con ejercicio DOM evaluable.
+- Lección integradora para pasar de datos filtrados a interfaz renderizada.
+- Lección específica para pasar de JSON local ya parseado a interfaz renderizada.
 - Easter egg técnico con una radiografía de `app.js` y su relación con la ruta de aprendizaje.
 - La radiografía técnica puede abrir directamente la lección o la práctica relacionada.
 - La radiografía detecta base cubierta o pendiente para cada bloque técnico.
 - La recomendación de siguiente sesión prioriza lecciones que desbloquean más partes del proyecto.
 - El panel de lecciones puede ordenarse por impacto técnico.
+- La sidebar incluye un plan de hoy con desbloqueos, tests pendientes y repaso.
+- El plan de hoy permite marcar pasos como hechos y cerrar la sesión diaria.
+- Cerrar la sesión diaria otorga XP extra y deja rastro en un historial corto.
+- El plan de hoy clasifica la sesión: desbloqueo, consolidación, repaso o práctica intensiva.
+- El tipo de sesión ya modifica la prioridad real de la cola diaria.
+- La cola reduce teoría nueva cuando arrastras demasiada práctica o repaso pendiente.
+- Cuando ocurre esa protección, la UI lo explica dentro del propio Plan de hoy.
+- El pie del plan diario añade una lectura semanal ligera: reenganche, estable, fuerte o limpieza.
+- Esa lectura semanal incluye también una recomendación concreta de ritmo.
+- También expone reglas visibles de ritmo semanal y suaviza la prioridad de lecciones avanzadas si toca contener carga.
 - Métricas de progreso total, progreso por lenguaje y racha diaria.
 - Siguiente sesión recomendada para mantener avance diario.
 - Lección activa claramente destacada con pasos de teoría, práctica, reto y cierre.

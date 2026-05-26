@@ -76,6 +76,16 @@ learningRoot.LEARNING_DATA = {
           "Métodos de array",
           "Datos anidados",
         ], "¿Qué estructura guarda pares propiedad-valor?", ["Objeto", "String", "Boolean"], "Objeto"),
+        lesson("js-array-methods", "Base", "map, filter y reduce", 55, [
+          "Transformar arrays",
+          "Filtrar elementos",
+          "Acumular resultados",
+        ], "¿Qué método usarías para quedarte solo con algunos elementos de un array?", ["map", "filter", "reduce"], "filter"),
+        lesson("js-render-lists", "Base", "Pintar listas desde datos", 65, [
+          "Convertir datos en HTML",
+          "innerHTML",
+          "Listas dinámicas",
+        ], "¿Qué propiedad suele usarse para insertar una cadena HTML dentro de un elemento?", ["textContent", "innerHTML", "dataset"], "innerHTML"),
         lesson("js-dom", "Base", "DOM y eventos", 60, [
           "querySelector",
           "addEventListener",
@@ -91,6 +101,11 @@ learningRoot.LEARNING_DATA = {
           "async / await",
           "Consumo de APIs",
         ], "¿Qué palabra permite esperar una Promise dentro de una función async?", ["await", "yield", "return"], "await"),
+        lesson("js-json-to-dom", "Intermedio", "JSON local a interfaz", 100, [
+          "Leer estructura de datos",
+          "Filtrar items útiles",
+          "Pintar resultados en DOM",
+        ], "Si ya tienes un objeto JSON convertido a JavaScript, ¿qué parte sueles recorrer para pintar una lista?", ["response", "items", "status"], "items"),
         lesson("js-json-fetch", "Intermedio", "JSON local con fetch", 95, [
           "fetch a un archivo JSON",
           "Recorrer arrays de objetos",
@@ -106,6 +121,11 @@ learningRoot.LEARNING_DATA = {
           "localStorage",
           "Renderizado",
         ], "¿Dónde guarda esta app tu progreso en el navegador?", ["localStorage", "session cookie", "Base de datos remota"], "localStorage"),
+        lesson("js-data-to-dom", "Intermedio", "De datos a interfaz", 105, [
+          "Filtrar datos",
+          "Transformar arrays",
+          "Pintar resultados",
+        ], "Si quieres mostrar solo algunos items antes de pintarlos, ¿qué método suele ser el paso natural?", ["filter", "trim", "split"], "filter"),
         lesson("js-testing", "Avanzado", "Testing de funciones e interfaz", 115, [
           "Funciones puras",
           "Casos límite",
@@ -287,6 +307,37 @@ xp = sumarXp(xp, 25);`,
 const aprobadas = estudiante.notas.filter((nota) => nota >= 5);`,
       "Crea un array de tareas con título y completada. Filtra solo las pendientes.",
     ),
+    "js-array-methods": details(
+      "Los métodos de array son una base real de trabajo en JavaScript moderno. map transforma datos, filter descarta lo que no necesitas y reduce acumula un resultado final sin tener que montar bucles manuales en cada caso.",
+      ["Usa map para transformar cada elemento.", "Usa filter para quedarte solo con los válidos.", "Usa reduce para contar, sumar o agrupar."],
+      `const tareas = [
+  { title: "Repasar arrays", done: false, xp: 20 },
+  { title: "Practicar DOM", done: true, xp: 35 },
+  { title: "Leer sobre fetch", done: false, xp: 25 },
+];
+
+const pendingTitles = tareas
+  .filter((task) => !task.done)
+  .map((task) => task.title);
+
+const totalXp = tareas.reduce((sum, task) => sum + task.xp, 0);`,
+      "Crea un resumen a partir de un array de tareas: cuántas están pendientes, qué títulos están completados y cuánto XP total suman.",
+    ),
+    "js-render-lists": details(
+      "Una gran parte del frontend consiste en convertir datos en interfaz. El patrón típico es: recibir un array, transformarlo con map y luego insertar el resultado dentro de una lista o contenedor.",
+      ["Selecciona el contenedor donde pintarás la lista.", "Transforma cada objeto en una cadena HTML.", "Une las cadenas e insértalas con innerHTML."],
+      `const lessons = [
+  { title: "map y filter", level: "Base" },
+  { title: "DOM y eventos", level: "Base" },
+];
+
+const html = lessons
+  .map((lesson) => \`<li>\${lesson.title} · \${lesson.level}</li>\`)
+  .join("");
+
+document.querySelector("#lessonList").innerHTML = html;`,
+      "Recibe un array de items y pinta una lista HTML dentro de un `<ul>` usando title, language y level.",
+    ),
     "js-dom": details(
       "El DOM es la representación de la página que JavaScript puede leer y modificar. La clave es seleccionar elementos, escuchar eventos y actualizar la interfaz.",
       ["Selecciona un elemento.", "Escucha un evento click.", "Actualiza texto o clases para reflejar el cambio."],
@@ -323,6 +374,24 @@ boton.addEventListener("click", () => {
   }
 }`,
       "Carga datos de una API pública y pinta en pantalla un campo concreto de la respuesta.",
+    ),
+    "js-json-to-dom": details(
+      "Este paso junta lectura de JSON ya disponible, filtrado de datos y renderizado en pantalla. Es una versión muy cercana a trabajo frontend real, pero sin añadir todavía la complejidad extra de la red.",
+      ["Recibe un objeto con un array items.", "Filtra los elementos que sí quieres mostrar.", "Transforma cada item en HTML y píntalo en una lista."],
+      `const data = {
+  items: [
+    { title: "map y filter", language: "JavaScript", level: "Base", featured: true },
+    { title: "Spring", language: "Java", level: "Avanzado", featured: false },
+  ],
+};
+
+const html = data.items
+  .filter((item) => item.featured)
+  .map((item) => \`<li>\${item.title} | \${item.language} | \${item.level}</li>\`)
+  .join("");
+
+document.querySelector("#featuredList").innerHTML = html;`,
+      "Recibe un objeto data con items, muestra solo los featured y pinta title, language y level en el DOM.",
     ),
     "js-json-fetch": details(
       "Un archivo JSON local te permite practicar consumo de datos sin depender de una API externa. La clave es entender la forma de los datos: objetos con propiedades, arrays de objetos y propiedades anidadas.",
@@ -363,6 +432,22 @@ import { calcularNivel } from "./progreso.js";`,
 
 localStorage.setItem("progreso", JSON.stringify(state));`,
       "Guarda una lista de lecciones completadas en localStorage y recupérala al recargar.",
+    ),
+    "js-data-to-dom": details(
+      "Aquí se junta el flujo típico de muchas apps frontend: recibes datos, decides cuáles mostrar, los conviertes en HTML y actualizas la interfaz. Si este paso lo dominas, luego fetch, filtros y componentes encajan mucho mejor.",
+      ["Filtra el array para decidir qué items entran.", "Transforma cada item en una cadena HTML.", "Inserta el resultado dentro del contenedor correcto."],
+      `const items = [
+  { title: "map y filter", language: "JavaScript", visible: true },
+  { title: "Clases y objetos", language: "Java", visible: false },
+];
+
+const html = items
+  .filter((item) => item.visible)
+  .map((item) => \`<li>\${item.title} | \${item.language}</li>\`)
+  .join("");
+
+document.querySelector("#resultList").innerHTML = html;`,
+      "Recibe un array de items, muestra solo los visibles y pinta una lista con title, language y level dentro del DOM.",
     ),
     "js-testing": details(
       "Probar JavaScript empieza por funciones puras y casos límite. Después puedes pasar a probar interacción de usuario con herramientas específicas.",
@@ -409,19 +494,19 @@ function render() {
       dates: "Junio · Semanas 1-2",
       title: "Base sin agujeros",
       goal: "Sintaxis, funciones, arrays, métodos y control de flujo en ambos lenguajes.",
-      lessonIds: ["java-variables", "java-methods", "java-control", "java-arrays", "js-values", "js-objects"],
+      lessonIds: ["java-variables", "java-methods", "java-control", "java-arrays", "js-values", "js-objects", "js-array-methods"],
     },
     {
       dates: "Junio · Semanas 3-4",
       title: "Interfaz y modelo mental",
       goal: "DOM, formularios y primeras clases para empezar a construir cosas pequeñas.",
-      lessonIds: ["js-dom", "js-forms", "java-oop", "java-inheritance"],
+      lessonIds: ["js-render-lists", "js-dom", "js-forms", "java-oop", "java-inheritance"],
     },
     {
       dates: "Julio",
       title: "Construcción real",
       goal: "Colecciones, estado, módulos, asincronía y pequeños proyectos semanales.",
-      lessonIds: ["java-collections", "java-exceptions", "js-async", "js-json-fetch", "js-modules", "js-state"],
+      lessonIds: ["java-collections", "java-exceptions", "js-async", "js-json-to-dom", "js-json-fetch", "js-modules", "js-state", "js-data-to-dom"],
     },
     {
       dates: "Agosto",
@@ -486,6 +571,97 @@ function render() {
             { title: "DOM", completada: true },
           ]],
           expected: [],
+        },
+      ],
+    }),
+    "js-array-methods": exercise({
+      prompt: "Implementa `crearResumenTareas(tareas)` usando `filter`, `map` y `reduce`.",
+      checklist: [
+        "Devuelve un objeto con pendingCount, completedTitles y totalXp.",
+        "pendingCount debe contar tareas no completadas.",
+        "completedTitles debe contener solo títulos completados.",
+        "totalXp debe sumar el xp de todas las tareas.",
+      ],
+      starter: `function crearResumenTareas(tareas) {
+  return {
+    pendingCount: 0,
+    completedTitles: [],
+    totalXp: 0,
+  };
+}`,
+      functionName: "crearResumenTareas",
+      tests: [
+        {
+          label: "Resume pendientes, completadas y XP total",
+          args: [[
+            { title: "Repasar arrays", done: false, xp: 20 },
+            { title: "Practicar DOM", done: true, xp: 35 },
+            { title: "Leer fetch", done: false, xp: 25 },
+            { title: "Cerrar reto", done: true, xp: 10 },
+          ]],
+          expected: {
+            pendingCount: 2,
+            completedTitles: ["Practicar DOM", "Cerrar reto"],
+            totalXp: 90,
+          },
+        },
+        {
+          label: "Funciona con arrays vacíos",
+          args: [[]],
+          expected: {
+            pendingCount: 0,
+            completedTitles: [],
+            totalXp: 0,
+          },
+        },
+      ],
+    }),
+    "js-render-lists": exercise({
+      mode: "dom",
+      prompt: "Implementa `renderizarLessons(items)` para pintar una lista en `#lessonList` a partir de un array de objetos.",
+      checklist: [
+        "Recibe un array de objetos con title, language y level.",
+        "Genera un `<li>` por item.",
+        "Inserta el HTML dentro de `#lessonList`.",
+      ],
+      starterHtml: `<section>
+  <h1>Lecciones</h1>
+  <ul id="lessonList"></ul>
+</section>`,
+      starter: `function renderizarLessons(items) {
+  // Convierte los datos en <li> y píntalos en #lessonList.
+}`,
+      functionName: "renderizarLessons",
+      tests: [
+        {
+          label: "Pinta tantos li como items recibe",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarLessons",
+              args: [[
+                { title: "map y filter", language: "JavaScript", level: "Base" },
+                { title: "Clases y objetos", language: "Java", level: "Intermedio" },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#lessonList li", expected: 2 },
+            { type: "text", selector: "#lessonList li:first-child", expected: "map y filter | JavaScript | Base" },
+          ],
+        },
+        {
+          label: "Deja la lista vacía si no hay datos",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarLessons",
+              args: [[]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#lessonList li", expected: 0 },
+          ],
         },
       ],
     }),
@@ -625,6 +801,115 @@ function render() {
           assertions: [
             { type: "count", selector: "#taskList li", expected: 2 },
             { type: "text", selector: "#taskCount", expected: "Pendientes: 0" },
+          ],
+        },
+      ],
+    }),
+    "js-data-to-dom": exercise({
+      mode: "dom",
+      prompt: "Implementa `renderizarItemsVisibles(items)` para filtrar, transformar y pintar solo los items visibles dentro de `#resultList`.",
+      checklist: [
+        "Filtra solo items con visible === true.",
+        "Genera un `<li>` por item usando title, language y level.",
+        "Inserta el resultado en `#resultList` con innerHTML.",
+      ],
+      starterHtml: `<section>
+  <h1>Items visibles</h1>
+  <ul id="resultList"></ul>
+</section>`,
+      starter: `function renderizarItemsVisibles(items) {
+  // Filtra, transforma y pinta en #resultList.
+}`,
+      functionName: "renderizarItemsVisibles",
+      tests: [
+        {
+          label: "Pinta solo los visibles",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "map y filter", language: "JavaScript", level: "Base", visible: true },
+                { title: "Clases y objetos", language: "Java", level: "Intermedio", visible: false },
+                { title: "JSON local", language: "JavaScript", level: "Intermedio", visible: true },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#resultList li", expected: 2 },
+            { type: "text", selector: "#resultList li:first-child", expected: "map y filter | JavaScript | Base" },
+            { type: "text", selector: "#resultList li:last-child", expected: "JSON local | JavaScript | Intermedio" },
+          ],
+        },
+        {
+          label: "Deja la lista vacía si nada es visible",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "Spring", language: "Java", level: "Avanzado", visible: false },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#resultList li", expected: 0 },
+          ],
+        },
+      ],
+    }),
+    "js-json-to-dom": exercise({
+      mode: "dom",
+      prompt: "Implementa `renderizarDestacados(data)` para leer `data.items`, filtrar solo los featured y pintarlos en `#featuredList`.",
+      checklist: [
+        "Lee `data.items` desde el objeto recibido.",
+        "Filtra solo los items con featured === true.",
+        "Pinta title, language y level dentro de `<li>` en `#featuredList`.",
+      ],
+      starterHtml: `<section>
+  <h1>Items destacados</h1>
+  <ul id="featuredList"></ul>
+</section>`,
+      starter: `function renderizarDestacados(data) {
+  // Lee data.items, filtra los destacados y píntalos en #featuredList.
+}`,
+      functionName: "renderizarDestacados",
+      tests: [
+        {
+          label: "Pinta solo los featured",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  { title: "map y filter", language: "JavaScript", level: "Base", featured: true },
+                  { title: "Clases y objetos", language: "Java", level: "Intermedio", featured: false },
+                  { title: "JSON local", language: "JavaScript", level: "Intermedio", featured: true },
+                ],
+              }],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#featuredList li", expected: 2 },
+            { type: "text", selector: "#featuredList li:first-child", expected: "map y filter | JavaScript | Base" },
+          ],
+        },
+        {
+          label: "No pinta nada si ningún item es featured",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  { title: "Spring", language: "Java", level: "Avanzado", featured: false },
+                ],
+              }],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#featuredList li", expected: 0 },
           ],
         },
       ],

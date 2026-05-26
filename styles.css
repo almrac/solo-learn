@@ -523,6 +523,7 @@ pre {
 }
 
 .next-session,
+.daily-queue,
 .review-box {
   display: grid;
   gap: var(--space-2);
@@ -531,11 +532,16 @@ pre {
   background: var(--mint-kiss);
 }
 
+.daily-queue {
+  background: var(--java-bg);
+}
+
 .review-box {
   background: var(--keylime);
 }
 
 .next-session h3,
+.daily-queue h3,
 .review-box h3 {
   margin: 0;
   color: var(--forest);
@@ -544,6 +550,7 @@ pre {
 }
 
 .next-session p:not(.eyebrow),
+.daily-queue p:not(.eyebrow),
 .review-box p:not(.eyebrow) {
   margin: 0;
   color: var(--muted);
@@ -552,6 +559,7 @@ pre {
 }
 
 .next-session button,
+.daily-queue button,
 .review-box button {
   min-height: 2.5rem;
   border: var(--border-width) solid var(--forest);
@@ -564,6 +572,160 @@ pre {
 .review-box button {
   padding: var(--space-2) var(--space-3);
   text-align: left;
+}
+
+.daily-queue button {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+}
+
+.daily-queue__item {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.daily-queue__kind {
+  color: var(--white);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.daily-queue button small {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.daily-queue__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.daily-queue__state {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.daily-queue__done {
+  min-height: 2.25rem;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  padding: 0 var(--space-3);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.daily-queue__footer {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: var(--border-width) solid rgba(38, 58, 99, 0.12);
+}
+
+.daily-queue__notice {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--border-width) solid rgba(232, 112, 79, 0.42);
+  border-radius: var(--radius);
+  background: var(--mint-kiss);
+}
+
+.daily-queue__notice strong {
+  color: var(--forest);
+  font-size: 0.88rem;
+}
+
+.daily-queue__notice p {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.daily-queue__footer p {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.daily-queue__history {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.daily-queue__weekly {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--border-width) solid rgba(38, 58, 99, 0.14);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.daily-queue__weekly strong {
+  color: var(--forest);
+  font-size: 0.88rem;
+}
+
+.daily-queue__weekly p {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.daily-queue__weekly-tip {
+  color: var(--forest);
+  font-weight: 700;
+}
+
+.daily-queue__weekly-rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.daily-queue__weekly-rules span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-3);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.daily-queue__history strong {
+  color: var(--forest);
+  font-size: 0.86rem;
+}
+
+.daily-queue__history-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.daily-queue__history-list span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-3);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
 }
 
 .storage-tools__input {
@@ -602,10 +764,15 @@ pre {
 }
 
 .roadmap__grid,
-.lessons__grid,
 .achievements__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14.5rem, 1fr));
+  gap: var(--space-5);
+}
+
+.lessons__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-5);
 }
 
@@ -988,6 +1155,10 @@ pre {
   justify-content: space-between;
 }
 
+.runner__exercise-header h3 {
+  color: var(--white);
+}
+
 .study-exercise__header span,
 .runner__exercise-header span {
   border-radius: var(--radius-pill);
@@ -1341,6 +1512,12 @@ pre {
 
 .focus-mode .study {
   margin-top: var(--space-10);
+}
+
+@media (max-width: 75rem) {
+  .lessons__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 53.75rem) {

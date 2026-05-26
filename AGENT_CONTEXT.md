@@ -68,6 +68,11 @@ La app ya incluye:
 - práctica de `fetch` contra JSON local
 - primera versión de ejercicios evaluables con tests automáticos en lecciones
   de `JavaScript`
+- el temario ya incluye una lección específica de transformación de datos con
+  `map`, `filter` y `reduce`
+- el temario ya incluye un paso puente de renderizado de listas desde datos
+- el temario ya incluye una lección integradora de datos -> transformación -> DOM
+- el temario ya incluye un paso explícito de JSON local ya parseado -> DOM
 - preview DOM con `iframe` aislado para ejercicios de interfaz
 - validación de listas renderizadas y contadores en ejercicios DOM
 - panel oculto tipo easter egg que documenta conceptos reales de `app.js`
@@ -75,6 +80,16 @@ La app ya incluye:
 - el panel técnico muestra prerequisitos ya cubiertos o aún pendientes
 - la recomendación de siguiente sesión ya usa dependencias técnicas, no solo orden lineal
 - el listado de lecciones soporta ordenación por impacto técnico
+- la sidebar incluye una cola diaria corta basada en impacto, tests y repaso
+- la cola diaria guarda marcados por fecha para cerrar una sesión de estudio
+- cerrar la sesión diaria concede XP y se guarda en un historial breve
+- el plan diario deriva un tipo de sesión según la mezcla real de tareas
+- el tipo de sesión diaria ya afecta al orden y composición de la cola
+- hay protección contra saturación: si la deuda práctica es alta, baja la teoría nueva
+- la UI del plan diario muestra un aviso explícito cuando se bloquea teoría nueva
+- el pie del plan diario incluye una lectura semanal derivada de sesiones cerradas y deuda actual
+- la lectura semanal incluye una recomendación práctica de ritmo para esa semana
+- la lectura semanal expone reglas visibles y puede penalizar ligeramente lecciones avanzadas
 
 ## Convenciones de implementación
 

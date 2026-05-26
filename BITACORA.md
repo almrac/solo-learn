@@ -182,6 +182,116 @@ o sesión futura.
   - orden por impacto técnico
 - Las tarjetas pueden mostrar por qué una lección tiene prioridad cuando se usa ese modo
 
+## Fase 19 — Cola diaria inteligente
+
+- La sidebar ahora incluye un bloque "Plan de hoy"
+- La cola combina tres señales:
+  - desbloqueo técnico del proyecto
+  - ejercicios evaluables empezados pero no cerrados
+  - retos fallados pendientes de repaso
+- Cada elemento abre directamente la lección o la práctica correspondiente
+
+## Fase 20 — Cierre de sesión diaria
+
+- Los pasos del "Plan de hoy" pueden marcarse como hechos
+- El estado se guarda por fecha dentro del progreso
+- La cola muestra cuándo la sesión del día ha quedado cerrada
+
+## Fase 21 — Recompensa e historial de sesiones
+
+- Cerrar el plan diario concede 30 XP una sola vez por día
+- Se guarda un historial breve de sesiones diarias cerradas
+- La cola muestra tanto la recompensa como los últimos días completados
+
+## Fase 22 — Tipos de sesión diaria
+
+- El bloque "Plan de hoy" ahora clasifica la sesión actual
+- Tipos añadidos:
+  - desbloqueo
+  - consolidación
+  - repaso
+  - práctica intensiva
+  - mixta
+- La clasificación se calcula a partir de la composición real de la cola
+
+## Fase 23 — Cola adaptada al tipo de sesión
+
+- El tipo de sesión ya no es solo descriptivo
+- Ahora modifica la cola diaria:
+  - `repaso` sube errores recientes
+  - `consolidación` prioriza ejercicios abiertos
+  - `desbloqueo` deja arriba piezas con más impacto técnico
+  - `mixta` combina avance, práctica y repaso
+
+## Fase 24 — Protección contra saturación
+
+- La cola detecta deuda de práctica y repaso abierta
+- Si la deuda es alta, reduce o bloquea teoría nueva en la sesión del día
+- El objetivo es evitar abrir más frentes de los que luego se pueden cerrar
+
+## Fase 25 — Aviso visible de saturación
+
+- El bloque "Plan de hoy" ahora explica cuándo se está bloqueando teoría nueva
+- El aviso indica si la causa es deuda de práctica, repaso o ambas
+
+## Fase 26 — Lectura semanal ligera
+
+- El pie del plan diario ahora resume la tendencia de la semana
+- Estados añadidos:
+  - reenganche
+  - estable
+  - fuerte
+  - contención
+  - limpieza
+- La lectura mezcla sesiones cerradas recientes y deuda práctica actual
+
+## Fase 27 — Recomendación semanal de ritmo
+
+- Cada estado semanal ahora añade una instrucción accionable
+- Ejemplos:
+  - evitar teoría avanzada nueva
+  - priorizar una práctica y un repaso
+  - permitir una sesión de desbloqueo si la semana viene fuerte
+
+## Fase 29 — Profundización en transformación de datos
+
+- Se añadió la lección `js-array-methods`
+- La ruta ahora cubre de forma explícita:
+  - `map`
+  - `filter`
+  - `reduce`
+- Se añadió un ejercicio evaluable para resumir tareas a partir de arrays de objetos
+
+## Fase 30 — Puente entre datos y DOM
+
+- Se añadió la lección `js-render-lists`
+- Esta lección cubre el paso intermedio entre transformar datos y pintarlos en interfaz
+- Se añadió un ejercicio DOM evaluable para renderizar `<li>` a partir de arrays de objetos
+
+## Fase 31 — Lección integradora de datos a interfaz
+
+- Se añadió la lección `js-data-to-dom`
+- Esta pieza une:
+  - filtrado
+  - transformación
+  - renderizado en el DOM
+- Se añadió un ejercicio DOM evaluable para pintar solo items visibles
+
+## Fase 32 — JSON local a interfaz
+
+- Se añadió la lección `js-json-to-dom`
+- Esta pieza cubre el paso entre JSON ya convertido a objeto y renderizado en pantalla
+- Se añadió un ejercicio DOM evaluable para filtrar items destacados y pintarlos en una lista
+
+## Fase 28 — Reglas semanales visibles
+
+- El plan diario ahora muestra reglas concretas de ritmo semanal
+- Ejemplos:
+  - cuánta teoría nueva conviene abrir
+  - cuánta práctica o repaso focalizar
+  - si esta semana conviene evitar contenido avanzado
+- Estas reglas también ajustan ligeramente la priorización de lecciones
+
 ## Estado actual resumido
 
 Hoy la app tiene:
