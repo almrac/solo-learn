@@ -1,6 +1,6 @@
 const STORAGE_KEY = "solo-learn-progress-v2";
 const LEGACY_STORAGE_KEY = "solo-learn-progress-v1";
-const { tracks, lessonDetails, studyPlan, exercises, javaPracticeGuides, projectBriefs, appBlueprint } = window.LEARNING_DATA;
+const { tracks, lessonDetails, studyPlan, exercises, javaPracticeGuides, projectBriefs, evolutionBriefs, appBlueprint } = window.LEARNING_DATA;
 
 const achievements = [
   {
@@ -80,6 +80,7 @@ const defaultState = {
   practiceDifficultyFilter: "all",
   practiceTypeFilter: "all",
   practiceStatusFilter: "all",
+  practiceEvolutionFilter: "all",
   practiceSort: "pending",
   activeLessonId: "java-variables",
   completed: [],
@@ -148,6 +149,12 @@ const elements = {
   studyProjectOutcome: document.querySelector("#studyProjectOutcome"),
   studyProjectMilestones: document.querySelector("#studyProjectMilestones"),
   studyProjectDeliverables: document.querySelector("#studyProjectDeliverables"),
+  studyEvolution: document.querySelector("#studyEvolution"),
+  studyEvolutionFrom: document.querySelector("#studyEvolutionFrom"),
+  studyEvolutionBasic: document.querySelector("#studyEvolutionBasic"),
+  studyEvolutionAdvanced: document.querySelector("#studyEvolutionAdvanced"),
+  studyEvolutionUpgrades: document.querySelector("#studyEvolutionUpgrades"),
+  studyEvolutionJump: document.querySelector("#studyEvolutionJump"),
   markReadButton: document.querySelector("#markReadButton"),
   markPracticeButton: document.querySelector("#markPracticeButton"),
   finishLessonButton: document.querySelector("#finishLessonButton"),
@@ -183,6 +190,7 @@ const elements = {
   practiceDifficultyFilter: document.querySelector("#practiceDifficultyFilter"),
   practiceTypeFilter: document.querySelector("#practiceTypeFilter"),
   practiceStatusFilter: document.querySelector("#practiceStatusFilter"),
+  practiceEvolutionFilter: document.querySelector("#practiceEvolutionFilter"),
   practiceSort: document.querySelector("#practiceSort"),
   practiceResetFilters: document.querySelector("#practiceResetFilters"),
   closeBlueprintButton: document.querySelector("#closeBlueprintButton"),
@@ -253,6 +261,14 @@ elements.practiceStatusFilter.addEventListener("change", () => {
   render();
 });
 
+elements.practiceEvolutionFilter.addEventListener("change", () => {
+  state.practiceEvolutionFilter = ["all", "evolves", "standalone"].includes(elements.practiceEvolutionFilter.value)
+    ? elements.practiceEvolutionFilter.value
+    : "all";
+  persist();
+  render();
+});
+
 elements.practiceSort.addEventListener("change", () => {
   state.practiceSort = ["pending", "impact", "difficulty", "family"].includes(elements.practiceSort.value)
     ? elements.practiceSort.value
@@ -266,9 +282,20 @@ elements.practiceResetFilters.addEventListener("click", () => {
   state.practiceDifficultyFilter = "all";
   state.practiceTypeFilter = "all";
   state.practiceStatusFilter = "all";
+  state.practiceEvolutionFilter = "all";
   state.practiceSort = "pending";
   persist();
   render();
+});
+
+elements.studyEvolutionJump.addEventListener("click", () => {
+  const lessonId = elements.studyEvolutionJump.dataset.lessonBase;
+  if (!lessonId) return;
+  saveCurrentNotes();
+  openLesson(lessonId);
+  persist();
+  render();
+  document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
 });
 
 elements.focusModeButton.addEventListener("click", () => {
@@ -782,6 +809,7 @@ function renderStudyPanel() {
   const exercise = exercises[lesson.id];
   const guidedProblem = javaPracticeGuides[lesson.id];
   const projectBrief = projectBriefs[lesson.id];
+  const evolutionBrief = evolutionBriefs[lesson.id];
   const isRead = state.readLessons.includes(lesson.id);
   const isPracticed = state.practiceDone.includes(lesson.id);
   const isCompleted = state.completed.includes(lesson.id);
@@ -810,6 +838,7 @@ function renderStudyPanel() {
   renderStudyExercise(lesson, exercise, isExerciseSolved);
   renderGuidedProblem(guidedProblem);
   renderProjectBrief(projectBrief);
+  renderEvolutionBrief(evolutionBrief);
 
   elements.markReadButton.textContent = isRead ? "Teoría leída" : "Marcar teoría";
   elements.markReadButton.disabled = isRead;
@@ -925,6 +954,27 @@ function renderProjectBrief(projectBrief) {
     .join("");
 }
 
+function renderEvolutionBrief(evolutionBrief) {
+  if (!evolutionBrief) {
+    elements.studyEvolution.hidden = true;
+    elements.studyEvolutionFrom.textContent = "";
+    elements.studyEvolutionBasic.textContent = "";
+    elements.studyEvolutionAdvanced.textContent = "";
+    elements.studyEvolutionUpgrades.innerHTML = "";
+    elements.studyEvolutionJump.dataset.lessonBase = "";
+    return;
+  }
+
+  elements.studyEvolution.hidden = false;
+  elements.studyEvolutionFrom.textContent = `Retoma ${evolutionBrief.fromTitle}`;
+  elements.studyEvolutionBasic.textContent = evolutionBrief.basicVersion;
+  elements.studyEvolutionAdvanced.textContent = evolutionBrief.advancedVersion;
+  elements.studyEvolutionUpgrades.innerHTML = evolutionBrief.upgrades
+    .map((item) => `<li>${escapeHtml(item)}</li>`)
+    .join("");
+  elements.studyEvolutionJump.dataset.lessonBase = evolutionBrief.fromLessonId;
+}
+
 function renderChallenge() {
   const lesson = findLesson(state.activeLessonId) ?? visibleLessons()[0];
   if (!lesson) return;
@@ -984,6 +1034,8 @@ function renderPracticeBank() {
           <span class="language-mark language-mark--${entry.trackId}">${entry.trackLabel}</span>
           <span class="badge">${escapeHtml(entry.family)}</span>
           <span class="badge">${escapeHtml(entry.difficulty)}</span>
+          ${entry.hasEvolution ? '<span class="badge practice-card__badge">Escala después</span>' : ""}
+          ${entry.hasEvolution ? `<span class="badge practice-card__evolution-state">${entry.evolutionBaseCovered ? "Base cubierta" : "Base pendiente"}</span>` : ""}
           <span class="badge practice-card__status practice-card__status--${entry.progressState.key}">${escapeHtml(entry.progressState.label)}</span>
         </div>
         <h3>${escapeHtml(entry.title)}</h3>
@@ -992,6 +1044,7 @@ function renderPracticeBank() {
           <button type="button" data-practice-lesson="${entry.lessonId}" data-practice-target="${entry.target}">
             ${entry.target === "practice" ? "Abrir práctica" : "Abrir problema"}
           </button>
+          ${entry.hasEvolution ? `<button type="button" class="practice-card__secondary" data-base-lesson="${entry.evolutionBaseLessonId}">Ver base</button>` : ""}
         </div>
       </article>
     `)
@@ -1033,6 +1086,8 @@ function renderPracticeBankSpotlight(entries) {
         <span class="eyebrow">Más útil ahora</span>
         <span class="badge">${escapeHtml(recommended.family)}</span>
         <span class="badge">${escapeHtml(recommended.difficulty)}</span>
+        ${recommended.hasEvolution ? '<span class="badge practice-card__badge">Escala después</span>' : ""}
+        ${recommended.hasEvolution ? `<span class="badge practice-card__evolution-state">${recommended.evolutionBaseCovered ? "Base cubierta" : "Base pendiente"}</span>` : ""}
         <span class="badge">${escapeHtml(recommended.progressState.label)}</span>
       </div>
       <h3>${escapeHtml(recommended.title)}</h3>
@@ -1041,6 +1096,7 @@ function renderPracticeBankSpotlight(entries) {
         <button type="button" data-practice-lesson="${recommended.lessonId}" data-practice-target="${recommended.target}">
           ${recommended.target === "practice" ? "Abrir práctica" : "Abrir problema"}
         </button>
+        ${recommended.hasEvolution ? `<button type="button" class="practice-card__secondary" data-base-lesson="${recommended.evolutionBaseLessonId}">Ver base</button>` : ""}
       </div>
     </article>
   `;
@@ -1071,6 +1127,7 @@ function renderPracticeBankFilters(entries) {
     ? state.practiceTypeFilter
     : "all";
   elements.practiceStatusFilter.value = state.practiceStatusFilter;
+  elements.practiceEvolutionFilter.value = state.practiceEvolutionFilter;
   elements.practiceSort.value = state.practiceSort;
 }
 
@@ -1084,8 +1141,12 @@ function filterPracticeBankEntries(entries) {
       state.practiceStatusFilter === "all" ||
       (state.practiceStatusFilter === "done" && entry.isDone) ||
       (state.practiceStatusFilter === "pending" && !entry.isDone);
+    const evolutionMatch =
+      state.practiceEvolutionFilter === "all" ||
+      (state.practiceEvolutionFilter === "evolves" && entry.hasEvolution) ||
+      (state.practiceEvolutionFilter === "standalone" && !entry.hasEvolution);
 
-    return familyMatch && difficultyMatch && typeMatch && statusMatch;
+    return familyMatch && difficultyMatch && typeMatch && statusMatch && evolutionMatch;
   });
 }
 
@@ -1098,6 +1159,10 @@ function sortPracticeBankEntries(entries) {
   };
 
   return [...entries].sort((left, right) => {
+    if (state.practiceEvolutionFilter === "evolves" && left.evolutionBaseCovered !== right.evolutionBaseCovered) {
+      return Number(right.evolutionBaseCovered) - Number(left.evolutionBaseCovered);
+    }
+
     if (state.practiceSort === "family") {
       return left.family.localeCompare(right.family) || left.title.localeCompare(right.title);
     }
@@ -1864,6 +1929,18 @@ function buildDailyQueue() {
   };
 
   const recommendation = recommendNextLesson();
+  const evolutionBaseLessons = Object.entries(evolutionBriefs)
+    .filter(([lessonId]) => {
+      const currentLesson = findLesson(lessonId);
+      return currentLesson && getTrackIdByLesson(lessonId) === state.activeTrack;
+    })
+    .map(([lessonId, evolution]) => ({
+      lesson: findLesson(evolution.fromLessonId),
+      sourceLesson: findLesson(lessonId),
+      sourceTitle: evolution.fromTitle,
+    }))
+    .filter((entry) => entry.lesson && entry.sourceLesson && !isLessonCovered(entry.lesson.id))
+    .sort((left, right) => scoreLessonRecommendation(right.lesson).score - scoreLessonRecommendation(left.lesson).score);
   const pendingExercises = allLessons()
     .filter((lesson) => exercises[lesson.id] && !state.solvedExercises.includes(lesson.id))
     .filter((lesson) => state.readLessons.includes(lesson.id) || state.practiceDone.includes(lesson.id))
@@ -1878,6 +1955,7 @@ function buildDailyQueue() {
   const saturation = getDailySaturationState(pendingExercises, failedLessons);
   const sessionMode = determineDailySessionMode({
     recommendation,
+    evolutionBaseLessons,
     pendingExercises,
     failedLessons,
     saturation,
@@ -1900,6 +1978,25 @@ function buildDailyQueue() {
         "Después del repaso, conviene cerrar una práctica que ya está arrancada.",
         "practice",
         20,
+      );
+    });
+  } else if (sessionMode === "evolution") {
+    evolutionBaseLessons.slice(0, 2).forEach((entry) => {
+      addItem(
+        entry.lesson,
+        "Base previa",
+        `Te conviene cubrir esta base antes de escalar hacia ${entry.sourceLesson.title}.`,
+        "study",
+        35,
+      );
+    });
+    pendingExercises.slice(0, 1).forEach((lesson) => {
+      addItem(
+        lesson,
+        "Tests",
+        "Después de cubrir la base, cierra una práctica empezada para fijar la progresión.",
+        "practice",
+        18,
       );
     });
   } else if (sessionMode === "consolidation") {
@@ -1926,6 +2023,15 @@ function buildDailyQueue() {
       );
     });
   } else {
+    evolutionBaseLessons.slice(0, 1).forEach((entry) => {
+      addItem(
+        entry.lesson,
+        "Base previa",
+        `Antes de subir hacia ${entry.sourceLesson.title}, conviene cubrir esta pieza base.`,
+        "study",
+        24,
+      );
+    });
     if (recommendation && !saturation.blockNewTheory) {
       addItem(recommendation.lesson, "Desbloqueo", recommendation.reason, "study", 30);
     }
@@ -1977,9 +2083,10 @@ function buildDailyQueue() {
     .slice(0, 3);
 }
 
-function determineDailySessionMode({ recommendation, pendingExercises, failedLessons, saturation }) {
+function determineDailySessionMode({ recommendation, evolutionBaseLessons, pendingExercises, failedLessons, saturation }) {
   if (saturation.blockNewTheory && failedLessons.length >= 1) return "review";
   if (saturation.blockNewTheory) return "consolidation";
+  if (evolutionBaseLessons.length >= 1 && pendingExercises.length === 0 && failedLessons.length === 0) return "evolution";
   if (failedLessons.length >= 2) return "review";
   if (pendingExercises.length >= 2) return "consolidation";
   if (recommendation) return "unlock";
@@ -1989,10 +2096,25 @@ function determineDailySessionMode({ recommendation, pendingExercises, failedLes
 function getDailySessionProfile(queue) {
   const kinds = queue.map((item) => item.kind);
   const counts = {
+    base: kinds.filter((kind) => kind === "Base previa").length,
     desbloqueo: kinds.filter((kind) => kind === "Desbloqueo").length,
     tests: kinds.filter((kind) => kind === "Tests").length,
     repaso: kinds.filter((kind) => kind === "Repaso").length,
   };
+
+  if (counts.base >= 1 && counts.tests === 0 && counts.repaso === 0) {
+    return {
+      label: "Sesion de preparacion",
+      description: "Hoy conviene cubrir una base previa para que una práctica más avanzada tenga sentido y retorno real.",
+    };
+  }
+
+  if (counts.base >= 1 && counts.tests >= 1) {
+    return {
+      label: "Sesion de progresion",
+      description: "Primero cubres una base previa y después cierras una práctica para que la subida de nivel no quede en falso.",
+    };
+  }
 
   if (counts.repaso >= 2) {
     return {
@@ -2136,6 +2258,48 @@ elements.blueprintGrid.addEventListener("click", (event) => {
 });
 
 elements.practiceBankGrid.addEventListener("click", (event) => {
+  const baseButton = event.target.closest("[data-base-lesson]");
+  if (baseButton) {
+    const lessonId = baseButton.dataset.baseLesson;
+    saveCurrentNotes();
+    openLesson(lessonId);
+    persist();
+    render();
+    document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+
+  const button = event.target.closest("[data-practice-lesson]");
+  if (!button) return;
+
+  const lessonId = button.dataset.practiceLesson;
+  const target = button.dataset.practiceTarget;
+  saveCurrentNotes();
+  openLesson(lessonId);
+  persist();
+  render();
+
+  if (target === "practice") {
+    loadActiveExercise();
+    document.querySelector(".runner").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+
+  document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
+});
+
+elements.practiceBankSpotlight.addEventListener("click", (event) => {
+  const baseButton = event.target.closest("[data-base-lesson]");
+  if (baseButton) {
+    const lessonId = baseButton.dataset.baseLesson;
+    saveCurrentNotes();
+    openLesson(lessonId);
+    persist();
+    render();
+    document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+
   const button = event.target.closest("[data-practice-lesson]");
   if (!button) return;
 
@@ -2200,6 +2364,9 @@ function normalizeState(value) {
   const practiceStatusFilter = ["all", "pending", "done"].includes(value?.practiceStatusFilter)
     ? value.practiceStatusFilter
     : defaultState.practiceStatusFilter;
+  const practiceEvolutionFilter = ["all", "evolves", "standalone"].includes(value?.practiceEvolutionFilter)
+    ? value.practiceEvolutionFilter
+    : defaultState.practiceEvolutionFilter;
   const practiceSort = ["pending", "impact", "difficulty", "family"].includes(value?.practiceSort)
     ? value.practiceSort
     : defaultState.practiceSort;
@@ -2212,6 +2379,7 @@ function normalizeState(value) {
     practiceDifficultyFilter: typeof value?.practiceDifficultyFilter === "string" ? value.practiceDifficultyFilter : "all",
     practiceTypeFilter,
     practiceStatusFilter,
+    practiceEvolutionFilter,
     practiceSort,
     activeLessonId: trackLessonIds.includes(value?.activeLessonId)
       ? value.activeLessonId
@@ -2316,6 +2484,7 @@ function getPracticeBankEntries(trackId) {
       .map(([lessonId, exercise]) => {
         const lesson = findLesson(lessonId);
         if (!lesson) return null;
+        const evolution = evolutionBriefs[lessonId];
 
         return {
           lessonId,
@@ -2329,7 +2498,11 @@ function getPracticeBankEntries(trackId) {
           summary: exercise.prompt,
           target: "practice",
           isDone: state.solvedExercises.includes(lessonId),
-      };
+          hasEvolution: Boolean(evolution),
+          evolutionBaseLessonId: evolution?.fromLessonId ?? "",
+          evolutionSourceTitle: evolution?.fromTitle ?? "",
+          evolutionBaseCovered: evolution ? isLessonCovered(evolution.fromLessonId) : false,
+        };
       })
       .filter(Boolean)
       .sort((left, right) => left.family.localeCompare(right.family) || left.title.localeCompare(right.title));
@@ -2339,6 +2512,7 @@ function getPracticeBankEntries(trackId) {
     .map(([lessonId, guideEntry]) => {
       const lesson = findLesson(lessonId);
       if (!lesson) return null;
+      const evolution = evolutionBriefs[lessonId];
 
       return {
         lessonId,
@@ -2352,6 +2526,10 @@ function getPracticeBankEntries(trackId) {
         summary: guideEntry.prompt,
         target: "study",
         isDone: state.practiceDone.includes(lessonId) || state.completed.includes(lessonId),
+        hasEvolution: Boolean(evolution),
+        evolutionBaseLessonId: evolution?.fromLessonId ?? "",
+        evolutionSourceTitle: evolution?.fromTitle ?? "",
+        evolutionBaseCovered: evolution ? isLessonCovered(evolution.fromLessonId) : false,
       };
     })
     .filter(Boolean)
@@ -2382,7 +2560,22 @@ function getPracticeProgressState(lessonId, trackId) {
   return { key: "new", label: "Sin tocar" };
 }
 
+function isLessonCovered(lessonId) {
+  return state.completed.includes(lessonId) ||
+    state.readLessons.includes(lessonId) ||
+    state.practiceDone.includes(lessonId) ||
+    state.solvedExercises.includes(lessonId);
+}
+
 function getPracticeSpotlightReason(entry) {
+  if (entry.hasEvolution && !entry.evolutionBaseCovered) {
+    return `Escala un ejercicio anterior, pero todavía te conviene cubrir antes la base: ${entry.evolutionSourceTitle}.`;
+  }
+
+  if (entry.hasEvolution && entry.progressState.key !== "done") {
+    return "Te sirve ahora y además reaparece después con una versión más exigente del mismo problema.";
+  }
+
   if (entry.progressState.key === "started") {
     return "Ya empezaste esta práctica. Cerrarla ahora suele dar más retorno que abrir otra distinta.";
   }

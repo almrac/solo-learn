@@ -25,6 +25,12 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - Cobertura guiada ampliada también para interfaces/herencia y primera arquitectura con Spring.
 - Mini proyectos guiados en lecciones avanzadas de Java y JavaScript para empujar hacia entregables reales.
 - Mini proyectos guiados ampliados también a varias lecciones intermedias para dar continuidad entre ejercicios y entregables.
+- Bloque de replanteamiento avanzado para retomar ejercicios básicos y rehacerlos con mejor diseño en niveles superiores.
+- El banco de práctica marca ya qué ejercicios escalan después a una versión más avanzada.
+- El banco permite filtrar también por si una práctica escala después o es autocontenida.
+- En las prácticas que escalan, el banco indica además si la base previa ya está cubierta o sigue pendiente.
+- Desde el banco y desde el bloque de replanteamiento avanzado se puede abrir directamente la lección base previa.
+- El plan diario ya puede recomendar cubrir una base previa antes de atacar una práctica evolutiva.
 - Banco de práctica por familias y dificultad, adaptado a la ruta activa.
 - El banco de práctica puede filtrarse por familia, dificultad y estado.
 - El banco de práctica también puede filtrarse por tipo: función, DOM, async, consola, testing o arquitectura.

@@ -239,6 +239,26 @@ const progreso = retos.filter(r => r.done);</code></pre>
                 </div>
                 <ul id="studyProjectMilestones"></ul>
               </div>
+              <div class="study-exercise" id="studyEvolution" hidden>
+                <div class="study-exercise__header">
+                  <h3>Replanteamiento avanzado</h3>
+                  <span id="studyEvolutionFrom"></span>
+                </div>
+                <div class="study-guided">
+                  <div>
+                    <strong>Antes</strong>
+                    <p id="studyEvolutionBasic"></p>
+                  </div>
+                  <div>
+                    <strong>Ahora</strong>
+                    <p id="studyEvolutionAdvanced"></p>
+                  </div>
+                </div>
+                <ul id="studyEvolutionUpgrades"></ul>
+                <div class="study__actions">
+                  <button id="studyEvolutionJump" type="button">Abrir base previa</button>
+                </div>
+              </div>
             </div>
           </article>
         </div>
@@ -325,6 +345,14 @@ const progreso = retos.filter(r => r.done);</code></pre>
               <option value="all">Todo</option>
               <option value="pending">Pendiente</option>
               <option value="done">Hecho</option>
+            </select>
+          </label>
+          <label class="practice-bank__filter">
+            <span>Evolución</span>
+            <select id="practiceEvolutionFilter">
+              <option value="all">Todo</option>
+              <option value="evolves">Escala después</option>
+              <option value="standalone">Autocontenida</option>
             </select>
           </label>
           <label class="practice-bank__filter">

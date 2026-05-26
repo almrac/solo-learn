@@ -1433,6 +1433,53 @@ function render() {
     ),
   },
 
+  evolutionBriefs: {
+    "java-oop": evolutionBrief(
+      "java-variables",
+      "Variables, tipos y consola",
+      "Pedir antigüedad y salario, y aplicar un 20% si supera 10 años o un 10% en caso contrario.",
+      "Convertir ese cálculo puntual en un modelo `Employee` con comportamiento propio y reglas expresadas en métodos claros.",
+      [
+        "Separar entrada, cálculo y salida.",
+        "Mover la regla salarial a métodos como `getRaiseRate()` o `calculateAdjustedSalary()`.",
+        "Sustituir números mágicos por constantes con nombre.",
+      ],
+    ),
+    "java-collections": evolutionBrief(
+      "java-oop",
+      "Clases y objetos",
+      "Calcular el salario ajustado de un solo empleado con una clase simple.",
+      "Escalar el problema a una lista de empleados, recorrerla y generar resúmenes globales por antigüedad o coste total.",
+      [
+        "Trabajar con `ArrayList<Employee>` en vez de variables sueltas.",
+        "Acumular totales y contadores sin duplicar lógica.",
+        "Preparar el terreno para servicios o repositorios más adelante.",
+      ],
+    ),
+    "js-state": evolutionBrief(
+      "js-values",
+      "Valores, variables y funciones",
+      "Resolver el cálculo de subida salarial con un `prompt`, un `if` y un `console.log`.",
+      "Pasar a una lista de empleados en memoria, recalcular todos sus salarios y repintar la interfaz cada vez que cambian los datos.",
+      [
+        "Extraer una función pura para calcular el salario final.",
+        "Guardar empleados en un array dentro de `state`.",
+        "Renderizar una tabla o lista en vez de imprimir un único resultado.",
+      ],
+    ),
+    "js-components": evolutionBrief(
+      "js-state",
+      "Estado, persistencia y patrones",
+      "Mantener el cálculo salarial y el renderizado en un solo bloque de código.",
+      "Separar una pieza reutilizable de interfaz, por ejemplo una tarjeta o fila de empleado que se pinte desde datos.",
+      [
+        "Crear una función `renderEmployeeCard(employee)` o similar.",
+        "Reutilizar esa pieza con `map` para varios empleados.",
+        "Aislar mejor presentación, datos y reglas de cálculo.",
+      ],
+    ),
+  },
+
   // Easter egg pedagógico:
   // documenta partes reales de app.js y las conecta con la ruta de estudio.
   appBlueprint: [
@@ -1591,5 +1638,15 @@ function projectBrief(summary, outcome, milestones, deliverables) {
     outcome,
     milestones,
     deliverables,
+  };
+}
+
+function evolutionBrief(fromLessonId, fromTitle, basicVersion, advancedVersion, upgrades) {
+  return {
+    fromLessonId,
+    fromTitle,
+    basicVersion,
+    advancedVersion,
+    upgrades,
   };
 }

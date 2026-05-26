@@ -167,6 +167,17 @@ El estado vive en `app.js` bajo `state` y contiene, al menos:
   de la ruta `JavaScript`
 - Hay interés explícito en reutilizar problemas simples en niveles superiores
   para reescribirlos con mejor diseño, escalabilidad y arquitectura
+- Esa idea ya tiene primera implementación visible dentro de la lección activa
+  con bloques de `replanteamiento avanzado`
+- El banco de práctica ya puede señalar qué entradas reaparecen más adelante con
+  un replanteamiento avanzado
+- También puede filtrarlas explícitamente por evolución
+- En esas prácticas, la UI ya distingue si la base previa del replanteamiento
+  está cubierta o pendiente
+- Ya existe navegación directa hacia la lección base desde el banco y desde el
+  propio bloque de replanteamiento
+- La cola diaria ya puede introducir tareas de `Base previa` cuando una práctica
+  evolutiva necesita cerrar antes su fundamento
 - La app es privada y pensada para una sola persona
 
 ## Deuda y siguiente foco razonable

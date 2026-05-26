@@ -430,6 +430,48 @@ o sesión futura.
   - `js-ui-states`
 - Esto mejora el puente entre práctica puntual y entregables más reales
 
+## Fase 50 — Replanteamiento avanzado de ejercicios
+
+- Se añadió una nueva capa pedagógica en la lección activa
+- Algunas lecciones intermedias y avanzadas muestran ahora:
+  - de qué ejercicio simple parten
+  - cómo se resolvía de forma básica
+  - cómo cambia el enfoque al subir de nivel
+- Primeras rutas cubiertas:
+  - `java-oop`
+  - `java-collections`
+  - `js-state`
+  - `js-components`
+
+## Fase 51 — Señal de evolución en el banco de práctica
+
+- El banco de práctica marca ahora qué entradas escalan después
+- Se usa la etiqueta `Escala después`
+- La recomendación destacada del banco también tiene en cuenta este valor
+
+## Fase 52 — Filtro de evolución en el banco
+
+- El banco de práctica añade un filtro específico de evolución
+- Permite ver:
+  - todas las prácticas
+  - solo las que escalan después
+  - solo las autocontenidas
+
+## Fase 53 — Base cubierta o pendiente en prácticas evolutivas
+
+- Las prácticas con evolución muestran ya si la base previa está cubierta
+- Al filtrar por evolución, el banco prioriza primero las que ya tienen base cubierta
+
+## Fase 54 — Navegación a la base previa
+
+- El banco de práctica permite abrir la lección base de una práctica evolutiva
+- El bloque `Replanteamiento avanzado` también puede saltar a esa base previa
+
+## Fase 55 — Base previa dentro del plan diario
+
+- El plan de hoy puede recomendar ya tareas de tipo `Base previa`
+- Esto aparece cuando una práctica evolutiva tiene sentido, pero su fundamento aún no está cubierto
+
 ## Fase 28 — Reglas semanales visibles
 
 - El plan diario ahora muestra reglas concretas de ritmo semanal
