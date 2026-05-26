@@ -106,6 +106,11 @@ learningRoot.LEARNING_DATA = {
           "Filtrar items útiles",
           "Pintar resultados en DOM",
         ], "Si ya tienes un objeto JSON convertido a JavaScript, ¿qué parte sueles recorrer para pintar una lista?", ["response", "items", "status"], "items"),
+        lesson("js-fetch-to-dom", "Intermedio", "fetch a interfaz", 110, [
+          "await fetch",
+          "Transformar datos cargados",
+          "Pintar resultados",
+        ], "Si una función necesita esperar datos antes de pintar el DOM, ¿qué palabra suele aparecer dentro de una función async?", ["await", "return", "break"], "await"),
         lesson("js-json-fetch", "Intermedio", "JSON local con fetch", 95, [
           "fetch a un archivo JSON",
           "Recorrer arrays de objetos",
@@ -393,6 +398,22 @@ const html = data.items
 document.querySelector("#featuredList").innerHTML = html;`,
       "Recibe un objeto data con items, muestra solo los featured y pinta title, language y level en el DOM.",
     ),
+    "js-fetch-to-dom": details(
+      "Este es el flujo completo frontend más útil para empezar: esperar datos asíncronos, seleccionar solo lo que te interesa y pintar el resultado en pantalla. Aquí ya conviven async/await, arrays y DOM.",
+      ["Crea una función async.", "Espera los datos antes de trabajar con ellos.", "Filtra, transforma y pinta dentro del contenedor final."],
+      `async function cargarDestacados() {
+  const response = await fetch("./data/study-items.json");
+  const data = await response.json();
+
+  const html = data.items
+    .filter((item) => item.language === "JavaScript")
+    .map((item) => \`<li>\${item.title} | \${item.level}</li>\`)
+    .join("");
+
+  document.querySelector("#fetchList").innerHTML = html;
+}`,
+      "Carga datos de una fuente asíncrona, filtra solo algunos items y píntalos en una lista del DOM.",
+    ),
     "js-json-fetch": details(
       "Un archivo JSON local te permite practicar consumo de datos sin depender de una API externa. La clave es entender la forma de los datos: objetos con propiedades, arrays de objetos y propiedades anidadas.",
       ["Carga data/study-items.json con fetch.", "Convierte la respuesta con response.json().", "Recorre data.items con map o forEach y genera un item HTML por cada objeto."],
@@ -506,7 +527,7 @@ function render() {
       dates: "Julio",
       title: "Construcción real",
       goal: "Colecciones, estado, módulos, asincronía y pequeños proyectos semanales.",
-      lessonIds: ["java-collections", "java-exceptions", "js-async", "js-json-to-dom", "js-json-fetch", "js-modules", "js-state", "js-data-to-dom"],
+      lessonIds: ["java-collections", "java-exceptions", "js-async", "js-json-to-dom", "js-fetch-to-dom", "js-json-fetch", "js-modules", "js-state", "js-data-to-dom"],
     },
     {
       dates: "Agosto",
@@ -520,6 +541,9 @@ function render() {
   // Eso permite añadir nuevas prácticas sin tocar mucho app.js.
   exercises: {
     "js-values": exercise({
+      family: "Fundamentos",
+      difficulty: "Cero",
+      practiceType: "Función",
       prompt: "Implementa una función pura `crearResumen(nombre, nivel, xp)` que devuelva una frase legible.",
       checklist: [
         "Declara una función llamada crearResumen.",
@@ -544,6 +568,9 @@ function render() {
       ],
     }),
     "js-objects": exercise({
+      family: "Datos",
+      difficulty: "Cero",
+      practiceType: "Función",
       prompt: "Implementa `obtenerPendientes(tareas)` para devolver solo los títulos de las tareas no completadas.",
       checklist: [
         "Recibe un array de objetos tarea.",
@@ -575,6 +602,9 @@ function render() {
       ],
     }),
     "js-array-methods": exercise({
+      family: "Transformación de datos",
+      difficulty: "Base",
+      practiceType: "Función",
       prompt: "Implementa `crearResumenTareas(tareas)` usando `filter`, `map` y `reduce`.",
       checklist: [
         "Devuelve un objeto con pendingCount, completedTitles y totalXp.",
@@ -618,6 +648,9 @@ function render() {
     }),
     "js-render-lists": exercise({
       mode: "dom",
+      family: "DOM y renderizado",
+      difficulty: "Base",
+      practiceType: "DOM",
       prompt: "Implementa `renderizarLessons(items)` para pintar una lista en `#lessonList` a partir de un array de objetos.",
       checklist: [
         "Recibe un array de objetos con title, language y level.",
@@ -667,6 +700,9 @@ function render() {
     }),
     "js-dom": exercise({
       mode: "dom",
+      family: "DOM y eventos",
+      difficulty: "Base",
+      practiceType: "DOM",
       prompt: "Implementa `conectarContador()` para enlazar los botones con el contador del HTML de prueba.",
       checklist: [
         "Selecciona contador y botones desde el DOM.",
@@ -708,6 +744,9 @@ function render() {
     }),
     "js-forms": exercise({
       mode: "dom",
+      family: "Formularios",
+      difficulty: "Base",
+      practiceType: "DOM",
       prompt: "Implementa `activarFormularioTarea()` para validar el título y pintar un mensaje en pantalla.",
       checklist: [
         "Escucha el evento submit del formulario.",
@@ -751,6 +790,9 @@ function render() {
     }),
     "js-state": exercise({
       mode: "dom",
+      family: "Estado y UI",
+      difficulty: "Intermedio",
+      practiceType: "DOM",
       prompt: "Implementa `renderizarTareas(tareas)` para pintar items en pantalla y mostrar cuántas quedan pendientes.",
       checklist: [
         "Recibe un array de objetos tarea.",
@@ -807,6 +849,9 @@ function render() {
     }),
     "js-data-to-dom": exercise({
       mode: "dom",
+      family: "Datos a interfaz",
+      difficulty: "Intermedio",
+      practiceType: "DOM",
       prompt: "Implementa `renderizarItemsVisibles(items)` para filtrar, transformar y pintar solo los items visibles dentro de `#resultList`.",
       checklist: [
         "Filtra solo items con visible === true.",
@@ -860,6 +905,9 @@ function render() {
     }),
     "js-json-to-dom": exercise({
       mode: "dom",
+      family: "JSON y DOM",
+      difficulty: "Intermedio",
+      practiceType: "DOM",
       prompt: "Implementa `renderizarDestacados(data)` para leer `data.items`, filtrar solo los featured y pintarlos en `#featuredList`.",
       checklist: [
         "Lee `data.items` desde el objeto recibido.",
@@ -914,7 +962,53 @@ function render() {
         },
       ],
     }),
+    "js-fetch-to-dom": exercise({
+      mode: "dom",
+      family: "Asincronía y DOM",
+      difficulty: "Intermedio",
+      practiceType: "Async",
+      prompt: "Implementa `cargarYRenderizar(fetchItems)` para esperar datos asíncronos, filtrar solo JavaScript y pintarlos en `#fetchList`.",
+      checklist: [
+        "La función debe ser async.",
+        "Espera los datos llamando a fetchItems().",
+        "Pinta en `#fetchList` solo items con language === \"JavaScript\".",
+      ],
+      starterHtml: `<section>
+  <h1>Items cargados</h1>
+  <ul id="fetchList"></ul>
+</section>`,
+      starter: `async function cargarYRenderizar(fetchItems) {
+  // Espera los datos, filtra JavaScript y pinta en #fetchList.
+}`,
+      functionName: "cargarYRenderizar",
+      tests: [
+        {
+          label: "Espera datos y pinta solo JavaScript",
+          actions: [
+            {
+              type: "call",
+              name: "cargarYRenderizar",
+              args: [async () => ({
+                items: [
+                  { title: "map y filter", language: "JavaScript", level: "Base" },
+                  { title: "Clases y objetos", language: "Java", level: "Intermedio" },
+                  { title: "JSON local", language: "JavaScript", level: "Intermedio" },
+                ],
+              })],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#fetchList li", expected: 2 },
+            { type: "text", selector: "#fetchList li:first-child", expected: "map y filter | Base" },
+            { type: "text", selector: "#fetchList li:last-child", expected: "JSON local | Intermedio" },
+          ],
+        },
+      ],
+    }),
     "js-json-fetch": exercise({
+      family: "JSON y utilidades",
+      difficulty: "Intermedio",
+      practiceType: "Función",
       prompt: "Implementa `crearItemsHtml(data)` para recorrer `data.items` y devolver una cadena con varios `<li>`.",
       checklist: [
         "Lee `data.items`.",
@@ -954,6 +1048,9 @@ function render() {
       ],
     }),
     "js-testing": exercise({
+      family: "Testing",
+      difficulty: "Avanzado",
+      practiceType: "Testing",
       prompt: "Implementa `tieneTituloValido(titulo)` y devuelve `true` solo si, tras `trim()`, el texto tiene al menos 3 caracteres.",
       checklist: [
         "Comprueba que el valor sea string.",
@@ -982,6 +1079,139 @@ function render() {
         },
       ],
     }),
+  },
+
+  javaPracticeGuides: {
+    "java-variables": guide(
+      "Crea un programa de consola que muestre la ficha de un estudiante.",
+      "Nombre, edad, nota media y si tiene el módulo aprobado.",
+      "Una línea con todos los datos formateados de forma legible.",
+      [
+        "Declara variables con tipos adecuados.",
+        "Usa String para texto, int para edad, double para nota y boolean para aprobado.",
+        "Compón la salida con System.out.println.",
+      ],
+      "Fundamentos",
+      "Cero",
+      "Consola",
+    ),
+    "java-methods": guide(
+      "Escribe un programa con un método `calcularNivel(int xp)` que devuelva el nivel del usuario.",
+      "Un entero xp, por ejemplo 0, 150, 320 o 480.",
+      "El nivel calculado en bloques de 150 XP, empezando en nivel 1.",
+      [
+        "Crea un método separado de main.",
+        "Haz que el método reciba xp y devuelva un int.",
+        "Prueba varios casos desde main e imprime el resultado.",
+      ],
+      "Métodos",
+      "Cero",
+      "Consola",
+    ),
+    "java-control": guide(
+      "Lee una nota ya fijada en una variable y clasifícala con condicionales.",
+      "Una variable nota entre 0 y 10.",
+      "El texto suspenso, aprobado, notable o sobresaliente, seguido de tres mensajes de repaso.",
+      [
+        "Usa if / else if / else para clasificar.",
+        "Añade un bucle para mostrar tres líneas de repaso.",
+        "Evita duplicar condiciones que se pisan entre sí.",
+      ],
+      "Control de flujo",
+      "Base",
+      "Consola",
+    ),
+    "java-arrays": guide(
+      "Trabaja con un array de cinco notas y calcula un pequeño resumen.",
+      "Un array int[] con cinco valores.",
+      "Media entera y nota más alta.",
+      [
+        "Recorre el array para sumar notas.",
+        "Guarda la nota máxima mientras iteras.",
+        "Usa notas.length para no fijar el tamaño a mano.",
+      ],
+      "Arrays",
+      "Base",
+      "Consola",
+    ),
+    "java-oop": guide(
+      "Modela una clase Libro con un comportamiento útil.",
+      "Título, autor y páginas en el constructor.",
+      "Un método esLargo() que devuelva true si el libro supera 400 páginas.",
+      [
+        "Declara atributos privados.",
+        "Crea un constructor que reciba los datos principales.",
+        "Añade un método de instancia con return boolean.",
+      ],
+      "POO",
+      "Intermedio",
+      "POO",
+    ),
+    "java-inheritance": guide(
+      "Diseña una interfaz `Notificable` y dos clases que la implementen.",
+      "Un método `enviar(String mensaje)` definido en la interfaz.",
+      "Dos implementaciones distintas, por ejemplo Email y SMS, con salidas diferentes por consola.",
+      [
+        "Declara una interfaz pequeña con una sola responsabilidad.",
+        "Haz que dos clases usen `implements`.",
+        "Sobrescribe el mismo método con comportamientos distintos.",
+      ],
+      "Interfaces y herencia",
+      "Intermedio",
+      "POO",
+    ),
+    "java-collections": guide(
+      "Construye un pequeño registro de progreso por lenguaje usando List y Map.",
+      "Una lista de tareas y un mapa con XP por lenguaje.",
+      "Muestra cuántas tareas hay pendientes y cuánto XP tiene cada lenguaje.",
+      [
+        "Usa ArrayList para guardar tareas.",
+        "Usa HashMap para asociar lenguaje con XP.",
+        "Recorre ambas estructuras y muestra un resumen legible.",
+      ],
+      "Colecciones",
+      "Intermedio",
+      "Colecciones",
+    ),
+    "java-exceptions": guide(
+      "Crea un método `parsearNota(String texto)` que convierta texto a número y maneje errores.",
+      "Un String que puede contener una nota válida o un valor inválido.",
+      "La nota convertida si es correcta, o `-1` si no se puede parsear.",
+      [
+        "Usa Integer.parseInt dentro de try.",
+        "Captura NumberFormatException en catch.",
+        "Devuelve -1 cuando la entrada no sea válida.",
+      ],
+      "Excepciones",
+      "Intermedio",
+      "Errores",
+    ),
+    "java-testing": guide(
+      "Diseña una función `estaAprobado(int nota)` y plantea sus pruebas principales.",
+      "Tres casos base: 4, 5 y 10.",
+      "false para 4, true para 5 y true para 10.",
+      [
+        "Separa la lógica en una función pequeña.",
+        "Piensa un caso que falla y dos que pasan.",
+        "Escribe qué comprobarías en JUnit aunque no ejecutes el test aquí.",
+      ],
+      "Testing",
+      "Avanzado",
+      "Testing",
+    ),
+    "java-spring-intro": guide(
+      "Diseña la estructura base de una API de tareas con Spring.",
+      "Operaciones mínimas: listar tareas, crear tarea y completar tarea.",
+      "Una propuesta de capas con controller, service y DTOs sencillos.",
+      [
+        "Define al menos tres endpoints HTTP con intención clara.",
+        "Separa qué devolvería el controller y qué resolvería el service.",
+        "Piensa un DTO de entrada y otro de salida antes de tocar base de datos.",
+      ],
+      "Spring",
+      "Avanzado",
+      "Arquitectura",
+    ),
   },
 
   // Easter egg pedagógico:
@@ -1111,5 +1341,17 @@ function blueprint(title, concept, where, lessonId, phase, howToLearn, tags, pre
     howToLearn,
     tags,
     prerequisites,
+  };
+}
+
+function guide(prompt, input, output, checklist, family, difficulty, practiceType) {
+  return {
+    prompt,
+    input,
+    output,
+    checklist,
+    family,
+    difficulty,
+    practiceType,
   };
 }
