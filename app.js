@@ -1230,21 +1230,38 @@ function renderPracticeBankPhases(entries) {
         phase: entry.evolutionPhase,
         total: 0,
         done: 0,
+        started: 0,
+        newCount: 0,
       });
     }
 
     const current = grouped.get(entry.evolutionPhase);
     current.total += 1;
-    if (entry.isDone) current.done += 1;
+    if (entry.progressState.key === "done") {
+      current.done += 1;
+    } else if (entry.progressState.key === "started") {
+      current.started += 1;
+    } else {
+      current.newCount += 1;
+    }
   });
 
-  elements.practiceBankPhases.innerHTML = [...grouped.values()]
+  const phaseStats = [...grouped.values()]
+    .map((item) => ({
+      ...item,
+      debtScore: item.started * 2 + item.newCount,
+    }))
+    .sort((left, right) => right.debtScore - left.debtScore || left.phase.localeCompare(right.phase));
+  const priorityPhase = phaseStats.find((item) => item.debtScore > 0)?.phase ?? "";
+
+  elements.practiceBankPhases.innerHTML = phaseStats
     .map((item) => {
       const pending = item.total - item.done;
       return `
-        <button class="practice-phase-pill ${state.practicePhaseFilter === item.phase ? "is-active" : ""}" type="button" data-practice-phase-pick="${escapeHtml(item.phase)}">
+        <button class="practice-phase-pill ${state.practicePhaseFilter === item.phase ? "is-active" : ""} ${priorityPhase === item.phase ? "is-priority" : ""}" type="button" data-practice-phase-pick="${escapeHtml(item.phase)}">
           <strong>${escapeHtml(item.phase)}</strong>
           <span>${item.done}/${item.total} hechas · ${pending} pendientes</span>
+          ${priorityPhase === item.phase ? "<small>Prioridad útil ahora</small>" : ""}
         </button>
       `;
     })

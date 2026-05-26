@@ -540,6 +540,11 @@ o sesión futura.
 - El resumen por fase evolutiva ya no es solo informativo
 - Pulsar una fase aplica el filtro correspondiente en el banco
 
+## Fase 65 — Prioridad útil por fase
+
+- El resumen por fase evolutiva marca ahora cuál concentra más deuda útil
+- La prioridad pondera más lo empezado que lo completamente nuevo
+
 ## Fase 28 — Reglas semanales visibles
 
 - El plan diario ahora muestra reglas concretas de ritmo semanal

@@ -193,6 +193,7 @@ El estado vive en `app.js` bajo `state` y contiene, al menos:
 - El banco ya soporta también filtrado directo por fase evolutiva
 - También resume el volumen de práctica por fase evolutiva
 - Ese resumen por fase ya actúa como acceso directo al filtro de fase
+- También puede marcar la fase con más deuda útil en la ruta activa
 - La app es privada y pensada para una sola persona
 
 ## Deuda y siguiente foco razonable
