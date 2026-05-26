@@ -178,6 +178,13 @@ El estado vive en `app.js` bajo `state` y contiene, al menos:
   propio bloque de replanteamiento
 - La cola diaria ya puede introducir tareas de `Base previa` cuando una práctica
   evolutiva necesita cerrar antes su fundamento
+- Si esa base ya está cubierta, la cola puede empujar la práctica avanzada con
+  tareas de `Escalada`
+- La app ya incluye un onboarding corto para nuevos usuarios dentro de la
+  sidebar
+- Ese onboarding ya es adaptativo según el estado real del progreso
+- La tarjeta `Siguiente sesión` comparte ya la misma lógica de base previa /
+  escalada
 - La app es privada y pensada para una sola persona
 
 ## Deuda y siguiente foco razonable

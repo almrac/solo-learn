@@ -472,6 +472,29 @@ o sesión futura.
 - El plan de hoy puede recomendar ya tareas de tipo `Base previa`
 - Esto aparece cuando una práctica evolutiva tiene sentido, pero su fundamento aún no está cubierto
 
+## Fase 56 — Escalada tras cubrir la base
+
+- Cuando la base ya está cubierta, la cola diaria puede priorizar la práctica avanzada correspondiente
+- Se añadieron nuevas etiquetas de sesión:
+  - `Sesion de escalado`
+  - `Sesion de transferencia`
+
+## Fase 57 — Onboarding y siguiente sesión enriquecida
+
+- Se añadió una guía rápida inicial para nuevos usuarios
+- La tarjeta `Siguiente sesión` ya contempla:
+  - `Base previa`
+  - `Escalada`
+  - `Desbloqueo`
+
+## Fase 58 — Onboarding adaptativo
+
+- La guía rápida inicial ya no es fija
+- Cambia según tres estados:
+  - primera toma de contacto
+  - progreso inicial
+  - trabajo por progresión y ejercicios evolutivos
+
 ## Fase 28 — Reglas semanales visibles
 
 - El plan diario ahora muestra reglas concretas de ritmo semanal

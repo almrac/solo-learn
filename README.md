@@ -31,6 +31,10 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - En las prácticas que escalan, el banco indica además si la base previa ya está cubierta o sigue pendiente.
 - Desde el banco y desde el bloque de replanteamiento avanzado se puede abrir directamente la lección base previa.
 - El plan diario ya puede recomendar cubrir una base previa antes de atacar una práctica evolutiva.
+- Cuando la base ya está cubierta, el plan diario puede priorizar la práctica avanzada correspondiente como tarea de `Escalada`.
+- La sidebar incluye una guía rápida inicial para entender cómo usar la app al entrar por primera vez.
+- Esa guía inicial ya se adapta al estado real: primera vez, progreso inicial o trabajo por progresión/evolución.
+- `Siguiente sesión` ya entiende también `Base previa` y `Escalada`, no solo desbloqueos generales.
 - Banco de práctica por familias y dificultad, adaptado a la ruta activa.
 - El banco de práctica puede filtrarse por familia, dificultad y estado.
 - El banco de práctica también puede filtrarse por tipo: función, DOM, async, consola, testing o arquitectura.

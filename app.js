@@ -90,6 +90,7 @@ const defaultState = {
   practiceDone: [],
   solvedExercises: [],
   notes: {},
+  quickstartDismissed: false,
   dailyQueueLog: {},
   completedDailySessions: [],
   lastStudyDate: null,
@@ -112,6 +113,7 @@ const elements = {
   progressText: document.querySelector("#progressText"),
   progressBar: document.querySelector("#progressBar"),
   trackProgress: document.querySelector("#trackProgress"),
+  quickstart: document.querySelector("#quickstart"),
   nextSession: document.querySelector("#nextSession"),
   dailyQueue: document.querySelector("#dailyQueue"),
   reviewBox: document.querySelector("#reviewBox"),
@@ -207,6 +209,14 @@ let brandTapCount = 0;
 let brandTapTimer = null;
 
 render();
+
+elements.quickstart.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-dismiss-quickstart]");
+  if (!button) return;
+  state.quickstartDismissed = true;
+  persist();
+  render();
+});
 
 elements.tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
@@ -341,6 +351,11 @@ elements.nextSession.addEventListener("click", (event) => {
   openLesson(button.dataset.lessonId);
   persist();
   render();
+  if (button.dataset.target === "practice") {
+    loadActiveExercise();
+    document.querySelector(".runner").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
   document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
 });
 
@@ -564,6 +579,7 @@ function render() {
   elements.progressText.textContent = `${progress}%`;
   elements.progressBar.style.width = `${progress}%`;
   renderTrackProgress();
+  renderQuickstart();
   renderNextSession();
   renderDailyQueue();
   renderReviewBox();
@@ -621,10 +637,76 @@ function renderTrackProgress() {
     .join("");
 }
 
+function renderQuickstart() {
+  if (state.quickstartDismissed) {
+    elements.quickstart.innerHTML = "";
+    return;
+  }
+
+  const guide = getQuickstartGuide();
+  elements.quickstart.innerHTML = `
+    <p class="eyebrow">${escapeHtml(guide.eyebrow)}</p>
+    <h3>${escapeHtml(guide.title)}</h3>
+    <p>${escapeHtml(guide.summary)}</p>
+    <ol class="quickstart__list">
+      ${guide.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}
+    </ol>
+    <button type="button" data-dismiss-quickstart="true">Entendido</button>
+  `;
+}
+
+function getQuickstartGuide() {
+  const hasCompleted = state.completed.length > 0;
+  const hasPractice = state.practiceDone.length > 0 || state.solvedExercises.length > 0;
+  const hasEvolutionWork = Object.keys(evolutionBriefs).some((lessonId) => {
+    const evolution = evolutionBriefs[lessonId];
+    return isLessonCovered(evolution.fromLessonId) || isLessonCovered(lessonId);
+  });
+
+  if (!hasCompleted && !hasPractice) {
+    return {
+      eyebrow: "Como usar Solo Learn",
+      title: "Empieza simple",
+      summary: "La idea es avanzar por una lección pequeña cada vez, no intentar abarcar toda la app de golpe.",
+      steps: [
+        "Elige Java o JavaScript y filtra por nivel si lo necesitas.",
+        "Abre una lección y recorre teoría, práctica, reto y, si existe, tests.",
+        "Usa Siguiente sesión y Plan de hoy para no perder tiempo decidiendo por dónde empezar.",
+        "En JavaScript, carga ejercicios en el laboratorio; en Java, usa problemas guiados y mini proyectos.",
+      ],
+    };
+  }
+
+  if (hasEvolutionWork) {
+    return {
+      eyebrow: "Como seguir",
+      title: "Ya puedes trabajar por progresión",
+      summary: "La app ya no solo te sirve para abrir teoría: ahora puede encadenar base previa, escalada y práctica avanzada.",
+      steps: [
+        "Mira si Siguiente sesión o Plan de hoy te mandan a Base previa o Escalada.",
+        "Si una práctica dice Escala después, puedes abrir su base desde el banco o desde la lección activa.",
+        "Prioriza cerrar la base antes de intentar la versión avanzada del mismo problema.",
+        "Usa el banco de práctica para filtrar solo ejercicios evolutivos si quieres trabajar esa capa.",
+      ],
+    };
+  }
+
+  return {
+    eyebrow: "Como seguir",
+    title: "Convierte avance en soltura",
+    summary: "Ya has empezado a usar la app. Ahora conviene combinar teoría nueva con práctica cerrada y algo de repaso.",
+    steps: [
+      "Usa el Plan de hoy para decidir si toca desbloqueo, tests o repaso.",
+      "Cuando una lección tenga ejercicio evaluable, intenta validarlo antes de darla por cerrada.",
+      "En Java, apóyate en problemas guiados y mini proyectos para pasar de sintaxis a diseño.",
+      "Usa notas personales para registrar dudas o errores que no quieres repetir.",
+    ],
+  };
+}
+
 function renderNextSession() {
-  const recommendation = recommendNextLesson();
-  const nextLesson = recommendation?.lesson;
-  if (!nextLesson) {
+  const recommendation = recommendNextSession();
+  if (!recommendation) {
     elements.nextSession.innerHTML = `
       <p class="eyebrow">Siguiente sesión</p>
       <h3>Ruta completada</h3>
@@ -633,13 +715,14 @@ function renderNextSession() {
     return;
   }
 
+  const nextLesson = recommendation.lesson;
   const track = tracks[getTrackIdByLesson(nextLesson.id)];
   elements.nextSession.innerHTML = `
     <p class="eyebrow">Siguiente sesión</p>
     <h3>${nextLesson.title}</h3>
     <p>${track.label} · ${nextLesson.level} · ${nextLesson.xp} XP</p>
-    <p>${escapeHtml(recommendation.reason)}</p>
-    <button type="button" data-lesson-id="${nextLesson.id}">Abrir lección</button>
+    <p><strong>${recommendation.kind}:</strong> ${escapeHtml(recommendation.reason)}</p>
+    <button type="button" data-lesson-id="${nextLesson.id}" data-target="${recommendation.target}">${recommendation.target === "practice" ? "Abrir práctica" : "Abrir lección"}</button>
   `;
 }
 
@@ -1881,6 +1964,63 @@ function recommendNextLesson() {
   return ranked[0];
 }
 
+function recommendNextSession() {
+  const readyEvolutionTargets = Object.entries(evolutionBriefs)
+    .filter(([lessonId]) => getTrackIdByLesson(lessonId) === state.activeTrack)
+    .map(([lessonId, evolution]) => ({
+      lesson: findLesson(lessonId),
+      baseLesson: findLesson(evolution.fromLessonId),
+      target: exercises[lessonId] ? "practice" : "study",
+      baseTitle: evolution.fromTitle,
+    }))
+    .filter((entry) =>
+      entry.lesson &&
+      entry.baseLesson &&
+      isLessonCovered(entry.baseLesson.id) &&
+      !isLessonCovered(entry.lesson.id),
+    )
+    .sort((left, right) => scoreLessonRecommendation(right.lesson).score - scoreLessonRecommendation(left.lesson).score);
+
+  if (readyEvolutionTargets.length) {
+    const entry = readyEvolutionTargets[0];
+    return {
+      lesson: entry.lesson,
+      kind: "Escalada",
+      target: entry.target,
+      reason: `La base ${entry.baseTitle} ya está cubierta. Ahora conviene subir al siguiente replanteamiento.`,
+    };
+  }
+
+  const evolutionBaseLessons = Object.entries(evolutionBriefs)
+    .filter(([lessonId]) => getTrackIdByLesson(lessonId) === state.activeTrack)
+    .map(([lessonId, evolution]) => ({
+      lesson: findLesson(evolution.fromLessonId),
+      sourceLesson: findLesson(lessonId),
+    }))
+    .filter((entry) => entry.lesson && entry.sourceLesson && !isLessonCovered(entry.lesson.id))
+    .sort((left, right) => scoreLessonRecommendation(right.lesson).score - scoreLessonRecommendation(left.lesson).score);
+
+  if (evolutionBaseLessons.length) {
+    const entry = evolutionBaseLessons[0];
+    return {
+      lesson: entry.lesson,
+      kind: "Base previa",
+      target: "study",
+      reason: `Te conviene cubrir esta base antes de escalar hacia ${entry.sourceLesson.title}.`,
+    };
+  }
+
+  const lessonRecommendation = recommendNextLesson();
+  if (!lessonRecommendation) return null;
+
+  return {
+    lesson: lessonRecommendation.lesson,
+    kind: "Desbloqueo",
+    target: "study",
+    reason: lessonRecommendation.reason,
+  };
+}
+
 // Esta puntuación mezcla varias señales:
 // conceptos que desbloquea, continuidad con la ruta activa
 // y progreso parcial ya hecho.
@@ -1941,6 +2081,24 @@ function buildDailyQueue() {
     }))
     .filter((entry) => entry.lesson && entry.sourceLesson && !isLessonCovered(entry.lesson.id))
     .sort((left, right) => scoreLessonRecommendation(right.lesson).score - scoreLessonRecommendation(left.lesson).score);
+  const readyEvolutionTargets = Object.entries(evolutionBriefs)
+    .filter(([lessonId]) => {
+      const sourceLesson = findLesson(lessonId);
+      return sourceLesson && getTrackIdByLesson(lessonId) === state.activeTrack;
+    })
+    .map(([lessonId, evolution]) => ({
+      lesson: findLesson(lessonId),
+      baseLesson: findLesson(evolution.fromLessonId),
+      target: exercises[lessonId] ? "practice" : "study",
+      baseTitle: evolution.fromTitle,
+    }))
+    .filter((entry) =>
+      entry.lesson &&
+      entry.baseLesson &&
+      isLessonCovered(entry.baseLesson.id) &&
+      !isLessonCovered(entry.lesson.id),
+    )
+    .sort((left, right) => scoreLessonRecommendation(right.lesson).score - scoreLessonRecommendation(left.lesson).score);
   const pendingExercises = allLessons()
     .filter((lesson) => exercises[lesson.id] && !state.solvedExercises.includes(lesson.id))
     .filter((lesson) => state.readLessons.includes(lesson.id) || state.practiceDone.includes(lesson.id))
@@ -1956,6 +2114,7 @@ function buildDailyQueue() {
   const sessionMode = determineDailySessionMode({
     recommendation,
     evolutionBaseLessons,
+    readyEvolutionTargets,
     pendingExercises,
     failedLessons,
     saturation,
@@ -2009,6 +2168,25 @@ function buildDailyQueue() {
         30,
       );
     });
+  } else if (sessionMode === "evolution-ready") {
+    readyEvolutionTargets.slice(0, 2).forEach((entry) => {
+      addItem(
+        entry.lesson,
+        "Escalada",
+        `La base ${entry.baseTitle} ya está cubierta. Ahora conviene subir al siguiente replanteamiento.`,
+        entry.target,
+        34,
+      );
+    });
+    pendingExercises.slice(0, 1).forEach((lesson) => {
+      addItem(
+        lesson,
+        "Tests",
+        "Después de la subida, cerrar una práctica abierta ayuda a consolidar la progresión.",
+        "practice",
+        16,
+      );
+    });
   } else if (sessionMode === "unlock" && !saturation.blockNewTheory) {
     if (recommendation) {
       addItem(recommendation.lesson, "Desbloqueo", recommendation.reason, "study", 30);
@@ -2023,6 +2201,15 @@ function buildDailyQueue() {
       );
     });
   } else {
+    readyEvolutionTargets.slice(0, 1).forEach((entry) => {
+      addItem(
+        entry.lesson,
+        "Escalada",
+        `Ya puedes pasar del fundamento a ${entry.lesson.title}.`,
+        entry.target,
+        26,
+      );
+    });
     evolutionBaseLessons.slice(0, 1).forEach((entry) => {
       addItem(
         entry.lesson,
@@ -2059,6 +2246,15 @@ function buildDailyQueue() {
   if (recommendation && !saturation.blockNewTheory) {
     addItem(recommendation.lesson, "Desbloqueo", recommendation.reason, "study", 12);
   }
+  readyEvolutionTargets.slice(0, 1).forEach((entry) => {
+    addItem(
+      entry.lesson,
+      "Escalada",
+      `Ya puedes aprovechar la base cubierta y subir hacia ${entry.lesson.title}.`,
+      entry.target,
+      13,
+    );
+  });
   pendingExercises.slice(0, 2).forEach((lesson) => {
     addItem(
       lesson,
@@ -2083,9 +2279,10 @@ function buildDailyQueue() {
     .slice(0, 3);
 }
 
-function determineDailySessionMode({ recommendation, evolutionBaseLessons, pendingExercises, failedLessons, saturation }) {
+function determineDailySessionMode({ recommendation, evolutionBaseLessons, readyEvolutionTargets, pendingExercises, failedLessons, saturation }) {
   if (saturation.blockNewTheory && failedLessons.length >= 1) return "review";
   if (saturation.blockNewTheory) return "consolidation";
+  if (readyEvolutionTargets.length >= 1 && pendingExercises.length <= 1 && failedLessons.length === 0) return "evolution-ready";
   if (evolutionBaseLessons.length >= 1 && pendingExercises.length === 0 && failedLessons.length === 0) return "evolution";
   if (failedLessons.length >= 2) return "review";
   if (pendingExercises.length >= 2) return "consolidation";
@@ -2097,15 +2294,30 @@ function getDailySessionProfile(queue) {
   const kinds = queue.map((item) => item.kind);
   const counts = {
     base: kinds.filter((kind) => kind === "Base previa").length,
+    escalada: kinds.filter((kind) => kind === "Escalada").length,
     desbloqueo: kinds.filter((kind) => kind === "Desbloqueo").length,
     tests: kinds.filter((kind) => kind === "Tests").length,
     repaso: kinds.filter((kind) => kind === "Repaso").length,
   };
 
+  if (counts.escalada >= 1 && counts.tests === 0 && counts.repaso === 0) {
+    return {
+      label: "Sesion de escalado",
+      description: "La base ya está cubierta. Hoy toca aprovechar ese fundamento y subir un nivel en el mismo problema.",
+    };
+  }
+
   if (counts.base >= 1 && counts.tests === 0 && counts.repaso === 0) {
     return {
       label: "Sesion de preparacion",
       description: "Hoy conviene cubrir una base previa para que una práctica más avanzada tenga sentido y retorno real.",
+    };
+  }
+
+  if (counts.escalada >= 1 && counts.tests >= 1) {
+    return {
+      label: "Sesion de transferencia",
+      description: "Pasas de una base ya cubierta a una versión más exigente y luego la refuerzas con validación práctica.",
     };
   }
 
@@ -2358,6 +2570,9 @@ function normalizeState(value) {
   const lessonSort = ["default", "impact"].includes(value?.lessonSort)
     ? value.lessonSort
     : defaultState.lessonSort;
+  const quickstartDismissed = typeof value?.quickstartDismissed === "boolean"
+    ? value.quickstartDismissed
+    : defaultState.quickstartDismissed;
   const practiceTypeFilter = typeof value?.practiceTypeFilter === "string"
     ? value.practiceTypeFilter
     : defaultState.practiceTypeFilter;
@@ -2375,6 +2590,7 @@ function normalizeState(value) {
     activeTrack,
     filter,
     lessonSort,
+    quickstartDismissed,
     practiceFamilyFilter: typeof value?.practiceFamilyFilter === "string" ? value.practiceFamilyFilter : "all",
     practiceDifficultyFilter: typeof value?.practiceDifficultyFilter === "string" ? value.practiceDifficultyFilter : "all",
     practiceTypeFilter,
@@ -2423,6 +2639,7 @@ function createDefaultState() {
     practiceDone: [],
     solvedExercises: [],
     notes: {},
+    quickstartDismissed: false,
     dailyQueueLog: {},
     completedDailySessions: [],
     lastStudyDate: null,
