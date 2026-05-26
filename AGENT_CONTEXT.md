@@ -189,6 +189,9 @@ El estado vive en `app.js` bajo `state` y contiene, al menos:
   práctica real, no solo planificación
 - La lección activa ya no se limita a teoría + práctica: también expone apoyo
   mental en forma de concepto, lógica, mnemotecnia y error típico
+- La propia lección ya permite marcar atascos explícitos por tipo:
+  concepto, lógica, error típico o transferencia
+- Además, fallar retos o tests deja también rastro automático en ese historial
 - La cola diaria ya puede etiquetar el foco mental principal de cada tarea
 - También detecta un patrón de dificultad dominante y lo usa para modular
   recomendación principal y plan diario

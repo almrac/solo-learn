@@ -90,6 +90,7 @@ const defaultState = {
   readLessons: [],
   practiceDone: [],
   solvedExercises: [],
+  lessonStruggles: {},
   notes: {},
   quickstartDismissed: false,
   dailyQueueLog: {},
@@ -132,6 +133,7 @@ const elements = {
   studyTitle: document.querySelector("#studyTitle"),
   studyTheory: document.querySelector("#studyTheory"),
   studySupport: document.querySelector("#studySupport"),
+  studyStruggles: document.querySelector("#studyStruggles"),
   studySteps: document.querySelector("#studySteps"),
   studyProgress: document.querySelector("#studyProgress"),
   studyNotes: document.querySelector("#studyNotes"),
@@ -327,6 +329,15 @@ elements.studyEvolutionJump.addEventListener("click", () => {
   document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
 });
 
+elements.studyStruggles.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-struggle-type]");
+  if (!button) return;
+
+  recordLessonStruggle(state.activeLessonId, button.dataset.struggleType, "manual");
+  persist();
+  render();
+});
+
 elements.studyEvolutionCaseLoad.addEventListener("click", () => {
   const lessonId = elements.studyEvolutionCaseLoad.dataset.caseLesson;
   const evolutionCase = evolutionCases[lessonId];
@@ -482,6 +493,7 @@ elements.challengeForm.addEventListener("submit", (event) => {
     if (!state.failedChallenges.includes(lesson.id)) {
       state.failedChallenges.push(lesson.id);
     }
+    recordLessonStruggle(lesson.id, "error", "challenge");
     setFeedback("No es esa. Revisa el objetivo de la lección y vuelve a probar.", "wrong");
   }
 
@@ -939,6 +951,7 @@ function renderStudyPanel() {
   elements.studyTitle.textContent = lesson.title;
   elements.studyTheory.textContent = details.theory;
   renderStudySupport(support);
+  renderStudyStruggles(lesson, support);
   elements.studySteps.innerHTML = details.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("");
   elements.studyLanguage.textContent = tracks[getTrackIdByLesson(lesson.id)].label;
   elements.studyExample.textContent = details.example;
@@ -1042,6 +1055,59 @@ function renderStudySupport(support) {
       <strong>Error tipico</strong>
       <p>${escapeHtml(support.mistake)}</p>
     </article>
+  `;
+}
+
+function renderStudyStruggles(lesson, support) {
+  const struggleSummary = getLessonStruggleSummary(lesson.id);
+  const buttons = [
+    { key: "concept", label: "Concepto" },
+    { key: "logic", label: "Logica" },
+    { key: "error", label: "Error tipico" },
+    { key: "transfer", label: "Transferencia" },
+  ];
+
+  elements.studyStruggles.innerHTML = `
+    <div class="study-struggles__header">
+      <div>
+        <strong>Si te atascas, márcalo aquí</strong>
+        <p>${struggleSummary.total > 0
+          ? `Historial de esta lección: ${escapeHtml(struggleSummary.label)}.`
+          : "Esto ayuda a que la app recomiende mejor qué conviene reforzar."}</p>
+      </div>
+      ${support ? `<span class="study-struggles__hint">${escapeHtml(getSupportHint(support, struggleSummary.topKey))}</span>` : ""}
+    </div>
+    <div class="study-struggles__actions">
+      ${buttons
+        .map(
+          (button) => `
+            <button class="study-struggles__button ${struggleSummary.topKey === button.key ? "is-active" : ""}" type="button" data-struggle-type="${button.key}">
+              ${button.label}
+            </button>
+          `,
+        )
+        .join("")}
+    </div>
+    ${renderLessonStruggleBreakdown(struggleSummary)}
+  `;
+}
+
+function renderLessonStruggleBreakdown(summary) {
+  if (!summary.total) return "";
+
+  return `
+    <div class="study-struggles__breakdown">
+      ${summary.entries
+        .map(
+          (entry) => `
+            <span>
+              <strong>${escapeHtml(entry.label)}</strong>
+              ${entry.count}
+            </span>
+          `,
+        )
+        .join("")}
+    </div>
   `;
 }
 
@@ -1708,6 +1774,9 @@ function evaluateActiveExercise() {
         }
 
         const solved = results.length > 0 && results.every((result) => result.passed);
+        if (!solved) {
+          recordLessonStruggle(lesson.id, "logic", "tests");
+        }
         renderExerciseResults(results, solved);
         elements.jsRunnerOutput.textContent = output.length
           ? output.join("\n")
@@ -1724,10 +1793,12 @@ function evaluateActiveExercise() {
         render();
       })
       .catch((error) => {
+        recordLessonStruggle(lesson.id, "logic", "tests");
         elements.jsRunnerOutput.textContent = `${error.name}: ${error.message}`;
         renderExerciseResults([], false);
       });
   } catch (error) {
+    recordLessonStruggle(lesson.id, "logic", "tests");
     elements.jsRunnerOutput.textContent = `${error.name}: ${error.message}`;
     renderExerciseResults([], false);
   }
@@ -1848,6 +1919,9 @@ function evaluateDomExercise(lesson, exercise, code) {
   )
     .then((results) => {
       const solved = results.length > 0 && results.every((result) => result.passed);
+      if (!solved) {
+        recordLessonStruggle(lesson.id, "logic", "dom-tests");
+      }
       renderExerciseResults(results, solved);
       elements.jsRunnerOutput.textContent = solved
         ? "Preview y validación DOM correctos."
@@ -1862,6 +1936,7 @@ function evaluateDomExercise(lesson, exercise, code) {
       render();
     })
     .catch((error) => {
+      recordLessonStruggle(lesson.id, "logic", "dom-tests");
       elements.jsRunnerOutput.textContent = `${error.name}: ${error.message}`;
       renderExerciseResults([], false);
     });
@@ -2210,6 +2285,7 @@ function recommendNextSession() {
 }
 
 function getLearningDifficultyPattern() {
+  const struggleCounts = getTrackStruggleCounts(state.activeTrack);
   const conceptDebt = allLessons()
     .filter((lesson) => getTrackIdByLesson(lesson.id) === state.activeTrack)
     .filter((lesson) => !state.readLessons.includes(lesson.id) && !state.completed.includes(lesson.id))
@@ -2229,10 +2305,10 @@ function getLearningDifficultyPattern() {
     .length;
 
   const candidates = [
-    { key: "concept", label: "deuda conceptual", count: conceptDebt },
-    { key: "logic", label: "deuda de logica", count: logicDebt * 2 },
-    { key: "error", label: "arrastre de error tipico", count: errorDebt * 3 },
-    { key: "transfer", label: "transferencia pendiente", count: transferDebt * 2 },
+    { key: "concept", label: "deuda conceptual", count: conceptDebt + struggleCounts.concept * 3 },
+    { key: "logic", label: "deuda de logica", count: logicDebt * 2 + struggleCounts.logic * 4 },
+    { key: "error", label: "arrastre de error tipico", count: errorDebt * 3 + struggleCounts.error * 4 },
+    { key: "transfer", label: "transferencia pendiente", count: transferDebt * 2 + struggleCounts.transfer * 3 },
   ].sort((left, right) => right.count - left.count);
 
   return candidates[0]?.count ? candidates[0] : null;
@@ -2866,6 +2942,7 @@ function normalizeState(value) {
     readLessons: cleanIds(value?.readLessons, lessonIds),
     practiceDone: cleanIds(value?.practiceDone, lessonIds),
     solvedExercises: cleanIds(value?.solvedExercises, lessonIds),
+    lessonStruggles: cleanLessonStruggles(value?.lessonStruggles, lessonIds),
     notes: cleanNotes(value?.notes, lessonIds),
     dailyQueueLog: cleanDailyQueueLog(value?.dailyQueueLog, lessonIds),
     completedDailySessions: cleanDateArray(value?.completedDailySessions),
@@ -2889,6 +2966,28 @@ function cleanNotes(value, validIds) {
   );
 }
 
+function cleanLessonStruggles(value, validIds) {
+  if (!value || typeof value !== "object") return {};
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([lessonId, counts]) => validIds.includes(lessonId) && counts && typeof counts === "object")
+      .map(([lessonId, counts]) => [
+        lessonId,
+        {
+          concept: sanitizeStruggleCount(counts.concept),
+          logic: sanitizeStruggleCount(counts.logic),
+          error: sanitizeStruggleCount(counts.error),
+          transfer: sanitizeStruggleCount(counts.transfer),
+        },
+      ]),
+  );
+}
+
+function sanitizeStruggleCount(value) {
+  return Number.isFinite(value) ? Math.max(0, Math.round(value)) : 0;
+}
+
 function createDefaultState() {
   return {
     ...defaultState,
@@ -2898,6 +2997,7 @@ function createDefaultState() {
     readLessons: [],
     practiceDone: [],
     solvedExercises: [],
+    lessonStruggles: {},
     notes: {},
     quickstartDismissed: false,
     dailyQueueLog: {},
@@ -2930,6 +3030,75 @@ function formatExerciseMismatch(expected, received) {
   }
 
   return `<p>Esperado: ${escapeHtml(formatConsoleValue(expected))}</p><p>Recibido: ${escapeHtml(formatConsoleValue(received))}</p>`;
+}
+
+function recordLessonStruggle(lessonId, type) {
+  if (!lessonId || !["concept", "logic", "error", "transfer"].includes(type)) return;
+
+  const current = state.lessonStruggles[lessonId] ?? {
+    concept: 0,
+    logic: 0,
+    error: 0,
+    transfer: 0,
+  };
+
+  state.lessonStruggles[lessonId] = {
+    ...current,
+    [type]: current[type] + 1,
+  };
+  recordStudyDay();
+}
+
+function getLessonStruggleSummary(lessonId) {
+  const counts = state.lessonStruggles[lessonId] ?? {
+    concept: 0,
+    logic: 0,
+    error: 0,
+    transfer: 0,
+  };
+  const labels = {
+    concept: "Concepto",
+    logic: "Logica",
+    error: "Error tipico",
+    transfer: "Transferencia",
+  };
+  const entries = Object.entries(counts)
+    .map(([key, count]) => ({
+      key,
+      label: labels[key],
+      count,
+    }))
+    .filter((entry) => entry.count > 0)
+    .sort((left, right) => right.count - left.count);
+
+  return {
+    total: entries.reduce((sum, entry) => sum + entry.count, 0),
+    topKey: entries[0]?.key ?? null,
+    label: entries[0] ? `${entries[0].label} (${entries[0].count})` : "",
+    entries,
+  };
+}
+
+function getSupportHint(support, topKey) {
+  if (topKey === "logic") return `Pista util ahora: ${support.logic}`;
+  if (topKey === "error") return `Error a vigilar: ${support.mistake}`;
+  if (topKey === "transfer") return `Salto importante: ${support.mnemonic}`;
+  return `Idea clave: ${support.concept}`;
+}
+
+function getTrackStruggleCounts(trackId) {
+  return tracks[trackId].lessons.reduce(
+    (totals, lesson) => {
+      const counts = state.lessonStruggles[lesson.id];
+      if (!counts) return totals;
+      totals.concept += counts.concept ?? 0;
+      totals.logic += counts.logic ?? 0;
+      totals.error += counts.error ?? 0;
+      totals.transfer += counts.transfer ?? 0;
+      return totals;
+    },
+    { concept: 0, logic: 0, error: 0, transfer: 0 },
+  );
 }
 
 function cleanDailyQueueLog(value, validIds) {

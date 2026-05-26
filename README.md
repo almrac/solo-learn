@@ -43,6 +43,8 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - Ese resumen por fase es interactivo: al pulsar una fase se aplica el filtro correspondiente.
 - El resumen por fase marca también cuál concentra más deuda útil en la ruta activa.
 - Cada lección incluye también una capa de apoyo mental: idea clave, lógica, mnemotecnia y error típico.
+- La lección activa permite marcar explícitamente si el atasco es de concepto, lógica, error típico o transferencia.
+- La app registra también atascos automáticos al fallar retos o tests para tener historial real de bloqueo.
 - El plan diario ya sugiere también el tipo de foco mental de cada tarea: concepto, lógica, error típico o transferencia.
 - La app detecta además el patrón de dificultad predominante del momento y lo usa para ajustar `Siguiente sesión` y `Plan de hoy`.
 - Banco de práctica por familias y dificultad, adaptado a la ruta activa.

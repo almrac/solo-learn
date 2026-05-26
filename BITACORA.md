@@ -253,6 +253,23 @@ o sesión futura.
   - priorizar una práctica y un repaso
   - permitir una sesión de desbloqueo si la semana viene fuerte
 
+## Fase 28 — Dificultad cognitiva y atascos explícitos
+
+- Cada lección pasó a incluir apoyo mental:
+  - idea clave
+  - lógica
+  - mnemotecnia
+  - error típico
+- El plan diario empezó a etiquetar el foco mental de cada tarea
+- La app detecta un patrón de dificultad dominante para modular la recomendación
+- Se añadió además registro explícito de atascos por lección:
+  - concepto
+  - lógica
+  - error típico
+  - transferencia
+- Ese historial puede alimentarse de forma manual y también automática al
+  fallar retos o tests
+
 ## Fase 29 — Profundización en transformación de datos
 
 - Se añadió la lección `js-array-methods`
