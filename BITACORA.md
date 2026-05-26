@@ -269,6 +269,8 @@ o sesión futura.
   - transferencia
 - Ese historial puede alimentarse de forma manual y también automática al
   fallar retos o tests
+- Si una lección concentra más atasco real que el resto, puede emerger como
+  tarea de `Rescate` en la recomendación principal y en el plan diario
 
 ## Fase 29 — Profundización en transformación de datos
 

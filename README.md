@@ -47,6 +47,7 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - La app registra también atascos automáticos al fallar retos o tests para tener historial real de bloqueo.
 - El plan diario ya sugiere también el tipo de foco mental de cada tarea: concepto, lógica, error típico o transferencia.
 - La app detecta además el patrón de dificultad predominante del momento y lo usa para ajustar `Siguiente sesión` y `Plan de hoy`.
+- Si una lección concentra más atasco real que las demás, la app puede subirla como tarea de `Rescate`.
 - Banco de práctica por familias y dificultad, adaptado a la ruta activa.
 - El banco de práctica puede filtrarse por familia, dificultad y estado.
 - El banco de práctica también puede filtrarse por tipo: función, DOM, async, consola, testing o arquitectura.

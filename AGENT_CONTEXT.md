@@ -195,6 +195,8 @@ El estado vive en `app.js` bajo `state` y contiene, al menos:
 - La cola diaria ya puede etiquetar el foco mental principal de cada tarea
 - También detecta un patrón de dificultad dominante y lo usa para modular
   recomendación principal y plan diario
+- Si una lección concreta acumula más atasco real que las demás, puede
+  priorizarse como tarea de `Rescate`
 - El caso de salario por antigüedad ya se extiende a una tercera fase con
   colecciones, filtros y agregados
 - Esa progresión ya se expone también en el banco mediante etiquetas de fase

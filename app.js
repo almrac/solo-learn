@@ -2200,6 +2200,7 @@ function recommendNextLesson() {
 
 function recommendNextSession() {
   const pattern = getLearningDifficultyPattern();
+  const struggleLeader = getTrackStruggleLeaders(state.activeTrack)[0];
   const failedLessons = state.failedChallenges
     .filter((lessonId) => !state.solvedChallenges.includes(lessonId))
     .map((lessonId) => findLesson(lessonId))
@@ -2209,6 +2210,15 @@ function recommendNextSession() {
     .filter((lesson) => exercises[lesson.id] && !state.solvedExercises.includes(lesson.id))
     .filter((lesson) => state.readLessons.includes(lesson.id) || state.practiceDone.includes(lesson.id))
     .sort((left, right) => scoreLessonRecommendation(right).score - scoreLessonRecommendation(left).score);
+
+  if (struggleLeader && struggleLeader.summary.total >= 2 && !state.completed.includes(struggleLeader.lesson.id)) {
+    return {
+      lesson: struggleLeader.lesson,
+      kind: "Rescate",
+      target: struggleLeader.summary.topKey === "logic" && exercises[struggleLeader.lesson.id] ? "practice" : "study",
+      reason: `Es la lección donde más atasco real llevas ahora: ${struggleLeader.summary.label}. Conviene desatascarla antes de abrir más frente.`,
+    };
+  }
 
   if (pattern?.key === "error" && failedLessons.length) {
     return {
@@ -2365,8 +2375,9 @@ function scoreLessonRecommendation(lesson) {
 function buildDailyQueue() {
   const items = [];
   const seen = new Set();
+  const struggleLeader = getTrackStruggleLeaders(state.activeTrack)[0];
 
-  const addItem = (lesson, kind, reason, target = "study", priority = 0) => {
+  const addItem = (lesson, kind, reason, target = "study", priority = 0, focusKey = null) => {
     if (!lesson || seen.has(lesson.id)) return;
     seen.add(lesson.id);
     items.push({
@@ -2375,7 +2386,7 @@ function buildDailyQueue() {
       reason,
       target,
       priority,
-      focus: getLearningFocus(lesson, kind),
+      focus: getLearningFocus(lesson, kind, focusKey),
     });
   };
 
@@ -2430,6 +2441,17 @@ function buildDailyQueue() {
     failedLessons,
     saturation,
   });
+
+  if (struggleLeader && struggleLeader.summary.total >= 2 && !state.completed.includes(struggleLeader.lesson.id)) {
+    addItem(
+      struggleLeader.lesson,
+      "Rescate",
+      `Aquí llevas más atasco real acumulado: ${struggleLeader.summary.label}.`,
+      struggleLeader.summary.topKey === "logic" && exercises[struggleLeader.lesson.id] ? "practice" : "study",
+      32,
+      struggleLeader.summary.topKey,
+    );
+  }
 
   if (sessionMode === "review") {
     failedLessons.slice(0, 2).forEach((lesson) => {
@@ -2601,8 +2623,19 @@ function determineDailySessionMode({ recommendation, evolutionBaseLessons, ready
   return "mixed";
 }
 
-function getLearningFocus(lesson, kind) {
+function getLearningFocus(lesson, kind, focusKey = null) {
+  const explicitLabels = {
+    concept: "Concepto",
+    logic: "Logica",
+    error: "Error tipico",
+    transfer: "Transferencia",
+  };
+
+  if (focusKey && explicitLabels[focusKey]) return explicitLabels[focusKey];
   if (kind === "Repaso") return "Error tipico";
+  if (kind === "Rescate") {
+    return getLessonStruggleSummary(lesson.id).entries[0]?.label ?? "Concepto";
+  }
   if (kind === "Escalada") return "Transferencia";
   if (kind === "Base previa") return "Concepto";
   if (kind === "Tests") return "Logica";
@@ -3099,6 +3132,16 @@ function getTrackStruggleCounts(trackId) {
     },
     { concept: 0, logic: 0, error: 0, transfer: 0 },
   );
+}
+
+function getTrackStruggleLeaders(trackId) {
+  return tracks[trackId].lessons
+    .map((lesson) => ({
+      lesson,
+      summary: getLessonStruggleSummary(lesson.id),
+    }))
+    .filter((entry) => entry.summary.total > 0)
+    .sort((left, right) => right.summary.total - left.summary.total || scoreLessonRecommendation(right.lesson).score - scoreLessonRecommendation(left.lesson).score);
 }
 
 function cleanDailyQueueLog(value, validIds) {
