@@ -11,6 +11,14 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - Filtros por nivel: cero, base, intermedio y avanzado.
 - Vista de lección con teoría, pasos de estudio, ejemplo de código y práctica.
 - Laboratorio JavaScript con ejecución en el navegador y salida de `console.log`.
+- Ejercicios evaluables de JavaScript con tests automáticos en varias lecciones.
+- Preview DOM con HTML de prueba para practicar `DOM` y `formularios`.
+- Validación de renderizado de listas y contadores dentro del preview DOM.
+- Easter egg técnico con una radiografía de `app.js` y su relación con la ruta de aprendizaje.
+- La radiografía técnica puede abrir directamente la lección o la práctica relacionada.
+- La radiografía detecta base cubierta o pendiente para cada bloque técnico.
+- La recomendación de siguiente sesión prioriza lecciones que desbloquean más partes del proyecto.
+- El panel de lecciones puede ordenarse por impacto técnico.
 - Métricas de progreso total, progreso por lenguaje y racha diaria.
 - Siguiente sesión recomendada para mantener avance diario.
 - Lección activa claramente destacada con pasos de teoría, práctica, reto y cierre.
@@ -35,6 +43,9 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - `styles.css`: estilos responsive.
 - `data.js`: temario, ejemplos, prácticas y roadmap de verano.
 - `app.js`: estado, renderizado, progreso, retos y persistencia.
+- `AGENT_CONTEXT.md`: contexto operativo del proyecto para agentes.
+- `BACKLOG.md`: backlog futuro de mejoras priorizadas.
+- `BITACORA.md`: registro manual de cambios relevantes.
 
 ## Abrir en local
 

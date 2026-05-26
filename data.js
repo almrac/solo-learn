@@ -425,6 +425,357 @@ function render() {
       lessonIds: ["java-testing", "java-spring-intro", "js-testing", "js-components", "js-project"],
     },
   ],
+
+  exercises: {
+    "js-values": exercise({
+      prompt: "Implementa una función pura `crearResumen(nombre, nivel, xp)` que devuelva una frase legible.",
+      checklist: [
+        "Declara una función llamada crearResumen.",
+        "Recibe tres parámetros: nombre, nivel y xp.",
+        "Devuelve un string, no hagas console.log dentro de la función.",
+      ],
+      starter: `function crearResumen(nombre, nivel, xp) {
+  return "";
+}`,
+      functionName: "crearResumen",
+      tests: [
+        {
+          label: "Construye una frase completa",
+          args: ["Ana", "Base", 120],
+          expected: "Ana está en Base con 120 XP.",
+        },
+        {
+          label: "Mantiene los datos recibidos",
+          args: ["Luis", "Intermedio", 245],
+          expected: "Luis está en Intermedio con 245 XP.",
+        },
+      ],
+    }),
+    "js-objects": exercise({
+      prompt: "Implementa `obtenerPendientes(tareas)` para devolver solo los títulos de las tareas no completadas.",
+      checklist: [
+        "Recibe un array de objetos tarea.",
+        "Filtra por completada === false.",
+        "Devuelve un array de strings con los títulos.",
+      ],
+      starter: `function obtenerPendientes(tareas) {
+  return [];
+}`,
+      functionName: "obtenerPendientes",
+      tests: [
+        {
+          label: "Filtra tareas pendientes",
+          args: [[
+            { title: "Repasar arrays", completada: true },
+            { title: "Practicar objetos", completada: false },
+            { title: "Hacer fetch", completada: false },
+          ]],
+          expected: ["Practicar objetos", "Hacer fetch"],
+        },
+        {
+          label: "Devuelve array vacío si todo está completado",
+          args: [[
+            { title: "Variables", completada: true },
+            { title: "DOM", completada: true },
+          ]],
+          expected: [],
+        },
+      ],
+    }),
+    "js-dom": exercise({
+      mode: "dom",
+      prompt: "Implementa `conectarContador()` para enlazar los botones con el contador del HTML de prueba.",
+      checklist: [
+        "Selecciona contador y botones desde el DOM.",
+        "Incrementa el texto del contador al pulsar sumar.",
+        "Reinicia a 0 al pulsar reset.",
+      ],
+      starterHtml: `<section>
+  <h1>Contador de XP</h1>
+  <p>XP actual: <strong id="contador">0</strong></p>
+  <button id="sumar" type="button">Sumar</button>
+  <button id="reset" type="button">Reset</button>
+</section>`,
+      starter: `function conectarContador() {
+  // Selecciona los elementos y conecta los eventos.
+}`,
+      functionName: "conectarContador",
+      tests: [
+        {
+          label: "Incrementa el contador",
+          actions: [
+            { type: "call", name: "conectarContador" },
+            { type: "click", selector: "#sumar" },
+          ],
+          assertion: { type: "text", selector: "#contador" },
+          expected: "1",
+        },
+        {
+          label: "Reinicia el contador",
+          actions: [
+            { type: "call", name: "conectarContador" },
+            { type: "click", selector: "#sumar" },
+            { type: "click", selector: "#sumar" },
+            { type: "click", selector: "#reset" },
+          ],
+          assertion: { type: "text", selector: "#contador" },
+          expected: "0",
+        },
+      ],
+    }),
+    "js-forms": exercise({
+      mode: "dom",
+      prompt: "Implementa `activarFormularioTarea()` para validar el título y pintar un mensaje en pantalla.",
+      checklist: [
+        "Escucha el evento submit del formulario.",
+        "Impide el submit real con preventDefault().",
+        "Muestra un mensaje de error o confirmación en #feedback.",
+      ],
+      starterHtml: `<section>
+  <form id="taskForm">
+    <label for="taskTitle">Título</label>
+    <input id="taskTitle" name="title" type="text">
+    <button type="submit">Guardar</button>
+  </form>
+  <p id="feedback"></p>
+</section>`,
+      starter: `function activarFormularioTarea() {
+  // Conecta el formulario y pinta mensajes en #feedback.
+}`,
+      functionName: "activarFormularioTarea",
+      tests: [
+        {
+          label: "Bloquea títulos vacíos",
+          actions: [
+            { type: "call", name: "activarFormularioTarea" },
+            { type: "set-value", selector: "#taskTitle", value: "   " },
+            { type: "submit", selector: "#taskForm" },
+          ],
+          assertion: { type: "text", selector: "#feedback" },
+          expected: "El título es obligatorio.",
+        },
+        {
+          label: "Acepta títulos válidos",
+          actions: [
+            { type: "call", name: "activarFormularioTarea" },
+            { type: "set-value", selector: "#taskTitle", value: "Practicar fetch" },
+            { type: "submit", selector: "#taskForm" },
+          ],
+          assertion: { type: "text", selector: "#feedback" },
+          expected: "Tarea guardada: Practicar fetch",
+        },
+      ],
+    }),
+    "js-state": exercise({
+      mode: "dom",
+      prompt: "Implementa `renderizarTareas(tareas)` para pintar items en pantalla y mostrar cuántas quedan pendientes.",
+      checklist: [
+        "Recibe un array de objetos tarea.",
+        "Pinta un `<li>` por cada tarea dentro de `#taskList`.",
+        "Actualiza `#taskCount` con el número de tareas pendientes.",
+      ],
+      starterHtml: `<section>
+  <h1>Tablero de tareas</h1>
+  <ul id="taskList"></ul>
+  <p id="taskCount">Pendientes: 0</p>
+</section>`,
+      starter: `function renderizarTareas(tareas) {
+  // Pinta la lista y actualiza el contador.
+}`,
+      functionName: "renderizarTareas",
+      tests: [
+        {
+          label: "Pinta una tarea por item y cuenta pendientes",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarTareas",
+              args: [[
+                { title: "Repasar arrays", completada: false },
+                { title: "Practicar fetch", completada: true },
+                { title: "Preparar proyecto", completada: false },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#taskList li", expected: 3 },
+            { type: "text", selector: "#taskCount", expected: "Pendientes: 2" },
+            { type: "text", selector: "#taskList li:first-child", expected: "Repasar arrays" },
+          ],
+        },
+        {
+          label: "Muestra cero pendientes si todo está hecho",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarTareas",
+              args: [[
+                { title: "Variables", completada: true },
+                { title: "DOM", completada: true },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#taskList li", expected: 2 },
+            { type: "text", selector: "#taskCount", expected: "Pendientes: 0" },
+          ],
+        },
+      ],
+    }),
+    "js-json-fetch": exercise({
+      prompt: "Implementa `crearItemsHtml(data)` para recorrer `data.items` y devolver una cadena con varios `<li>`.",
+      checklist: [
+        "Lee `data.items`.",
+        "Usa title, language, level, tags y stats.xp.",
+        "Devuelve un string HTML con un `<li>` por item.",
+      ],
+      starter: `function crearItemsHtml(data) {
+  return "";
+}`,
+      functionName: "crearItemsHtml",
+      tests: [
+        {
+          label: "Pinta todos los items del array",
+          args: [{
+            course: "Solo Learn",
+            items: [
+              {
+                title: "Variables",
+                language: "JavaScript",
+                level: "Cero",
+                tags: ["variables", "funciones"],
+                stats: { xp: 40 },
+              },
+              {
+                title: "Fetch local",
+                language: "JavaScript",
+                level: "Intermedio",
+                tags: ["fetch", "json"],
+                stats: { xp: 95 },
+              },
+            ],
+          }],
+          expected:
+            "<li>Variables | JavaScript | Cero | variables, funciones | 40 XP</li><li>Fetch local | JavaScript | Intermedio | fetch, json | 95 XP</li>",
+          compare: "html",
+        },
+      ],
+    }),
+    "js-testing": exercise({
+      prompt: "Implementa `tieneTituloValido(titulo)` y devuelve `true` solo si, tras `trim()`, el texto tiene al menos 3 caracteres.",
+      checklist: [
+        "Comprueba que el valor sea string.",
+        "Aplica trim antes de validar.",
+        "Devuelve true o false.",
+      ],
+      starter: `function tieneTituloValido(titulo) {
+  return false;
+}`,
+      functionName: "tieneTituloValido",
+      tests: [
+        {
+          label: "Acepta un título válido",
+          args: ["Repasar DOM"],
+          expected: true,
+        },
+        {
+          label: "Rechaza espacios vacíos",
+          args: ["   "],
+          expected: false,
+        },
+        {
+          label: "Rechaza textos demasiado cortos",
+          args: ["JS"],
+          expected: false,
+        },
+      ],
+    }),
+  },
+
+  // Easter egg metadata: each block explains a real concept used in app.js,
+  // where it appears, and which lesson covers the same idea explicitly.
+  appBlueprint: [
+    blueprint(
+      "Estado global",
+      "Objeto `state`, cambios controlados y render posterior.",
+      "Cuando la app recuerda progreso, filtro activo, lección abierta o racha.",
+      "js-state",
+      "Intermedio",
+      "Primero aprenderías variables, objetos y arrays. Luego pasarías a `js-state`, donde ya trabajas con estado, persistencia y reconstrucción de interfaz.",
+      ["state", "render", "localStorage"],
+      ["js-values", "js-objects"],
+    ),
+    blueprint(
+      "Eventos de interfaz",
+      "`addEventListener`, clicks, submit y cambios de formulario.",
+      "Cuando pulsas botones, cambias de track, marcas teoría o envías un reto.",
+      "js-dom",
+      "Base",
+      "Empieza en `js-dom` con eventos simples y se refuerza en `js-forms` cuando el flujo depende de inputs y validación.",
+      ["eventos", "DOM", "listeners"],
+      ["js-values"],
+    ),
+    blueprint(
+      "Renderizado dinámico",
+      "Generación de HTML con `map`, plantillas y `innerHTML`.",
+      "Cuando se pintan tarjetas, roadmap, logros, ejercicios y resultados.",
+      "js-objects",
+      "Cero -> Intermedio",
+      "Nace al transformar arrays y objetos en `js-objects`, y se vuelve serio en `js-state` cuando cada cambio de datos obliga a repintar interfaz.",
+      ["arrays", "map", "innerHTML"],
+      ["js-values", "js-objects"],
+    ),
+    blueprint(
+      "Funciones puras y helpers",
+      "Funciones pequeñas para calcular, buscar, comparar o formatear.",
+      "Cuando la app calcula progreso, escapa HTML o compara resultados de tests.",
+      "js-values",
+      "Cero -> Avanzado",
+      "La base está en `js-values`. Luego aparecen helpers más potentes en `js-testing`, donde separas lógica para poder validarla con tests.",
+      ["funciones", "helpers", "testing"],
+      [],
+    ),
+    blueprint(
+      "Persistencia local",
+      "`localStorage`, serialización JSON y normalización de datos guardados.",
+      "Cuando exportas, importas o recuperas el progreso al recargar la página.",
+      "js-state",
+      "Intermedio",
+      "Se estudia en `js-state`, porque ahí ya entiendes que estado y persistencia son cosas distintas pero conectadas.",
+      ["persistencia", "json", "localStorage"],
+      ["js-values", "js-objects", "js-state"],
+    ),
+    blueprint(
+      "Asincronía",
+      "`async`, `await`, Promises y manejo de errores.",
+      "Cuando el runner ejecuta código async o una práctica usa `fetch`.",
+      "js-async",
+      "Intermedio",
+      "Se trabaja en `js-async` y se consolida en `js-json-fetch`, donde ya consumes datos y transformas la respuesta.",
+      ["async", "await", "fetch"],
+      ["js-values", "js-objects"],
+    ),
+    blueprint(
+      "Manipulación de DOM real",
+      "Selección de nodos, actualización de texto, listas y validación del resultado en pantalla.",
+      "Cuando el preview DOM comprueba contadores, formularios y listas renderizadas.",
+      "js-dom",
+      "Base -> Intermedio",
+      "Empieza en `js-dom`, se refuerza en `js-forms` y gana forma de app real en `js-state` al renderizar listas y contadores.",
+      ["DOM", "querySelector", "render"],
+      ["js-dom", "js-forms"],
+    ),
+    blueprint(
+      "Arquitectura de frontend",
+      "Separación entre datos, estado, render, evaluación y persistencia.",
+      "Cuando `data.js` y `app.js` reparten responsabilidades distintas.",
+      "js-modules",
+      "Intermedio",
+      "La idea aparece de verdad en `js-modules`, donde dejas de meter toda la lógica en un solo archivo mental.",
+      ["módulos", "separación", "arquitectura"],
+      ["js-values", "js-objects", "js-state"],
+    ),
+  ],
 };
 
 function lesson(id, level, title, xp, goals, prompt, options, answer) {
@@ -448,5 +799,23 @@ function details(theory, steps, example, practice) {
     steps,
     example,
     practice,
+  };
+}
+
+function exercise(config) {
+  return config;
+}
+
+// Small data helper so the blueprint stays readable where it is declared.
+function blueprint(title, concept, where, lessonId, phase, howToLearn, tags, prerequisites) {
+  return {
+    title,
+    concept,
+    where,
+    lessonId,
+    phase,
+    howToLearn,
+    tags,
+    prerequisites,
   };
 }

@@ -12,7 +12,7 @@
   </head>
   <body>
     <header class="header">
-      <a class="header__brand" href="#top" aria-label="Solo Learn">
+      <a class="header__brand" href="#top" aria-label="Solo Learn" id="brandTrigger">
         <span class="header__brand-mark">SL</span>
         <strong class="header__brand-name">Solo Learn</strong>
       </a>
@@ -135,9 +135,18 @@ const progreso = retos.filter(r => r.done);</code></pre>
               <p class="eyebrow" id="trackLabel">Java</p>
               <h2 id="trackTitle">Fundamentos y backend</h2>
             </div>
-            <p class="section-heading__text" id="trackSummary">
-              Sintaxis, orientación a objetos, colecciones, testing y bases para Spring.
-            </p>
+            <div class="lessons__heading-tools">
+              <p class="section-heading__text" id="trackSummary">
+                Sintaxis, orientación a objetos, colecciones, testing y bases para Spring.
+              </p>
+              <label class="lessons__sort">
+                <span>Orden</span>
+                <select id="lessonSort">
+                  <option value="default">Ruta</option>
+                  <option value="impact">Impacto técnico</option>
+                </select>
+              </label>
+            </div>
           </div>
 
           <div class="lessons__grid" id="lessonGrid" aria-live="polite"></div>
@@ -184,6 +193,14 @@ const progreso = retos.filter(r => r.done);</code></pre>
             <div class="code-lab__practice">
               <h3>Práctica</h3>
               <p id="studyPractice"></p>
+              <div class="study-exercise" id="studyExercise" hidden>
+                <div class="study-exercise__header">
+                  <h3>Ejercicio evaluable</h3>
+                  <span id="studyExerciseStatus">Pendiente</span>
+                </div>
+                <p id="studyExercisePrompt"></p>
+                <ul id="studyExerciseChecklist"></ul>
+              </div>
             </div>
           </article>
         </div>
@@ -204,11 +221,25 @@ const progreso = retos.filter(r => r.done);</code></pre>
           <div class="runner__editor">
             <label for="jsRunnerInput">Código</label>
             <textarea id="jsRunnerInput" spellcheck="false"></textarea>
+            <div class="runner__html" id="runnerHtmlPanel" hidden>
+              <label for="jsRunnerHtml">HTML de prueba</label>
+              <textarea id="jsRunnerHtml" spellcheck="false"></textarea>
+            </div>
             <div class="runner__actions">
               <button class="button button--primary" id="runJsButton" type="button">Ejecutar JS</button>
               <button id="loadPracticeButton" type="button">Cargar práctica activa</button>
+              <button id="loadExerciseButton" type="button">Cargar ejercicio</button>
+              <button id="renderPreviewButton" type="button">Renderizar preview</button>
+              <button id="evaluateExerciseButton" type="button">Evaluar ejercicio</button>
               <button id="clearRunnerButton" type="button">Limpiar salida</button>
             </div>
+          </div>
+          <div class="runner__preview" id="runnerPreviewPanel" hidden>
+            <div class="code-lab__header">
+              <h3>Preview</h3>
+              <span>DOM</span>
+            </div>
+            <iframe id="runnerPreview" title="Vista previa del ejercicio"></iframe>
           </div>
           <div class="runner__output">
             <div class="code-lab__header">
@@ -216,6 +247,13 @@ const progreso = retos.filter(r => r.done);</code></pre>
               <span>console</span>
             </div>
             <pre><code id="jsRunnerOutput">Pulsa Ejecutar JS para ver el resultado.</code></pre>
+            <div class="runner__exercise-results" id="exerciseResultsPanel" hidden>
+              <div class="runner__exercise-header">
+                <h3>Resultado de evaluación</h3>
+                <span id="exerciseSummary">Sin evaluar</span>
+              </div>
+              <ul id="exerciseResults"></ul>
+            </div>
           </div>
         </div>
       </section>
@@ -242,6 +280,26 @@ const progreso = retos.filter(r => r.done);</code></pre>
           <p class="section-heading__text">Se desbloquean automáticamente al completar partes de la ruta.</p>
         </div>
         <div class="achievements__grid" id="achievementGrid"></div>
+      </section>
+
+      <section class="blueprint" id="blueprintPanel" aria-label="Radiografía JavaScript del proyecto" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Easter egg</p>
+            <h2>Radiografía de `app.js`</h2>
+          </div>
+          <p class="section-heading__text">
+            Este panel conecta partes reales de la app con conceptos de JavaScript y con la fase donde aprenderías a construirlas.
+          </p>
+        </div>
+        <div class="blueprint__intro">
+          <p>
+            Se activa pulsando `Alt + J` o tocando varias veces el logo `SL`.
+          </p>
+          <button id="closeBlueprintButton" type="button">Cerrar panel</button>
+        </div>
+        <div class="blueprint__legend" id="blueprintLegend"></div>
+        <div class="blueprint__grid" id="blueprintGrid"></div>
       </section>
     </main>
 
