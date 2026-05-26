@@ -528,6 +528,13 @@ o sesión futura.
 - El banco añade un filtro específico para entrenar por fase evolutiva
 - Se ajustó la maquetación de `.section-heading` para separar mejor bloques de texto y controles
 
+## Fase 63 — Resumen por fase evolutiva
+
+- El banco muestra ahora cuántas prácticas hay por fase evolutiva
+- Se indica, por fase:
+  - cuántas están hechas
+  - cuántas siguen pendientes
+
 ## Fase 28 — Reglas semanales visibles
 
 - El plan diario ahora muestra reglas concretas de ritmo semanal

@@ -191,6 +191,7 @@ El estado vive en `app.js` bajo `state` y contiene, al menos:
   colecciones, filtros y agregados
 - Esa progresión ya se expone también en el banco mediante etiquetas de fase
 - El banco ya soporta también filtrado directo por fase evolutiva
+- También resume el volumen de práctica por fase evolutiva
 - La app es privada y pensada para una sola persona
 
 ## Deuda y siguiente foco razonable

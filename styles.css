@@ -1290,6 +1290,34 @@ pre {
   margin-bottom: var(--space-5);
 }
 
+.practice-bank__phases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.practice-phase-pill {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 12rem;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  background: var(--panel);
+}
+
+.practice-phase-pill strong {
+  color: var(--forest);
+  font-size: 0.9rem;
+}
+
+.practice-phase-pill span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
 .practice-bank__stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

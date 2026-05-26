@@ -196,6 +196,7 @@ const elements = {
   blueprintGrid: document.querySelector("#blueprintGrid"),
   practiceBankGrid: document.querySelector("#practiceBankGrid"),
   practiceBankSpotlight: document.querySelector("#practiceBankSpotlight"),
+  practiceBankPhases: document.querySelector("#practiceBankPhases"),
   practiceBankStats: document.querySelector("#practiceBankStats"),
   practiceFamilyFilter: document.querySelector("#practiceFamilyFilter"),
   practiceDifficultyFilter: document.querySelector("#practiceDifficultyFilter"),
@@ -1155,6 +1156,7 @@ function renderPracticeBank() {
   renderPracticeBankFilters(allEntries);
   const entries = sortPracticeBankEntries(filterPracticeBankEntries(allEntries));
   renderPracticeBankSpotlight(entries);
+  renderPracticeBankPhases(entries);
   renderPracticeBankStats(entries);
 
   if (!entries.length) {
@@ -1211,6 +1213,41 @@ function renderPracticeBankStats(entries) {
         ${item.isPriority ? "<small>Prioridad útil ahora</small>" : ""}
       </button>
     `)
+    .join("");
+}
+
+function renderPracticeBankPhases(entries) {
+  const phaseEntries = entries.filter((entry) => entry.evolutionPhase);
+  if (!phaseEntries.length) {
+    elements.practiceBankPhases.innerHTML = "";
+    return;
+  }
+
+  const grouped = new Map();
+  phaseEntries.forEach((entry) => {
+    if (!grouped.has(entry.evolutionPhase)) {
+      grouped.set(entry.evolutionPhase, {
+        phase: entry.evolutionPhase,
+        total: 0,
+        done: 0,
+      });
+    }
+
+    const current = grouped.get(entry.evolutionPhase);
+    current.total += 1;
+    if (entry.isDone) current.done += 1;
+  });
+
+  elements.practiceBankPhases.innerHTML = [...grouped.values()]
+    .map((item) => {
+      const pending = item.total - item.done;
+      return `
+        <div class="practice-phase-pill">
+          <strong>${escapeHtml(item.phase)}</strong>
+          <span>${item.done}/${item.total} hechas · ${pending} pendientes</span>
+        </div>
+      `;
+    })
     .join("");
 }
 
