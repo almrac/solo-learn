@@ -203,6 +203,24 @@ const progreso = retos.filter(r => r.done);</code></pre>
                 <p id="studyExercisePrompt"></p>
                 <ul id="studyExerciseChecklist"></ul>
               </div>
+              <div class="study-exercise" id="studyGuidedProblem" hidden>
+                <div class="study-exercise__header">
+                  <h3>Problema guiado</h3>
+                  <span>Java</span>
+                </div>
+                <p id="studyGuidedPrompt"></p>
+                <div class="study-guided">
+                  <div>
+                    <strong>Entrada</strong>
+                    <p id="studyGuidedInput"></p>
+                  </div>
+                  <div>
+                    <strong>Salida esperada</strong>
+                    <p id="studyGuidedOutput"></p>
+                  </div>
+                </div>
+                <ul id="studyGuidedChecklist"></ul>
+              </div>
             </div>
           </article>
         </div>
@@ -258,6 +276,53 @@ const progreso = retos.filter(r => r.done);</code></pre>
             </div>
           </div>
         </div>
+      </section>
+
+      <section class="practice-bank" aria-label="Banco de práctica">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Banco de práctica</p>
+            <h2>Familias y dificultad</h2>
+          </div>
+          <p class="section-heading__text">
+            La práctica de la ruta activa se agrupa por tipo de problema para que no dependas solo de la lección abierta.
+          </p>
+        </div>
+        <div class="practice-bank__filters">
+          <label class="practice-bank__filter">
+            <span>Familia</span>
+            <select id="practiceFamilyFilter"></select>
+          </label>
+          <label class="practice-bank__filter">
+            <span>Dificultad</span>
+            <select id="practiceDifficultyFilter"></select>
+          </label>
+          <label class="practice-bank__filter">
+            <span>Tipo</span>
+            <select id="practiceTypeFilter"></select>
+          </label>
+          <label class="practice-bank__filter">
+            <span>Estado</span>
+            <select id="practiceStatusFilter">
+              <option value="all">Todo</option>
+              <option value="pending">Pendiente</option>
+              <option value="done">Hecho</option>
+            </select>
+          </label>
+          <label class="practice-bank__filter">
+            <span>Orden</span>
+            <select id="practiceSort">
+              <option value="pending">Pendientes primero</option>
+              <option value="impact">Impacto</option>
+              <option value="difficulty">Dificultad</option>
+              <option value="family">Familia</option>
+            </select>
+          </label>
+          <button class="practice-bank__reset" id="practiceResetFilters" type="button">Restablecer filtros</button>
+        </div>
+        <div class="practice-bank__spotlight" id="practiceBankSpotlight"></div>
+        <div class="practice-bank__stats" id="practiceBankStats"></div>
+        <div class="practice-bank__grid" id="practiceBankGrid"></div>
       </section>
 
       <section class="challenge" aria-label="Reto activo">

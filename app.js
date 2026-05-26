@@ -1,6 +1,6 @@
 const STORAGE_KEY = "solo-learn-progress-v2";
 const LEGACY_STORAGE_KEY = "solo-learn-progress-v1";
-const { tracks, lessonDetails, studyPlan, exercises, appBlueprint } = window.LEARNING_DATA;
+const { tracks, lessonDetails, studyPlan, exercises, javaPracticeGuides, appBlueprint } = window.LEARNING_DATA;
 
 const achievements = [
   {
@@ -76,6 +76,11 @@ const defaultState = {
   activeTrack: "java",
   filter: "all",
   lessonSort: "default",
+  practiceFamilyFilter: "all",
+  practiceDifficultyFilter: "all",
+  practiceTypeFilter: "all",
+  practiceStatusFilter: "all",
+  practiceSort: "pending",
   activeLessonId: "java-variables",
   completed: [],
   solvedChallenges: [],
@@ -133,6 +138,11 @@ const elements = {
   studyExercisePrompt: document.querySelector("#studyExercisePrompt"),
   studyExerciseChecklist: document.querySelector("#studyExerciseChecklist"),
   studyExerciseStatus: document.querySelector("#studyExerciseStatus"),
+  studyGuidedProblem: document.querySelector("#studyGuidedProblem"),
+  studyGuidedPrompt: document.querySelector("#studyGuidedPrompt"),
+  studyGuidedInput: document.querySelector("#studyGuidedInput"),
+  studyGuidedOutput: document.querySelector("#studyGuidedOutput"),
+  studyGuidedChecklist: document.querySelector("#studyGuidedChecklist"),
   markReadButton: document.querySelector("#markReadButton"),
   markPracticeButton: document.querySelector("#markPracticeButton"),
   finishLessonButton: document.querySelector("#finishLessonButton"),
@@ -161,6 +171,15 @@ const elements = {
   blueprintPanel: document.querySelector("#blueprintPanel"),
   blueprintLegend: document.querySelector("#blueprintLegend"),
   blueprintGrid: document.querySelector("#blueprintGrid"),
+  practiceBankGrid: document.querySelector("#practiceBankGrid"),
+  practiceBankSpotlight: document.querySelector("#practiceBankSpotlight"),
+  practiceBankStats: document.querySelector("#practiceBankStats"),
+  practiceFamilyFilter: document.querySelector("#practiceFamilyFilter"),
+  practiceDifficultyFilter: document.querySelector("#practiceDifficultyFilter"),
+  practiceTypeFilter: document.querySelector("#practiceTypeFilter"),
+  practiceStatusFilter: document.querySelector("#practiceStatusFilter"),
+  practiceSort: document.querySelector("#practiceSort"),
+  practiceResetFilters: document.querySelector("#practiceResetFilters"),
   closeBlueprintButton: document.querySelector("#closeBlueprintButton"),
   continueButton: document.querySelector("#continueButton"),
   resetButton: document.querySelector("#resetButton"),
@@ -199,6 +218,50 @@ elements.lessonSort.addEventListener("change", () => {
   state.lessonSort = ["default", "impact"].includes(elements.lessonSort.value)
     ? elements.lessonSort.value
     : "default";
+  persist();
+  render();
+});
+
+elements.practiceFamilyFilter.addEventListener("change", () => {
+  state.practiceFamilyFilter = elements.practiceFamilyFilter.value || "all";
+  persist();
+  render();
+});
+
+elements.practiceDifficultyFilter.addEventListener("change", () => {
+  state.practiceDifficultyFilter = elements.practiceDifficultyFilter.value || "all";
+  persist();
+  render();
+});
+
+elements.practiceTypeFilter.addEventListener("change", () => {
+  state.practiceTypeFilter = elements.practiceTypeFilter.value || "all";
+  persist();
+  render();
+});
+
+elements.practiceStatusFilter.addEventListener("change", () => {
+  state.practiceStatusFilter = ["all", "pending", "done"].includes(elements.practiceStatusFilter.value)
+    ? elements.practiceStatusFilter.value
+    : "all";
+  persist();
+  render();
+});
+
+elements.practiceSort.addEventListener("change", () => {
+  state.practiceSort = ["pending", "impact", "difficulty", "family"].includes(elements.practiceSort.value)
+    ? elements.practiceSort.value
+    : "pending";
+  persist();
+  render();
+});
+
+elements.practiceResetFilters.addEventListener("click", () => {
+  state.practiceFamilyFilter = "all";
+  state.practiceDifficultyFilter = "all";
+  state.practiceTypeFilter = "all";
+  state.practiceStatusFilter = "all";
+  state.practiceSort = "pending";
   persist();
   render();
 });
@@ -492,6 +555,7 @@ function render() {
   renderStudyPanel();
   renderChallenge();
   renderAchievements();
+  renderPracticeBank();
   // Esta llamada alimenta el easter egg que explica cómo se relaciona app.js
   // con la ruta de aprendizaje de JavaScript.
   renderBlueprint();
@@ -711,6 +775,7 @@ function renderStudyPanel() {
 
   const details = lessonDetails[lesson.id];
   const exercise = exercises[lesson.id];
+  const guidedProblem = javaPracticeGuides[lesson.id];
   const isRead = state.readLessons.includes(lesson.id);
   const isPracticed = state.practiceDone.includes(lesson.id);
   const isCompleted = state.completed.includes(lesson.id);
@@ -737,6 +802,7 @@ function renderStudyPanel() {
   }
   renderStudyProgress(lesson);
   renderStudyExercise(lesson, exercise, isExerciseSolved);
+  renderGuidedProblem(guidedProblem);
 
   elements.markReadButton.textContent = isRead ? "Teoría leída" : "Marcar teoría";
   elements.markReadButton.disabled = isRead;
@@ -812,6 +878,25 @@ function renderStudyExercise(lesson, exercise, isSolved) {
   elements.studyExerciseStatus.textContent = isSolved ? "Superado" : "Pendiente";
 }
 
+function renderGuidedProblem(problem) {
+  if (!problem) {
+    elements.studyGuidedProblem.hidden = true;
+    elements.studyGuidedPrompt.textContent = "";
+    elements.studyGuidedInput.textContent = "";
+    elements.studyGuidedOutput.textContent = "";
+    elements.studyGuidedChecklist.innerHTML = "";
+    return;
+  }
+
+  elements.studyGuidedProblem.hidden = false;
+  elements.studyGuidedPrompt.textContent = problem.prompt;
+  elements.studyGuidedInput.textContent = problem.input;
+  elements.studyGuidedOutput.textContent = problem.output;
+  elements.studyGuidedChecklist.innerHTML = problem.checklist
+    .map((item) => `<li>${escapeHtml(item)}</li>`)
+    .join("");
+}
+
 function renderChallenge() {
   const lesson = findLesson(state.activeLessonId) ?? visibleLessons()[0];
   if (!lesson) return;
@@ -845,6 +930,169 @@ function renderAchievements() {
       `;
     })
     .join("");
+}
+
+function renderPracticeBank() {
+  const allEntries = getPracticeBankEntries(state.activeTrack);
+  renderPracticeBankFilters(allEntries);
+  const entries = sortPracticeBankEntries(filterPracticeBankEntries(allEntries));
+  renderPracticeBankSpotlight(entries);
+  renderPracticeBankStats(entries);
+
+  if (!entries.length) {
+    elements.practiceBankGrid.innerHTML = `
+      <article class="practice-card">
+        <h3>Sin práctica disponible</h3>
+        <p>La ruta activa todavía no tiene un banco de práctica definido.</p>
+      </article>
+    `;
+    return;
+  }
+
+  elements.practiceBankGrid.innerHTML = entries
+    .map((entry) => `
+      <article class="practice-card">
+        <div class="practice-card__meta">
+          <span class="language-mark language-mark--${entry.trackId}">${entry.trackLabel}</span>
+          <span class="badge">${escapeHtml(entry.family)}</span>
+          <span class="badge">${escapeHtml(entry.difficulty)}</span>
+          <span class="badge practice-card__status practice-card__status--${entry.progressState.key}">${escapeHtml(entry.progressState.label)}</span>
+        </div>
+        <h3>${escapeHtml(entry.title)}</h3>
+        <p>${escapeHtml(entry.summary)}</p>
+        <div class="practice-card__actions">
+          <button type="button" data-practice-lesson="${entry.lessonId}" data-practice-target="${entry.target}">
+            ${entry.target === "practice" ? "Abrir práctica" : "Abrir problema"}
+          </button>
+        </div>
+      </article>
+    `)
+    .join("");
+}
+
+function renderPracticeBankStats(entries) {
+  if (!entries.length) {
+    elements.practiceBankStats.innerHTML = "";
+    return;
+  }
+
+  const stats = getPracticeFamilyStats(entries);
+  elements.practiceBankStats.innerHTML = stats
+    .map((item) => `
+      <button class="practice-stat-card ${item.isPriority ? "is-priority" : ""}" type="button" data-practice-family-pick="${escapeHtml(item.family)}">
+        <div class="practice-stat-card__top">
+          <strong>${escapeHtml(item.family)}</strong>
+          <span>${item.percent}%</span>
+        </div>
+        <div class="practice-stat-card__bar"><span style="width: ${item.percent}%"></span></div>
+        <p>${item.started} empezadas · ${item.newCount} sin tocar</p>
+        ${item.isPriority ? "<small>Prioridad útil ahora</small>" : ""}
+      </button>
+    `)
+    .join("");
+}
+
+function renderPracticeBankSpotlight(entries) {
+  const recommended = entries.find((entry) => !entry.isDone) ?? entries[0];
+  if (!recommended) {
+    elements.practiceBankSpotlight.innerHTML = "";
+    return;
+  }
+
+  elements.practiceBankSpotlight.innerHTML = `
+    <article class="practice-spotlight">
+      <div class="practice-spotlight__meta">
+        <span class="eyebrow">Más útil ahora</span>
+        <span class="badge">${escapeHtml(recommended.family)}</span>
+        <span class="badge">${escapeHtml(recommended.difficulty)}</span>
+        <span class="badge">${escapeHtml(recommended.progressState.label)}</span>
+      </div>
+      <h3>${escapeHtml(recommended.title)}</h3>
+      <p>${escapeHtml(getPracticeSpotlightReason(recommended))}</p>
+      <div class="practice-spotlight__actions">
+        <button type="button" data-practice-lesson="${recommended.lessonId}" data-practice-target="${recommended.target}">
+          ${recommended.target === "practice" ? "Abrir práctica" : "Abrir problema"}
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+function renderPracticeBankFilters(entries) {
+  const families = ["all", ...new Set(entries.map((entry) => entry.family))];
+  const difficulties = ["all", ...new Set(entries.map((entry) => entry.difficulty))];
+  const types = ["all", ...new Set(entries.map((entry) => entry.practiceType))];
+
+  elements.practiceFamilyFilter.innerHTML = families
+    .map((family) => `<option value="${escapeHtml(family)}">${family === "all" ? "Todas" : escapeHtml(family)}</option>`)
+    .join("");
+  elements.practiceDifficultyFilter.innerHTML = difficulties
+    .map((difficulty) => `<option value="${escapeHtml(difficulty)}">${difficulty === "all" ? "Todas" : escapeHtml(difficulty)}</option>`)
+    .join("");
+  elements.practiceTypeFilter.innerHTML = types
+    .map((type) => `<option value="${escapeHtml(type)}">${type === "all" ? "Todos" : escapeHtml(type)}</option>`)
+    .join("");
+
+  elements.practiceFamilyFilter.value = families.includes(state.practiceFamilyFilter)
+    ? state.practiceFamilyFilter
+    : "all";
+  elements.practiceDifficultyFilter.value = difficulties.includes(state.practiceDifficultyFilter)
+    ? state.practiceDifficultyFilter
+    : "all";
+  elements.practiceTypeFilter.value = types.includes(state.practiceTypeFilter)
+    ? state.practiceTypeFilter
+    : "all";
+  elements.practiceStatusFilter.value = state.practiceStatusFilter;
+  elements.practiceSort.value = state.practiceSort;
+}
+
+function filterPracticeBankEntries(entries) {
+  return entries.filter((entry) => {
+    const familyMatch = state.practiceFamilyFilter === "all" || entry.family === state.practiceFamilyFilter;
+    const difficultyMatch =
+      state.practiceDifficultyFilter === "all" || entry.difficulty === state.practiceDifficultyFilter;
+    const typeMatch = state.practiceTypeFilter === "all" || entry.practiceType === state.practiceTypeFilter;
+    const statusMatch =
+      state.practiceStatusFilter === "all" ||
+      (state.practiceStatusFilter === "done" && entry.isDone) ||
+      (state.practiceStatusFilter === "pending" && !entry.isDone);
+
+    return familyMatch && difficultyMatch && typeMatch && statusMatch;
+  });
+}
+
+function sortPracticeBankEntries(entries) {
+  const difficultyOrder = {
+    Cero: 0,
+    Base: 1,
+    Intermedio: 2,
+    Avanzado: 3,
+  };
+
+  return [...entries].sort((left, right) => {
+    if (state.practiceSort === "family") {
+      return left.family.localeCompare(right.family) || left.title.localeCompare(right.title);
+    }
+
+    if (state.practiceSort === "difficulty") {
+      return (difficultyOrder[left.difficulty] ?? 99) - (difficultyOrder[right.difficulty] ?? 99)
+        || left.title.localeCompare(right.title);
+    }
+
+    if (state.practiceSort === "impact") {
+      const leftImpact = scoreLessonRecommendation(findLesson(left.lessonId)).score;
+      const rightImpact = scoreLessonRecommendation(findLesson(right.lessonId)).score;
+      return rightImpact - leftImpact || left.title.localeCompare(right.title);
+    }
+
+    if (left.isDone !== right.isDone) {
+      return Number(left.isDone) - Number(right.isDone);
+    }
+
+    const leftImpact = scoreLessonRecommendation(findLesson(left.lessonId)).score;
+    const rightImpact = scoreLessonRecommendation(findLesson(right.lessonId)).score;
+    return rightImpact - leftImpact || left.title.localeCompare(right.title);
+  });
 }
 
 function renderBlueprint() {
@@ -1241,7 +1489,7 @@ function evaluateDomExercise(lesson, exercise, code) {
       // Simulamos acciones de usuario dentro del preview: click, submit, escribir.
       // Esto es útil para entender cómo se prueban interfaces.
       for (const action of test.actions ?? []) {
-        runDomAction(context.win, context.doc, action);
+        await runDomAction(context.win, context.doc, action);
       }
       const received = test.assertions
         ? test.assertions.map((assertion) => ({
@@ -1314,13 +1562,16 @@ async function executeDomCode(code, html) {
   return { output, win, doc };
 }
 
-function runDomAction(win, doc, action) {
+async function runDomAction(win, doc, action) {
   if (action.type === "call") {
     const candidate = win[action.name];
     if (typeof candidate !== "function") {
       throw new Error(`No existe la función ${action.name} en el preview.`);
     }
-    candidate(...(action.args ?? []));
+    const result = candidate(...(action.args ?? []));
+    if (result && typeof result.then === "function") {
+      await result;
+    }
     return;
   }
 
@@ -1856,6 +2107,36 @@ elements.blueprintGrid.addEventListener("click", (event) => {
   }
 });
 
+elements.practiceBankGrid.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-practice-lesson]");
+  if (!button) return;
+
+  const lessonId = button.dataset.practiceLesson;
+  const target = button.dataset.practiceTarget;
+  saveCurrentNotes();
+  openLesson(lessonId);
+  persist();
+  render();
+
+  if (target === "practice") {
+    loadActiveExercise();
+    document.querySelector(".runner").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+
+  document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
+});
+
+elements.practiceBankStats.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-practice-family-pick]");
+  if (!button) return;
+
+  state.practiceFamilyFilter = button.dataset.practiceFamilyPick;
+  persist();
+  render();
+  document.querySelector(".practice-bank").scrollIntoView({ behavior: "smooth" });
+});
+
 function saveCurrentNotes() {
   const note = elements.studyNotes.value.trim();
   if (note) {
@@ -1885,11 +2166,25 @@ function normalizeState(value) {
   const lessonSort = ["default", "impact"].includes(value?.lessonSort)
     ? value.lessonSort
     : defaultState.lessonSort;
+  const practiceTypeFilter = typeof value?.practiceTypeFilter === "string"
+    ? value.practiceTypeFilter
+    : defaultState.practiceTypeFilter;
+  const practiceStatusFilter = ["all", "pending", "done"].includes(value?.practiceStatusFilter)
+    ? value.practiceStatusFilter
+    : defaultState.practiceStatusFilter;
+  const practiceSort = ["pending", "impact", "difficulty", "family"].includes(value?.practiceSort)
+    ? value.practiceSort
+    : defaultState.practiceSort;
 
   return {
     activeTrack,
     filter,
     lessonSort,
+    practiceFamilyFilter: typeof value?.practiceFamilyFilter === "string" ? value.practiceFamilyFilter : "all",
+    practiceDifficultyFilter: typeof value?.practiceDifficultyFilter === "string" ? value.practiceDifficultyFilter : "all",
+    practiceTypeFilter,
+    practiceStatusFilter,
+    practiceSort,
     activeLessonId: trackLessonIds.includes(value?.activeLessonId)
       ? value.activeLessonId
       : tracks[activeTrack].lessons[0].id,
@@ -1985,6 +2280,134 @@ function cleanDailyQueueLog(value, validIds) {
 function cleanDateArray(value) {
   if (!Array.isArray(value)) return [];
   return value.filter((item) => typeof item === "string").slice(0, 14);
+}
+
+function getPracticeBankEntries(trackId) {
+  if (trackId === "javascript") {
+    return Object.entries(exercises)
+      .map(([lessonId, exercise]) => {
+        const lesson = findLesson(lessonId);
+        if (!lesson) return null;
+
+        return {
+          lessonId,
+          trackId,
+          trackLabel: tracks[trackId].label,
+          family: exercise.family ?? "Práctica",
+          difficulty: exercise.difficulty ?? lesson.level,
+          progressState: getPracticeProgressState(lessonId, "javascript"),
+          practiceType: exercise.practiceType ?? "Práctica",
+          title: lesson.title,
+          summary: exercise.prompt,
+          target: "practice",
+          isDone: state.solvedExercises.includes(lessonId),
+      };
+      })
+      .filter(Boolean)
+      .sort((left, right) => left.family.localeCompare(right.family) || left.title.localeCompare(right.title));
+  }
+
+  return Object.entries(javaPracticeGuides)
+    .map(([lessonId, guideEntry]) => {
+      const lesson = findLesson(lessonId);
+      if (!lesson) return null;
+
+      return {
+        lessonId,
+        trackId,
+        trackLabel: tracks[trackId].label,
+        family: guideEntry.family ?? "Problema",
+        difficulty: guideEntry.difficulty ?? lesson.level,
+        progressState: getPracticeProgressState(lessonId, "java"),
+        practiceType: guideEntry.practiceType ?? "Consola",
+        title: lesson.title,
+        summary: guideEntry.prompt,
+        target: "study",
+        isDone: state.practiceDone.includes(lessonId) || state.completed.includes(lessonId),
+      };
+    })
+    .filter(Boolean)
+    .sort((left, right) => left.family.localeCompare(right.family) || left.title.localeCompare(right.title));
+}
+
+function getPracticeProgressState(lessonId, trackId) {
+  if (trackId === "javascript") {
+    if (state.solvedExercises.includes(lessonId)) {
+      return { key: "done", label: "Hecho" };
+    }
+
+    if (state.readLessons.includes(lessonId) || state.practiceDone.includes(lessonId)) {
+      return { key: "started", label: "Empezado" };
+    }
+
+    return { key: "new", label: "Sin tocar" };
+  }
+
+  if (state.practiceDone.includes(lessonId) || state.completed.includes(lessonId)) {
+    return { key: "done", label: "Hecho" };
+  }
+
+  if (state.readLessons.includes(lessonId)) {
+    return { key: "started", label: "Empezado" };
+  }
+
+  return { key: "new", label: "Sin tocar" };
+}
+
+function getPracticeSpotlightReason(entry) {
+  if (entry.progressState.key === "started") {
+    return "Ya empezaste esta práctica. Cerrarla ahora suele dar más retorno que abrir otra distinta.";
+  }
+
+  if (entry.progressState.key === "new") {
+    const lesson = findLesson(entry.lessonId);
+    const recommendation = lesson ? scoreLessonRecommendation(lesson) : null;
+    return recommendation?.reason ?? "Es una buena siguiente pieza dentro de la ruta activa.";
+  }
+
+  return "Ya la tienes hecha. Puede servirte como repaso o contraste con otras prácticas de la misma familia.";
+}
+
+function getPracticeFamilyStats(entries) {
+  const grouped = new Map();
+
+  entries.forEach((entry) => {
+    if (!grouped.has(entry.family)) {
+      grouped.set(entry.family, {
+        family: entry.family,
+        total: 0,
+        done: 0,
+        started: 0,
+        newCount: 0,
+      });
+    }
+
+    const current = grouped.get(entry.family);
+    current.total += 1;
+
+    if (entry.progressState.key === "done") {
+      current.done += 1;
+    } else if (entry.progressState.key === "started") {
+      current.started += 1;
+    } else {
+      current.newCount += 1;
+    }
+  });
+
+  const sorted = [...grouped.values()]
+    .map((item) => ({
+      ...item,
+      percent: item.total ? Math.round((item.done / item.total) * 100) : 0,
+      debtScore: item.newCount * 2 + item.started,
+    }))
+    .sort((left, right) => right.debtScore - left.debtScore || left.family.localeCompare(right.family));
+
+  const priorityFamily = sorted.find((item) => item.debtScore > 0)?.family;
+
+  return sorted.map((item) => ({
+    ...item,
+    isPriority: item.family === priorityFamily,
+  }));
 }
 
 function renderDailySessionFooter(totalSteps, doneSteps, sessionCompletedToday) {

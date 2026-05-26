@@ -18,6 +18,19 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - Lección puente para pintar listas desde datos con ejercicio DOM evaluable.
 - Lección integradora para pasar de datos filtrados a interfaz renderizada.
 - Lección específica para pasar de JSON local ya parseado a interfaz renderizada.
+- Lección integradora de flujo async para pasar de `fetch` a renderizado en DOM.
+- Problemas guiados de Java con entrada, salida esperada y checklist de resolución.
+- Cobertura ampliada de problemas guiados Java para métodos, colecciones, excepciones y testing.
+- Cobertura guiada ampliada también para interfaces/herencia y primera arquitectura con Spring.
+- Banco de práctica por familias y dificultad, adaptado a la ruta activa.
+- El banco de práctica puede filtrarse por familia, dificultad y estado.
+- El banco de práctica también puede filtrarse por tipo: función, DOM, async, consola, testing o arquitectura.
+- El banco de práctica también puede ordenarse por pendientes, impacto, dificultad o familia.
+- Cada tarjeta del banco muestra si la práctica está hecha, empezada o sin tocar.
+- El banco destaca una práctica “más útil ahora” según estado e impacto.
+- El banco muestra estadísticas por familia: total, hechas, empezadas y sin tocar.
+- Las estadísticas por familia son clicables y destacan la prioridad útil actual.
+- Las familias muestran porcentaje de avance y el banco permite restablecer filtros rápido.
 - Easter egg técnico con una radiografía de `app.js` y su relación con la ruta de aprendizaje.
 - La radiografía técnica puede abrir directamente la lección o la práctica relacionada.
 - La radiografía detecta base cubierta o pendiente para cada bloque técnico.

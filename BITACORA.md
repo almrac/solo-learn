@@ -283,6 +283,111 @@ o sesión futura.
 - Esta pieza cubre el paso entre JSON ya convertido a objeto y renderizado en pantalla
 - Se añadió un ejercicio DOM evaluable para filtrar items destacados y pintarlos en una lista
 
+## Fase 33 — Flujo async de fetch a DOM
+
+- Se añadió la lección `js-fetch-to-dom`
+- Esta pieza une:
+  - espera asíncrona
+  - filtrado de datos cargados
+  - renderizado en interfaz
+- El evaluador DOM ahora soporta acciones async al llamar funciones de ejercicio
+
+## Fase 34 — Problemas guiados para Java
+
+- Se añadió una capa de problemas estructurados para Java en la lección activa
+- Cada problema incluye:
+  - enunciado
+  - entrada
+  - salida esperada
+  - checklist
+- Se cubrieron varias lecciones base e intermedias de Java
+
+## Fase 35 — Ampliación de práctica Java
+
+- Se añadieron problemas guiados también para:
+  - `java-methods`
+  - `java-collections`
+  - `java-exceptions`
+  - `java-testing`
+- La capa Java cubre ya fundamentos, estructuras, POO, errores y validación básica
+
+## Fase 36 — Cierre casi completo de la ruta Java
+
+- Se añadieron problemas guiados también para:
+  - `java-inheritance`
+  - `java-spring-intro`
+- La práctica Java ya cubre casi toda la progresión de la ruta
+
+## Fase 37 — Banco de práctica por familias
+
+- Se añadió un banco de práctica conectado al track activo
+- JavaScript y Java se agrupan ahora por:
+  - familia
+  - dificultad
+- El banco permite abrir directamente la práctica o el problema relacionado
+
+## Fase 38 — Filtros del banco de práctica
+
+- El banco ahora permite filtrar por:
+  - familia
+  - dificultad
+  - estado
+- Esto permite usar la práctica como superficie propia y no solo como extensión de la lección activa
+
+## Fase 39 — Filtro por tipo de práctica
+
+- El banco ahora permite filtrar también por patrón técnico
+- Ejemplos de tipo:
+  - función
+  - DOM
+  - async
+  - consola
+  - testing
+  - arquitectura
+
+## Fase 40 — Ordenación del banco de práctica
+
+- El banco ahora permite ordenar por:
+  - pendientes primero
+  - impacto
+  - dificultad
+  - familia
+- Esto lo acerca más a un tablero de entrenamiento y no solo a un listado filtrable
+
+## Fase 41 — Estados visibles en el banco
+
+- Cada tarjeta del banco muestra ahora un estado de progreso
+- Estados añadidos:
+  - `Hecho`
+  - `Empezado`
+  - `Sin tocar`
+
+## Fase 42 — Recomendación dentro del banco
+
+- El banco ahora destaca una práctica “más útil ahora”
+- La recomendación prioriza:
+  - prácticas empezadas
+  - o, si no las hay, entradas con mejor impacto según la ruta activa
+
+## Fase 43 — Estadísticas por familia
+
+- El banco ahora muestra agregados por familia
+- Cada familia enseña:
+  - total de prácticas
+  - cuántas están hechas
+  - cuántas están empezadas
+  - cuántas siguen sin tocar
+
+## Fase 44 — Familias accionables
+
+- Las estadísticas por familia ahora funcionan como acceso directo al filtro
+- Se resalta la familia con mayor deuda útil para orientar la siguiente práctica
+
+## Fase 45 — Lectura visual del banco
+
+- Las familias muestran ya porcentaje de avance y barra visual
+- El banco añade una acción rápida para restablecer filtros y orden
+
 ## Fase 28 — Reglas semanales visibles
 
 - El plan diario ahora muestra reglas concretas de ritmo semanal

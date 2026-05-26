@@ -73,6 +73,19 @@ La app ya incluye:
 - el temario ya incluye un paso puente de renderizado de listas desde datos
 - el temario ya incluye una lección integradora de datos -> transformación -> DOM
 - el temario ya incluye un paso explícito de JSON local ya parseado -> DOM
+- el temario ya incluye un paso async de `fetch` -> filtrado -> DOM
+- Java ya dispone de problemas guiados estructurados para varias lecciones base
+- la capa de práctica Java ya cubre también métodos, colecciones, excepciones y testing
+- la capa de práctica Java cubre ya casi toda la ruta, incluyendo interfaces y Spring básico
+- existe un banco de práctica por track, familia y dificultad para no depender solo de la lección activa
+- el banco de práctica ya soporta filtros por familia, dificultad y completado
+- el banco de práctica ya soporta también filtrado por patrón técnico o tipo de práctica
+- el banco de práctica ya soporta ordenación por pendientes, impacto, dificultad y familia
+- las tarjetas del banco muestran un estado de progreso visible: hecho, empezado o sin tocar
+- el banco destaca una práctica recomendada dentro del subconjunto filtrado actual
+- el banco muestra agregados por familia para detectar huecos y zonas fuertes
+- las tarjetas de familia del banco son clicables y resaltan la familia con más deuda útil
+- las estadísticas por familia incluyen porcentaje y barra de avance; el banco tiene reset rápido de filtros
 - preview DOM con `iframe` aislado para ejercicios de interfaz
 - validación de listas renderizadas y contadores en ejercicios DOM
 - panel oculto tipo easter egg que documenta conceptos reales de `app.js`
