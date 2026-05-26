@@ -1242,10 +1242,10 @@ function renderPracticeBankPhases(entries) {
     .map((item) => {
       const pending = item.total - item.done;
       return `
-        <div class="practice-phase-pill">
+        <button class="practice-phase-pill ${state.practicePhaseFilter === item.phase ? "is-active" : ""}" type="button" data-practice-phase-pick="${escapeHtml(item.phase)}">
           <strong>${escapeHtml(item.phase)}</strong>
           <span>${item.done}/${item.total} hechas · ${pending} pendientes</span>
-        </div>
+        </button>
       `;
     })
     .join("");
@@ -2642,6 +2642,16 @@ elements.practiceBankStats.addEventListener("click", (event) => {
   if (!button) return;
 
   state.practiceFamilyFilter = button.dataset.practiceFamilyPick;
+  persist();
+  render();
+  document.querySelector(".practice-bank").scrollIntoView({ behavior: "smooth" });
+});
+
+elements.practiceBankPhases.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-practice-phase-pick]");
+  if (!button) return;
+
+  state.practicePhaseFilter = button.dataset.practicePhasePick;
   persist();
   render();
   document.querySelector(".practice-bank").scrollIntoView({ behavior: "smooth" });

@@ -1307,6 +1307,11 @@ pre {
   background: var(--panel);
 }
 
+.practice-phase-pill.is-active {
+  border-color: var(--forest);
+  background: var(--study);
+}
+
 .practice-phase-pill strong {
   color: var(--forest);
   font-size: 0.9rem;
