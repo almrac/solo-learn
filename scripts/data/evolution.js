@@ -125,6 +125,17 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Re-renderizar toda la vista desde una única fuente de verdad.",
       ],
     ),
+    "js-testing": evolutionBrief(
+      "js-project",
+      "Mini proyecto guiado",
+      "Filtrar tareas y renderizar un dashboard que parece correcto al probarlo a mano.",
+      "Aislar la lógica de filtrado y resumen en funciones puras y protegerla con tests para poder refactorizar el dashboard sin miedo.",
+      [
+        "Separar helpers puros de la parte DOM.",
+        "Cubrir filtro activo, resumen y casos borde con tests concretos.",
+        "Usar los tests como red antes de tocar nombres, ramas o persistencia.",
+      ],
+    ),
     "java-spring-intro": evolutionBrief(
       "java-collections",
       "Colecciones y mapas",
@@ -337,6 +348,43 @@ function buildTaskSummary(currentState) {
     pending: currentState.tasks.length - completed,
   };
 }`,
+      true,
+    ),
+    "js-testing": evolutionCase(
+      "Refuerzo con tests",
+      "Dashboard de tareas",
+      "La interfaz ya funciona, pero ahora blindas las reglas que sostienen filtros y contadores para no depender solo de revisar el DOM a mano.",
+      "Renderizas tareas, filtras por estado o track y compruebas visualmente que el resumen parece correcto.",
+      "Extraes `getVisibleTasks(state)` y `buildTaskSummary(state)` como funciones puras y las cubres con tests para filtros, lista vacia y recuentos mixtos.",
+      [
+        "Separa helpers de dominio del render DOM.",
+        "Cubre al menos filtro `pending`, filtro por track y resumen con completadas mezcladas.",
+        "Añade un caso borde para lista vacia o filtro desconocido.",
+      ],
+      `function getVisibleTasks(state) {
+  if (state.activeFilter === "completed") {
+    return state.tasks.filter((task) => task.done);
+  }
+
+  if (state.activeFilter === "javascript") {
+    return state.tasks.filter((task) => task.track === "javascript");
+  }
+
+  return state.tasks.filter((task) => !task.done);
+}
+
+function buildTaskSummary(state) {
+  const completed = state.tasks.filter((task) => task.done).length;
+
+  return {
+    total: state.tasks.length,
+    completed,
+    pending: state.tasks.length - completed,
+  };
+}
+
+// expect(getVisibleTasks(state)).toHaveLength(2);
+// expect(buildTaskSummary(state)).toEqual({ total: 3, completed: 1, pending: 2 });`,
       true,
     ),
     "java-oop": evolutionCase(

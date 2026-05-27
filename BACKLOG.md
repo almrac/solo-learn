@@ -168,7 +168,7 @@ Java:
 ### 10. Ejercicios evolutivos por nivel
 
 Estado:
-base ya arrancada con progresiones visibles en JavaScript y Java. Falta ampliar catálogo y cubrir más problemas con la misma lógica de reescritura por niveles.
+base ya bastante sólida con progresiones visibles en JavaScript y Java. Falta ampliar catálogo, pero el patrón de reescritura por niveles ya está bien representado.
 
 Objetivo:
 reutilizar un problema sencillo en varios niveles y rehacerlo con mejor diseño
@@ -183,11 +183,12 @@ Ejemplos:
 
 Casos claros:
 
-- cálculo de salario según antigüedad
+- [x] cálculo de salario según antigüedad
 - [x] gestor simple de notas
 - [x] carrito o lista de tareas
 - [x] filtros sobre datos cargados con `fetch`
-- evolución hacia capas y validación estilo backend
+- [x] evolución hacia capas y validación estilo backend
+- [x] refuerzo final con tests sobre el mismo problema
 
 Valor:
 enseña que programar bien no es solo “resolver”, sino mejorar estructura,
