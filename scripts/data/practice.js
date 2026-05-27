@@ -1047,6 +1047,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
     // TODO: imprime la ficha completa de forma legible.
   }
 }`,
+      [
+        "Cambia nombre, edad y nota y comprueba que la salida sigue siendo legible.",
+        "Verifica que el boolean no se pierda o se mezcle con el texto.",
+        "Asegúrate de que cada dato aparece una sola vez en la ficha final.",
+      ],
     ),
     "java-methods": guide(
       "Escribe un programa con un método `calcularNivel(int xp)` que devuelva el nivel del usuario.",
@@ -1077,6 +1082,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
     return 0;
   }
 }`,
+      [
+        "Prueba 0, 149, 150 y 320 para comprobar bien los saltos de nivel.",
+        "Verifica que el nivel empieza en 1 y no en 0.",
+        "Comprueba que mover la impresión fuera del método no cambia el cálculo.",
+      ],
     ),
     "java-control": guide(
       "Lee una nota ya fijada en una variable y clasifícala con condicionales.",
@@ -1106,6 +1116,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
     }
   }
 }`,
+      [
+        "Prueba una nota de cada tramo: suspenso, aprobado, notable y sobresaliente.",
+        "Comprueba que siempre salen exactamente tres mensajes de repaso.",
+        "Verifica que no se imprimen dos clasificaciones para la misma nota.",
+      ],
     ),
     "java-arrays": guide(
       "Trabaja con un array de cinco notas y calcula un pequeño resumen.",
@@ -1137,6 +1152,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
     System.out.println("Maxima: " + maxima);
   }
 }`,
+      [
+        "Prueba con la nota máxima en primera y última posición del array.",
+        "Comprueba que la media usa todas las notas y no solo parte del recorrido.",
+        "Verifica que cambiar el tamaño del array no obliga a tocar el bucle.",
+      ],
     ),
     "java-oop": guide(
       "Modela una clase Libro con un comportamiento útil.",
@@ -1171,6 +1191,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
     return false;
   }
 }`,
+      [
+        "Crea un libro corto y otro largo y compara el resultado de `esLargo()`.",
+        "Comprueba que el constructor deja el objeto listo sin pasos extra.",
+        "Verifica que la lógica depende del estado del libro y no de datos externos.",
+      ],
     ),
     "java-inheritance": guide(
       "Diseña una interfaz `Notificable` y dos clases que la implementen.",
@@ -1204,6 +1229,11 @@ class SmsNotifier implements Notificable {
     // TODO: implementar salida por consola.
   }
 }`,
+      [
+        "Llama al mismo método desde ambas implementaciones y comprueba que la salida cambia.",
+        "Verifica que el contrato de la interfaz obliga a mantener la misma firma.",
+        "Añade un tercer notificador pequeño para comprobar que el diseño aguanta.",
+      ],
     ),
     "java-collections": guide(
       "Construye un pequeño registro de progreso por lenguaje usando List y Map.",
@@ -1236,6 +1266,11 @@ public class ProgressRegistry {
     // TODO: mostrar resumen final.
   }
 }`,
+      [
+        "Añade varias tareas y comprueba que el recuento final coincide con la lista.",
+        "Verifica que cada clave del mapa devuelve el XP correcto.",
+        "Cambia el orden de inserción y comprueba que el programa sigue teniendo sentido.",
+      ],
     ),
     "java-exceptions": guide(
       "Crea un método `parsearNota(String texto)` que convierta texto a número y maneje errores.",
@@ -1265,6 +1300,11 @@ public class ProgressRegistry {
     return -1;
   }
 }`,
+      [
+        "Prueba un número válido, texto no numérico y un valor fuera del formato esperado.",
+        "Comprueba que los casos inválidos no rompen el programa principal.",
+        "Verifica que el contrato `-1` se mantiene igual en todos los fallos.",
+      ],
     ),
     "java-testing": guide(
       "Diseña una función `estaAprobado(int nota)` y plantea sus pruebas principales.",
@@ -1295,6 +1335,11 @@ public class ProgressRegistry {
     System.out.println(estaAprobado(10));
   }
 }`,
+      [
+        "Verifica el borde exacto de aprobado con la nota 5.",
+        "Comprueba un caso claramente inválido y otro claramente válido.",
+        "Asegúrate de que el método devuelve boolean y no texto de consola.",
+      ],
     ),
     "java-spring-intro": guide(
       "Diseña la estructura base de una API de tareas con Spring.",
@@ -1326,6 +1371,11 @@ class TaskController {
   // TODO: POST crear tarea.
   // TODO: PATCH completar tarea.
 }`,
+      [
+        "Enumera qué respondería cada endpoint antes de pensar en base de datos.",
+        "Comprueba que listar, crear y completar no mezclan la misma responsabilidad.",
+        "Verifica que los nombres de rutas y métodos HTTP se entienden sin comentarios extra.",
+      ],
     ),
   },
 
