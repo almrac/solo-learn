@@ -470,6 +470,55 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "text", selector: "#resultList li:first-child", expected: "Estado local | JavaScript | Intermedio" },
           ],
         },
+        {
+          label: "Mantiene el orden de visibles al renderizar una segunda tanda válida",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "Spring", language: "Java", level: "Avanzado", visible: false },
+              ]],
+            },
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "Estado local", language: "JavaScript", level: "Intermedio", visible: true },
+                { title: "DOM", language: "JavaScript", level: "Base", visible: true },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#resultList li", expected: 2 },
+            { type: "text", selector: "#resultList li:first-child", expected: "Estado local | JavaScript | Intermedio" },
+            { type: "text", selector: "#resultList li:last-child", expected: "DOM | JavaScript | Base" },
+          ],
+        },
+        {
+          label: "Puede vaciar la lista tras haber pintado varios visibles antes",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "map y filter", language: "JavaScript", level: "Base", visible: true },
+                { title: "JSON local", language: "JavaScript", level: "Intermedio", visible: true },
+              ]],
+            },
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "Colecciones", language: "Java", level: "Intermedio", visible: false },
+                { title: "Spring", language: "Java", level: "Avanzado", visible: false },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#resultList li", expected: 0 },
+          ],
+        },
       ],
     }),
     "js-json-to-dom": exercise({
@@ -538,6 +587,62 @@ Object.assign(learningRoot.LEARNING_DATA, {
               args: [{
                 items: [
                   { title: "map y filter", language: "JavaScript", level: "Base", featured: true },
+                ],
+              }],
+            },
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  { title: "Spring", language: "Java", level: "Avanzado", featured: false },
+                ],
+              }],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#featuredList li", expected: 0 },
+          ],
+        },
+        {
+          label: "Sustituye una lista anterior por nuevos destacados manteniendo el orden",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  { title: "map y filter", language: "JavaScript", level: "Base", featured: true },
+                ],
+              }],
+            },
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  { title: "Testing", language: "JavaScript", level: "Avanzado", featured: true },
+                  { title: "Colecciones", language: "Java", level: "Intermedio", featured: true },
+                ],
+              }],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#featuredList li", expected: 2 },
+            { type: "text", selector: "#featuredList li:first-child", expected: "Testing | JavaScript | Avanzado" },
+            { type: "text", selector: "#featuredList li:last-child", expected: "Colecciones | Java | Intermedio" },
+          ],
+        },
+        {
+          label: "Vuelve a vaciar la lista si después de varios destacados ya no queda ninguno",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  { title: "Testing", language: "JavaScript", level: "Avanzado", featured: true },
+                  { title: "Colecciones", language: "Java", level: "Intermedio", featured: true },
                 ],
               }],
             },

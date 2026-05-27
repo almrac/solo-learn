@@ -10,7 +10,7 @@ la naturaleza estática del proyecto.
 ### 1. Ejercicios evaluables de JavaScript
 
 Estado:
-base implementada y ampliándose de forma incremental.
+base implementada y ya bastante madura. Queda seguir ampliando cobertura fina.
 
 Objetivo:
 añadir ejercicios con tests automáticos y feedback claro.
@@ -32,7 +32,7 @@ convierte el laboratorio en una herramienta de práctica deliberada.
 ### 2. Práctica DOM con preview real
 
 Estado:
-primera versión sólida ya implementada. Se está endureciendo cobertura y casos.
+primera versión sólida ya implementada. Ahora pasa a frente principal para endurecer cobertura y casos.
 
 Objetivo:
 permitir ejercicios donde el usuario pinte items en pantalla a partir de datos.
