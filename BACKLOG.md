@@ -115,7 +115,7 @@ base ya visible en el banco con filtro por tema y agrupación útil. Falta segui
 ### 7. Misiones semanales
 
 - [x] completar X prácticas
-- [ ] resolver X retos
+- [x] resolver X retos
 - [x] estudiar ambos lenguajes
 - [~] cerrar una fase del roadmap
 

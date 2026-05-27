@@ -351,6 +351,7 @@ elements.challengeForm.addEventListener("submit", (event) => {
     if (!state.solvedChallenges.includes(lesson.id)) {
       state.solvedChallenges.push(lesson.id);
       state.xp += 25;
+      recordChallengeSuccess(lesson.id);
       recordStudyDay();
     }
     state.failedChallenges = state.failedChallenges.filter((lessonId) => lessonId !== lesson.id);

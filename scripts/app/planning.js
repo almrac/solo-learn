@@ -741,6 +741,7 @@ function getWeeklyContext() {
   const failedLessons = state.failedChallenges.filter((lessonId) => !state.solvedChallenges.includes(lessonId));
   const reviewEntries = getPendingReviewEntries(state.activeTrack);
   const saturation = getDailySaturationState(pendingExercises, failedLessons, reviewEntries);
+  const solvedChallengesCount = getWeeklySolvedChallengesCount();
 
   return {
     closedCount,
@@ -749,6 +750,7 @@ function getWeeklyContext() {
     failedLessons,
     reviewEntries,
     saturation,
+    solvedChallengesCount,
   };
 }
 
@@ -768,10 +770,28 @@ function findNextTrackLesson(trackId) {
   return candidate ?? tracks[trackId].lessons[0] ?? null;
 }
 
+function getClosestOpenPhase() {
+  return studyPlan
+    .map((phase) => {
+      const completedCount = phase.lessonIds.filter((lessonId) => state.completed.includes(lessonId)).length;
+      const pendingLessonIds = phase.lessonIds.filter((lessonId) => !state.completed.includes(lessonId));
+
+      return {
+        ...phase,
+        completedCount,
+        pendingCount: pendingLessonIds.length,
+        pendingLessonId: pendingLessonIds[0] ?? "",
+      };
+    })
+    .filter((phase) => phase.pendingCount > 0)
+    .sort((left, right) => left.pendingCount - right.pendingCount || left.lessonIds.length - right.lessonIds.length)[0] ?? null;
+}
+
 function buildWeeklyMissions() {
   const context = getWeeklyContext();
   const activeTrack = state.activeTrack;
   const closedTarget = context.closedCount >= 3 ? 3 : 3;
+  const solvedChallengesTarget = 2;
   const firstPendingExercise = context.pendingExercises[0] ?? null;
   const firstReviewEntry = context.reviewEntries[0] ?? null;
   const firstReviewRoute = firstReviewEntry ? getReviewEntryRoute(firstReviewEntry) : null;
@@ -784,6 +804,8 @@ function buildWeeklyMissions() {
       ? "javascript"
       : "";
   const crossTrackLesson = missingTrackId ? findNextTrackLesson(missingTrackId) : null;
+  const closestPhase = getClosestOpenPhase();
+  const closestPhaseLesson = closestPhase?.pendingLessonId ? findLesson(closestPhase.pendingLessonId) : null;
 
   return [
     {
@@ -796,6 +818,19 @@ function buildWeeklyMissions() {
         : {
             label: "Abrir plan",
             target: "daily-queue",
+          },
+    },
+    {
+      title: "Resolver 2 retos",
+      status: context.solvedChallengesCount >= solvedChallengesTarget ? "Hecha" : "En curso",
+      metric: `${context.solvedChallengesCount}/${solvedChallengesTarget} retos resueltos esta semana`,
+      tone: context.solvedChallengesCount >= solvedChallengesTarget ? "done" : "progress",
+      cta: context.solvedChallengesCount >= solvedChallengesTarget
+        ? null
+        : {
+            label: "Abrir reto",
+            lessonId: state.activeLessonId,
+            target: "challenge",
           },
     },
     {
@@ -841,6 +876,22 @@ function buildWeeklyMissions() {
             lessonId: crossTrackLesson.id,
             target: "study",
             trackId: missingTrackId,
+          }
+        : null,
+    },
+    {
+      title: "Cerrar una fase del roadmap",
+      status: !closestPhase ? "Hecha" : closestPhase.pendingCount <= 2 ? "Cerca" : "En curso",
+      metric: !closestPhase
+        ? "Todas las fases ya están cerradas"
+        : `${closestPhase.title}: ${closestPhase.completedCount}/${closestPhase.lessonIds.length} lecciones · ${closestPhase.pendingCount} pendientes`,
+      tone: !closestPhase ? "done" : closestPhase.pendingCount <= 2 ? "progress" : "warning",
+      cta: closestPhaseLesson
+        ? {
+            label: `Abrir ${closestPhase.title}`,
+            lessonId: closestPhaseLesson.id,
+            target: "study",
+            trackId: getTrackIdByLesson(closestPhaseLesson.id),
           }
         : null,
     },

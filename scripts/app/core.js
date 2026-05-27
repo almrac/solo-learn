@@ -109,6 +109,7 @@ const defaultState = {
     java: [],
     javascript: [],
   },
+  challengeSuccessLog: [],
   streak: 0,
   xp: 0,
 };
@@ -385,6 +386,29 @@ function getTrackSessionSnapshot(trackId) {
     weeklyCount,
     recent,
   };
+}
+
+function getCurrentWeekDateKeys(days = 7) {
+  const today = new Date();
+  return Array.from({ length: days }, (_, offset) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - offset);
+    return date.toISOString().slice(0, 10);
+  });
+}
+
+function recordChallengeSuccess(lessonId) {
+  const today = new Date().toISOString().slice(0, 10);
+  const item = `${today}:${lessonId}`;
+  state.challengeSuccessLog = [item, ...(state.challengeSuccessLog ?? []).filter((entry) => entry !== item)].slice(0, 30);
+}
+
+function getWeeklySolvedChallengesCount() {
+  const currentWeek = new Set(getCurrentWeekDateKeys());
+  return (state.challengeSuccessLog ?? [])
+    .filter((entry) => typeof entry === "string")
+    .filter((entry) => currentWeek.has(entry.split(":")[0]))
+    .length;
 }
 
 function formatStudyDate(dateKey) {
@@ -675,6 +699,7 @@ function normalizeState(value) {
     lastStudyDate: typeof value?.lastStudyDate === "string" ? value.lastStudyDate : null,
     lastTrackActivity: cleanTrackActivity(value?.lastTrackActivity),
     trackSessionLog: cleanTrackSessionLog(value?.trackSessionLog),
+    challengeSuccessLog: cleanChallengeSuccessLog(value?.challengeSuccessLog, lessonIds),
     streak: Number.isFinite(value?.streak) ? Math.max(0, value.streak) : 0,
     xp: Number.isFinite(value?.xp) ? Math.max(0, value.xp) : 0,
   };
@@ -729,6 +754,18 @@ function cleanTrackSessionLog(value) {
     java: cleanDateArray(value?.java),
     javascript: cleanDateArray(value?.javascript),
   };
+}
+
+function cleanChallengeSuccessLog(value, validIds) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((item) => typeof item === "string")
+    .filter((item) => {
+      const [, lessonId] = item.split(":");
+      return validIds.includes(lessonId);
+    })
+    .slice(0, 30);
 }
 
 function sanitizeStruggleCount(value) {
@@ -850,6 +887,7 @@ function createDefaultState() {
       java: [],
       javascript: [],
     },
+    challengeSuccessLog: [],
     streak: 0,
   };
 }
