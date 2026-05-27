@@ -777,6 +777,30 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "text", selector: "#courseList li:first-child", expected: "Estado local | Intermedio" },
           ],
         },
+        {
+          label: "Sustituye una lista anterior por estado vacio en la siguiente carga",
+          actions: [
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                items: [
+                  { title: "map y filter", level: "Base" },
+                  { title: "Estado local", level: "Intermedio" },
+                ],
+              })],
+            },
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({ items: [] })],
+            },
+          ],
+          assertions: [
+            { type: "text", selector: "#status", expected: "No hay resultados." },
+            { type: "count", selector: "#courseList li", expected: 0 },
+          ],
+        },
       ],
     }),
     "js-json-fetch": exercise({
@@ -826,6 +850,31 @@ Object.assign(learningRoot.LEARNING_DATA, {
             items: [],
           }],
           expected: "",
+          compare: "html",
+        },
+        {
+          label: "Mantiene el orden original y soporta tags vacíos",
+          args: [{
+            course: "Solo Learn",
+            items: [
+              {
+                title: "Estados UI",
+                language: "JavaScript",
+                level: "Intermedio",
+                tags: [],
+                stats: { xp: 70 },
+              },
+              {
+                title: "Testing",
+                language: "JavaScript",
+                level: "Avanzado",
+                tags: ["tests"],
+                stats: { xp: 110 },
+              },
+            ],
+          }],
+          expected:
+            "<li>Estados UI | JavaScript | Intermedio |  | 70 XP</li><li>Testing | JavaScript | Avanzado | tests | 110 XP</li>",
           compare: "html",
         },
       ],
@@ -973,6 +1022,33 @@ Object.assign(learningRoot.LEARNING_DATA, {
             visibleTitles: ["DOM", "UI states"],
           },
         },
+        {
+          label: "Filtra completadas y conserva los contadores globales",
+          args: [[
+            { title: "DOM", done: true },
+            { title: "UI states", done: false },
+            { title: "Testing", done: true },
+          ], { status: "completed" }],
+          expected: {
+            total: 3,
+            pending: 1,
+            completed: 2,
+            visibleTitles: ["DOM", "Testing"],
+          },
+        },
+        {
+          label: "Trata un filtro desconocido como lista vacía visible",
+          args: [[
+            { title: "DOM", done: true },
+            { title: "UI states", done: false },
+          ], { status: "archived" }],
+          expected: {
+            total: 2,
+            pending: 1,
+            completed: 1,
+            visibleTitles: [],
+          },
+        },
       ],
     }),
     "js-testing": exercise({
@@ -1014,6 +1090,16 @@ Object.assign(learningRoot.LEARNING_DATA, {
           label: "Rechaza valores que no son string",
           args: [null],
           expected: false,
+        },
+        {
+          label: "Rechaza strings con solo dos caracteres útiles aunque tengan espacios",
+          args: ["  ok  "],
+          expected: false,
+        },
+        {
+          label: "Acepta strings largos con saltos o espacios exteriores tras trim",
+          args: ["\n  Practica fetch  \t"],
+          expected: true,
         },
       ],
     }),
