@@ -110,6 +110,7 @@
 .next-session,
 .quickstart,
 .daily-queue,
+.weekly-missions,
 .review-box {
   display: grid;
   gap: var(--space-2);
@@ -120,6 +121,11 @@
 
 .daily-queue {
   background: var(--java-bg);
+}
+
+.weekly-missions {
+  background: rgba(255, 255, 255, 0.58);
+  border: var(--border-width) solid var(--line);
 }
 
 .quickstart {
@@ -134,6 +140,7 @@
 .quickstart h3,
 .next-session h3,
 .daily-queue h3,
+.weekly-missions h3,
 .review-box h3 {
   margin: 0;
   color: var(--forest);
@@ -144,11 +151,59 @@
 .next-session p:not(.eyebrow),
 .quickstart p:not(.eyebrow),
 .daily-queue p:not(.eyebrow),
+.weekly-missions p:not(.eyebrow),
 .review-box p:not(.eyebrow) {
   margin: 0;
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.45;
+}
+
+.weekly-missions__item {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--border-width) solid rgba(38, 58, 99, 0.12);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.weekly-missions__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.weekly-missions__top strong {
+  color: var(--forest);
+  font-size: 0.88rem;
+}
+
+.weekly-missions__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.9rem;
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-3);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.weekly-missions__badge--done {
+  background: var(--keylime);
+  color: var(--forest);
+}
+
+.weekly-missions__badge--progress {
+  background: rgba(38, 58, 99, 0.08);
+  color: var(--forest);
+}
+
+.weekly-missions__badge--warning {
+  background: rgba(232, 112, 79, 0.14);
+  color: var(--terracotta);
 }
 
 .quickstart__list {

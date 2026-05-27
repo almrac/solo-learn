@@ -16,6 +16,7 @@ function render() {
   renderQuickstart();
   renderNextSession();
   renderDailyQueue();
+  renderWeeklyMissions();
   renderReviewBox();
 
   elements.tabs.forEach((tab) => {
@@ -204,6 +205,28 @@ function renderReviewBox() {
           </button>
         `;
       })
+      .join("")}
+  `;
+}
+
+function renderWeeklyMissions() {
+  const missions = buildWeeklyMissions();
+
+  elements.weeklyMissions.innerHTML = `
+    <p class="eyebrow">Misiones semanales</p>
+    <h3>${missions.filter((mission) => mission.tone === "done").length}/${missions.length} en buen estado</h3>
+    ${missions
+      .map(
+        (mission) => `
+          <article class="weekly-missions__item">
+            <div class="weekly-missions__top">
+              <strong>${escapeHtml(mission.title)}</strong>
+              <span class="weekly-missions__badge weekly-missions__badge--${mission.tone}">${escapeHtml(mission.status)}</span>
+            </div>
+            <p>${escapeHtml(mission.metric)}</p>
+          </article>
+        `,
+      )
       .join("")}
   `;
 }

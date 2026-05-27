@@ -742,8 +742,51 @@ function getWeeklyContext() {
 
   return {
     closedCount,
+    lastSevenDays,
     pendingExercises,
     failedLessons,
+    reviewEntries,
     saturation,
   };
+}
+
+function hasTrackActivityInWindow(trackId, dateKeys) {
+  const lastActivity = state.lastTrackActivity[trackId];
+  return typeof lastActivity === "string" && dateKeys.includes(lastActivity);
+}
+
+function buildWeeklyMissions() {
+  const context = getWeeklyContext();
+  const activeTrack = state.activeTrack;
+  const closedTarget = context.closedCount >= 3 ? 3 : 3;
+  const bothTracksTouched =
+    hasTrackActivityInWindow("java", context.lastSevenDays) &&
+    hasTrackActivityInWindow("javascript", context.lastSevenDays);
+
+  return [
+    {
+      title: "Cerrar 3 sesiones",
+      status: context.closedCount >= closedTarget ? "Hecha" : "En curso",
+      metric: `${context.closedCount}/${closedTarget} sesiones esta semana`,
+      tone: context.closedCount >= closedTarget ? "done" : "progress",
+    },
+    {
+      title: `Bajar práctica abierta en ${tracks[activeTrack].label}`,
+      status: context.pendingExercises.length <= 2 ? "Controlada" : "Pendiente",
+      metric: `${context.pendingExercises.length} prácticas abiertas`,
+      tone: context.pendingExercises.length <= 2 ? "done" : "warning",
+    },
+    {
+      title: `Limpiar repaso en ${tracks[activeTrack].label}`,
+      status: context.reviewEntries.length <= 1 ? "Controlado" : "Pendiente",
+      metric: `${context.reviewEntries.length} frentes de repaso`,
+      tone: context.reviewEntries.length <= 1 ? "done" : "warning",
+    },
+    {
+      title: "Tocar ambos lenguajes",
+      status: bothTracksTouched ? "Hecha" : "En curso",
+      metric: `${Number(hasTrackActivityInWindow("java", context.lastSevenDays)) + Number(hasTrackActivityInWindow("javascript", context.lastSevenDays))}/2 lenguajes esta semana`,
+      tone: bothTracksTouched ? "done" : "progress",
+    },
+  ];
 }

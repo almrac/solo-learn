@@ -126,6 +126,7 @@ const elements = {
   quickstart: document.querySelector("#quickstart"),
   nextSession: document.querySelector("#nextSession"),
   dailyQueue: document.querySelector("#dailyQueue"),
+  weeklyMissions: document.querySelector("#weeklyMissions"),
   reviewBox: document.querySelector("#reviewBox"),
   activeTrack: document.querySelector("#activeTrack"),
   focusModeButton: document.querySelector("#focusModeButton"),

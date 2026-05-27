@@ -897,6 +897,16 @@ Object.assign(learningRoot.LEARNING_DATA, {
           args: ["JS"],
           expected: false,
         },
+        {
+          label: "Acepta exactamente 3 caracteres útiles tras trim",
+          args: ["  DOM "],
+          expected: true,
+        },
+        {
+          label: "Rechaza valores que no son string",
+          args: [null],
+          expected: false,
+        },
       ],
     }),
   },
