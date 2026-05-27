@@ -2079,12 +2079,13 @@ class Library {
       ],
     ),
     "java-collections": projectBrief(
-      "Construye un mini CRUD en memoria para tareas de estudio usando colecciones.",
-      "Pasar de variables sueltas a estructuras que permitan crear, listar, completar y resumir tareas sin rehacer el programa cada vez que crece.",
+      "Construye una agenda de estudio por consola con mini CRUD en memoria.",
+      "Pasar de variables sueltas a una agenda que permita crear, listar, completar y priorizar tareas de estudio sin rehacer el programa cada vez que crece.",
       [
         "Usa `ArrayList` para guardar tareas en memoria.",
         "Usa `HashMap` para asociar lenguaje con XP acumulado o con otro dato útil del dominio.",
-        "Añade operaciones mínimas para crear tarea, completarla y listar estado actual.",
+        "Añade operaciones mínimas para crear tarea, completarla, priorizarla y listar estado actual.",
+        "Separa pendientes y completadas en el resumen final.",
         "Muestra un resumen final recorriendo las estructuras.",
       ],
       [
@@ -2092,6 +2093,7 @@ class Library {
         "Mapa de XP",
         "Operaciones CRUD básicas",
         "Resumen por consola",
+        "Vista de pendientes priorizadas",
       ],
       `import java.util.ArrayList;
 import java.util.HashMap;
@@ -2117,17 +2119,19 @@ tasks.add(new StudyTask("Practicar DOM"));
 xpByTrack.put("java", 120);
 xpByTrack.put("javascript", 160);
 
-// TODO: crear otra tarea, completar una y mostrar resumen final.`,
+// TODO: crear otra tarea, completar una, decidir prioridad y mostrar resumen final.`,
       [
         "Comprueba cuántas tareas siguen pendientes y cuántas aparecen como hechas.",
         "Verifica que el mapa devuelve el XP correcto para cada lenguaje.",
         "Comprueba que completar una tarea cambia su estado sin duplicarla ni perderla.",
         "Añade un tercer dato y confirma que el resumen sigue saliendo legible.",
+        "Verifica que las tareas más urgentes aparecen antes en la vista principal si decides priorizarlas.",
       ],
       [
-        "La salida final resume tareas y XP sin depender de variables sueltas repetidas.",
+        "La salida final resume pendientes, completadas y XP sin depender de variables sueltas repetidas.",
         "Crear o completar tareas es un cambio local, no un parche repartido por todo `main`.",
         "Lista y mapa tienen responsabilidades distintas y eso se nota en el código.",
+        "La agenda ya parece una herramienta de estudio y no solo una demo de colecciones.",
       ],
     ),
     "java-inheritance": projectBrief(
@@ -2435,11 +2439,13 @@ function renderJsonViewer() {
         "Muestra un mensaje de carga antes de esperar datos.",
         "Pinta un mensaje vacío si no hay items.",
         "Captura errores y muestra un mensaje útil sin romper la vista.",
+        "Asegúrate de que una carga válida después de un error o un vacío recupere la vista completa.",
       ],
       [
         "Estado de carga",
         "Estado vacío",
         "Estado de error",
+        "Recuperación tras recarga",
       ],
       `async function loadCourses(fetchItems) {
   const status = document.querySelector("#status");
@@ -2448,6 +2454,16 @@ function renderJsonViewer() {
   status.textContent = "Cargando...";
   list.innerHTML = "";
 }`,
+      [
+        "Comprueba que una respuesta vacía no deje restos de la carga anterior.",
+        "Verifica que un error limpie la lista y deje un mensaje distinto del estado vacío.",
+        "Asegúrate de que una segunda carga válida recupere la vista después de un error.",
+      ],
+      [
+        "Los textos de carga, vacío y error son distinguibles sin ambigüedad.",
+        "La interfaz puede fallar y recuperarse sin recargar la página completa.",
+        "Cada recarga sustituye el estado visual anterior y no arrastra nodos viejos.",
+      ],
     ),
     "js-testing": projectBrief(
       "Extrae helpers puros de un dashboard y cúbrelos con tests.",

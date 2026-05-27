@@ -151,7 +151,7 @@ base ya visible en el banco con filtro por tema y agrupación útil. Falta segui
 ### 9. Mini proyectos guiados
 
 Estado:
-base ya en marcha con briefs, starters y validación manual. Falta ampliar catálogo y densidad.
+base ya en marcha con briefs, starters y validación manual. La densidad de varios proyectos ya subió; queda seguir ampliando catálogo y cerrar más casos fuertes.
 
 JavaScript:
 
