@@ -658,13 +658,14 @@ function guide(prompt, input, output, checklist, family, difficulty, practiceTyp
   };
 }
 
-function projectBrief(summary, outcome, milestones, deliverables, starterCode = "") {
+function projectBrief(summary, outcome, milestones, deliverables, starterCode = "", validationChecklist = []) {
   return {
     summary,
     outcome,
     milestones,
     deliverables,
     starterCode,
+    validationChecklist,
   };
 }
 

@@ -170,6 +170,8 @@ const elements = {
   studyProjectDeliverables: document.querySelector("#studyProjectDeliverables"),
   studyProjectStarterBlock: document.querySelector("#studyProjectStarterBlock"),
   studyProjectStarter: document.querySelector("#studyProjectStarter"),
+  studyProjectValidationBlock: document.querySelector("#studyProjectValidationBlock"),
+  studyProjectValidation: document.querySelector("#studyProjectValidation"),
   studyEvolution: document.querySelector("#studyEvolution"),
   studyEvolutionFrom: document.querySelector("#studyEvolutionFrom"),
   studyEvolutionBasic: document.querySelector("#studyEvolutionBasic"),

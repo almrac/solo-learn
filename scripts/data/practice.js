@@ -636,6 +636,34 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "count", selector: "#fetchList li", expected: 0 },
           ],
         },
+        {
+          label: "Sustituye la lista anterior cuando llega una segunda carga válida",
+          actions: [
+            {
+              type: "call",
+              name: "cargarYRenderizar",
+              args: [async () => ({
+                items: [
+                  { title: "map y filter", language: "JavaScript", level: "Base" },
+                  { title: "JSON local", language: "JavaScript", level: "Intermedio" },
+                ],
+              })],
+            },
+            {
+              type: "call",
+              name: "cargarYRenderizar",
+              args: [async () => ({
+                items: [
+                  { title: "Estado local", language: "JavaScript", level: "Intermedio" },
+                ],
+              })],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#fetchList li", expected: 1 },
+            { type: "text", selector: "#fetchList li:first-child", expected: "Estado local | Intermedio" },
+          ],
+        },
       ],
     }),
     "js-ui-states": exercise({
@@ -717,6 +745,30 @@ Object.assign(learningRoot.LEARNING_DATA, {
           assertions: [
             { type: "text", selector: "#status", expected: "No se pudieron cargar los cursos." },
             { type: "count", selector: "#courseList li", expected: 0 },
+          ],
+        },
+        {
+          label: "Se recupera tras un error y vuelve a pintar resultados válidos",
+          actions: [
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => { throw new Error("fallo de red"); }],
+            },
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                items: [
+                  { title: "Estado local", level: "Intermedio" },
+                ],
+              })],
+            },
+          ],
+          assertions: [
+            { type: "text", selector: "#status", expected: "Resultados listos." },
+            { type: "count", selector: "#courseList li", expected: 1 },
+            { type: "text", selector: "#courseList li:first-child", expected: "Estado local | Intermedio" },
           ],
         },
       ],
@@ -1301,6 +1353,11 @@ class TaskController {
     // TODO
   }
 }`,
+      [
+        "Comprueba que pedir prestado dos veces no deje el mismo resultado que la primera.",
+        "Verifica que `giveBack()` restaure la disponibilidad del libro.",
+        "Desde `main`, imprime el estado antes y después de cada operación.",
+      ],
     ),
     "java-collections": projectBrief(
       "Construye un registro de progreso por lenguaje usando colecciones.",
@@ -1325,6 +1382,11 @@ xpByTrack.put("java", 120);
 xpByTrack.put("javascript", 160);
 
 // TODO: mostrar resumen final.`,
+      [
+        "Comprueba cuántas tareas quedan pendientes y que el recuento coincide con la lista.",
+        "Verifica que el mapa devuelve el XP correcto para cada lenguaje.",
+        "Añade un tercer dato y confirma que el resumen sigue saliendo legible.",
+      ],
     ),
     "java-inheritance": projectBrief(
       "Diseña un sistema simple de notificaciones por interfaz.",
@@ -1350,6 +1412,11 @@ class EmailNotifier implements Notificable {
 }
 
 List<Notificable> canales = new ArrayList<>();`,
+      [
+        "Recorre la colección y comprueba que cada implementación responde con su propio formato.",
+        "Verifica que el código cliente usa `Notificable` y no depende de una clase concreta.",
+        "Añade una tercera implementación pequeña para comprobar que el diseño escala.",
+      ],
     ),
     "java-exceptions": projectBrief(
       "Crea un validador de notas resistente a entradas inválidas.",
@@ -1368,6 +1435,11 @@ List<Notificable> canales = new ArrayList<>();`,
   // TODO: convertir y validar 0-10.
   return -1;
 }`,
+      [
+        "Prueba una nota válida, una fuera de rango y un texto no numérico.",
+        "Comprueba que todos los casos inválidos devuelven `-1`.",
+        "Verifica que no capturas una excepción genérica si no hace falta.",
+      ],
     ),
     "java-testing": projectBrief(
       "Refactoriza una utilidad de validación y cúbrela con JUnit.",
@@ -1390,6 +1462,11 @@ List<Notificable> canales = new ArrayList<>();`,
 }
 
 // assertTrue(new TaskValidator().isValidTitle("Repasar DOM"));`,
+      [
+        "Cubre un caso válido, uno vacío y uno demasiado corto.",
+        "Refactoriza después de tener una base mínima de comprobaciones.",
+        "Comprueba que un cambio de nombre o trim no rompe los tests.",
+      ],
     ),
     "java-spring-intro": projectBrief(
       "Diseña una API REST mínima para tareas de estudio.",
@@ -1412,6 +1489,11 @@ class TaskController {
     return List.of();
   }
 }`,
+      [
+        "Revisa que cada endpoint tenga una intención clara y un verbo HTTP coherente.",
+        "Comprueba que controller y service no mezclen responsabilidades.",
+        "Valida que el DTO expone solo lo necesario para la respuesta.",
+      ],
     ),
     "js-components": projectBrief(
       "Extrae una tarjeta de práctica reutilizable a partir de datos.",

@@ -749,6 +749,8 @@ function renderProjectBrief(projectBrief) {
     elements.studyProjectDeliverables.innerHTML = "";
     elements.studyProjectStarterBlock.hidden = true;
     elements.studyProjectStarter.textContent = "";
+    elements.studyProjectValidationBlock.hidden = true;
+    elements.studyProjectValidation.innerHTML = "";
     return;
   }
 
@@ -768,6 +770,16 @@ function renderProjectBrief(projectBrief) {
   } else {
     elements.studyProjectStarterBlock.hidden = true;
     elements.studyProjectStarter.textContent = "";
+  }
+
+  if (Array.isArray(projectBrief.validationChecklist) && projectBrief.validationChecklist.length > 0) {
+    elements.studyProjectValidationBlock.hidden = false;
+    elements.studyProjectValidation.innerHTML = projectBrief.validationChecklist
+      .map((item) => `<li>${escapeHtml(item)}</li>`)
+      .join("");
+  } else {
+    elements.studyProjectValidationBlock.hidden = true;
+    elements.studyProjectValidation.innerHTML = "";
   }
 }
 
