@@ -186,7 +186,7 @@ Casos claros:
 - cálculo de salario según antigüedad
 - [x] gestor simple de notas
 - [x] carrito o lista de tareas
-- filtros sobre datos cargados con `fetch`
+- [x] filtros sobre datos cargados con `fetch`
 - evolución hacia capas y validación estilo backend
 
 Valor:

@@ -94,11 +94,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
       "js-async",
       "Asincronía y fetch",
       "Esperar una respuesta asíncrona y leer un campo concreto para mostrarlo.",
-      "Transformar una carga JSON completa en un resumen útil que luego pueda alimentar interfaz o filtros.",
+      "Transformar una carga JSON completa en un resumen útil y en una capa de filtros reutilizable para alimentar interfaz, métricas y navegación.",
       [
         "Separar carga y transformación en funciones distintas.",
-        "Pasar de leer un solo campo a resumir un array real de items.",
-        "Preparar una salida que ya sirva para UI o analítica básica.",
+        "Pasar de leer un solo campo a resumir y filtrar un array real de items.",
+        "Preparar una salida que ya sirva para UI, filtros o analítica básica.",
       ],
     ),
     "js-ui-states": evolutionBrief(
@@ -233,24 +233,29 @@ function buildFrontendPayroll(list) {
       true,
     ),
     "js-json-fetch": evolutionCase(
-      "Transformación de datos",
+      "Transformación y filtros",
       "Resumen de catálogo",
-      "Pasas de usar `fetch` solo para leer datos a convertir una respuesta JSON en un resumen que ya sirve para decisión o interfaz.",
+      "Pasas de usar `fetch` solo para leer datos a convertir una respuesta JSON en un resumen y en una capa de filtrado que ya sirve para decisión o interfaz.",
       "Lees una respuesta asíncrona y muestras un dato simple, por ejemplo el nombre del curso o un título.",
-      "Cargas un JSON local, recorres `items` y devuelves un resumen con total de elementos, cuántos son de JavaScript y cuántos están destacados.",
+      "Cargas un JSON local, normalizas `items`, aplicas filtros por lenguaje o nivel y devuelves un resumen con total visible, destacados y métricas útiles para render o navegación.",
       [
         "Crea una función async `buildCatalogSummary(fetchItems)`.",
         "Espera la respuesta y trabaja con `data.items` solo después del `await`.",
+        "Separa filtrado y resumen en helpers para no mezclar reglas en una sola función.",
         "Devuelve un objeto final listo para pintar o comprobar en tests.",
       ],
       `async function buildCatalogSummary(fetchItems) {
   const data = await fetchItems();
   const items = data.items ?? [];
+  const visibleItems = items.filter(
+    (item) => item.language === "JavaScript" && item.level !== "Avanzado",
+  );
 
   return {
-    total: items.length,
-    javascript: items.filter((item) => item.language === "JavaScript").length,
-    featured: items.filter((item) => item.featured).length,
+    total: visibleItems.length,
+    javascript: visibleItems.filter((item) => item.language === "JavaScript").length,
+    featured: visibleItems.filter((item) => item.featured).length,
+    levels: [...new Set(visibleItems.map((item) => item.level))],
   };
 }`,
       true,
