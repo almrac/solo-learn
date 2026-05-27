@@ -350,34 +350,22 @@ function getPracticeTopics(entry) {
   const topics = new Set();
   const lessonId = entry.lessonId;
 
-  if (lessonId.includes("array")) topics.add("arrays");
-  if (lessonId.includes("object")) topics.add("objetos");
-  if (
-    lessonId === "js-arrays" ||
-    lessonId === "js-map-filter" ||
-    lessonId === "js-objects" ||
-    lessonId === "js-json-fetch"
-  ) topics.add("map/filter/reduce");
-  if (
-    lessonId.includes("dom") ||
-    lessonId.includes("component") ||
-    lessonId.includes("ui-state")
-  ) topics.add("DOM");
-  if (
-    lessonId.includes("fetch") ||
-    lessonId.includes("async") ||
-    lessonId.includes("json-fetch")
-  ) topics.add("fetch");
-  if (
-    lessonId.includes("data-to-dom") ||
-    lessonId.includes("json-to-dom") ||
-    lessonId.includes("fetch-to-dom") ||
-    lessonId.includes("ui-states") ||
-    lessonId.includes("state") ||
-    lessonId.includes("project")
-  ) topics.add("renderizado UI");
-  if (lessonId.includes("java-oop") || lessonId.includes("inheritance")) topics.add("POO en Java");
-  if (lessonId.includes("collections")) topics.add("colecciones en Java");
+  if (["js-array-methods"].includes(lessonId)) topics.add("arrays");
+  if (["js-objects", "js-state", "js-project"].includes(lessonId)) topics.add("objetos");
+  if (["js-array-methods", "js-json-fetch"].includes(lessonId)) topics.add("map/filter/reduce");
+  if (["js-dom", "js-forms", "js-components"].includes(lessonId)) topics.add("DOM");
+  if (["js-async", "js-json-fetch", "js-fetch-to-dom"].includes(lessonId)) topics.add("fetch");
+  if ([
+    "js-render-lists",
+    "js-state",
+    "js-data-to-dom",
+    "js-json-to-dom",
+    "js-fetch-to-dom",
+    "js-ui-states",
+    "js-project",
+  ].includes(lessonId)) topics.add("renderizado UI");
+  if (["java-oop", "java-inheritance"].includes(lessonId)) topics.add("POO en Java");
+  if (["java-collections"].includes(lessonId)) topics.add("colecciones en Java");
 
   return [...topics];
 }
