@@ -1944,6 +1944,7 @@ public class ProgressRegistry {
         "Separa qué devolvería el controller y qué resolvería el service.",
         "Piensa un DTO de entrada y otro de salida antes de tocar base de datos.",
         "Decide dónde vive la validación del título y cómo se traduce a respuesta HTTP.",
+        "Añade un caso de `PATCH /complete` y decide qué devolver si la tarea no existe o ya estaba completada.",
       ],
       "Spring",
       "Avanzado",
@@ -1969,6 +1970,7 @@ class TaskController {
 
 record TaskCreateRequest(String title) {}
 record TaskResponse(long id, String title, boolean done) {}
+record ApiErrorResponse(String code, String message) {}
 
 class TaskService {
   List<TaskResponse> listTasks() {
@@ -1979,24 +1981,32 @@ class TaskService {
     // TODO: validar titulo y crear tarea.
     return null;
   }
+
+  TaskResponse completeTask(long id) {
+    // TODO: completar tarea o lanzar un error de dominio.
+    return null;
+  }
 }`,
       [
         "Enumera qué respondería cada endpoint antes de pensar en base de datos.",
         "Comprueba que listar, crear y completar no mezclan la misma responsabilidad.",
         "Verifica que los nombres de rutas y métodos HTTP se entienden sin comentarios extra.",
         "Decide qué código HTTP devolverías en alta válida, validación fallida y tarea inexistente.",
+        "Decide si `PATCH /complete` devuelve la tarea actualizada, `204` sin cuerpo o un error de dominio si ya estaba completada.",
       ],
       "Anade una cuarta operacion para filtrar tareas pendientes y decide si encaja mejor como query param en GET o como endpoint aparte.",
       [
         "Crear una tarea con titulo vacio para decidir donde iria la validacion.",
         "Completar una tarea inexistente para pensar la respuesta HTTP y el contrato del service.",
         "Enviar un titulo con espacios para decidir si normalizas antes de validar o rechazas tal cual.",
+        "Completar una tarea ya hecha para decidir si repites `200`, devuelves `409` o simplemente no haces nada.",
       ],
       [
         "Piensa primero en los recursos y acciones que vera el cliente, no en las clases internas.",
         "Reparte la responsabilidad: el controller recibe y responde, el service resuelve la logica.",
         "Define un DTO minimo para crear y otro para devolver tareas antes de hablar de persistencia.",
         "Fija primero el contrato HTTP y luego adapta la implementación interna a ese contrato.",
+        "Si introduces errores de dominio, dales nombre y forma estable antes de pensar en excepciones genéricas.",
       ],
     ),
   },
@@ -2251,10 +2261,12 @@ public static void main(String[] args) {
         "Crea un endpoint GET para listar tareas y un POST para crear una nueva.",
         "Separa la lógica de negocio en un `Service` para no dejar todo en el controlador.",
         "Añade validación básica y decide respuestas HTTP para alta inválida o id inexistente.",
+        "Diseña también `PATCH /api/tasks/{id}/complete` y un DTO de error mínimo para respuestas fallidas.",
       ],
       [
         "Modelo simple",
         "DTOs de entrada y salida",
+        "DTO de error",
         "Controller con endpoints",
         "Service con lógica básica",
         "Contratos HTTP y validación",
@@ -2274,6 +2286,12 @@ class TaskController {
     // TODO: validar y devolver 201 o 400.
     return null;
   }
+
+  @PatchMapping("/{id}/complete")
+  ResponseEntity<?> complete(@PathVariable long id) {
+    // TODO: devolver tarea actualizada, 404 o 409 segun el caso.
+    return null;
+  }
 }`,
       [
         "Revisa que cada endpoint tenga una intención clara y un verbo HTTP coherente.",
@@ -2281,12 +2299,14 @@ class TaskController {
         "Valida que el DTO expone solo lo necesario para la respuesta.",
         "Comprueba que crear con título vacío tiene un contrato explícito y no una respuesta ambigua.",
         "Decide qué devolvería `PATCH /api/tasks/{id}/complete` si la tarea no existe.",
+        "Comprueba que los errores de validación o conflicto tengan un cuerpo estable si decides devolver JSON de error.",
       ],
       [
         "La API se entiende por recursos y casos de uso, no por acciones técnicas sueltas.",
         "El controller queda fino y delega la lógica real fuera de HTTP.",
         "La estructura ya parece escalable aunque todavía no haya base de datos real.",
         "DTOs, validación y respuestas HTTP ya están alineados aunque la persistencia siga en memoria.",
+        "El contrato de error ya no es improvisado: también tiene forma y intención claras.",
       ],
     ),
     "js-components": projectBrief(
