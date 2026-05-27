@@ -1486,6 +1486,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
           expected: false,
         },
         {
+          label: "Rechaza undefined como entrada invalida",
+          args: [undefined],
+          expected: false,
+        },
+        {
           label: "Rechaza strings con solo dos caracteres útiles aunque tengan espacios",
           args: ["  ok  "],
           expected: false,
@@ -1494,6 +1499,16 @@ Object.assign(learningRoot.LEARNING_DATA, {
           label: "Acepta strings largos con saltos o espacios exteriores tras trim",
           args: ["\n  Practica fetch  \t"],
           expected: true,
+        },
+        {
+          label: "Rechaza string vacio directo como caso borde",
+          args: [""],
+          expected: false,
+        },
+        {
+          label: "Rechaza numeros aunque parezcan texto util",
+          args: [1234],
+          expected: false,
         },
       ],
     }),
@@ -1873,7 +1888,7 @@ public class ProgressRegistry {
       [
         "Separa la lógica en una función pequeña.",
         "Piensa un caso que falla y dos que pasan.",
-        "Escribe qué comprobarías en JUnit aunque no ejecutes el test aquí.",
+        "Escribe qué comprobarías en JUnit con `@Test`, `assertTrue` y `assertFalse` aunque no ejecutes el test aquí.",
       ],
       "Testing",
       "Avanzado",
@@ -1894,21 +1909,30 @@ public class ProgressRegistry {
     System.out.println(estaAprobado(5));
     System.out.println(estaAprobado(10));
   }
-}`,
+}
+
+// Ejemplo de test JUnit:
+// @Test
+// void devuelveTrueCuandoLaNotaEsCinco() {
+//   assertTrue(GradeRules.estaAprobado(5));
+// }`,
       [
         "Verifica el borde exacto de aprobado con la nota 5.",
         "Comprueba un caso claramente inválido y otro claramente válido.",
         "Asegúrate de que el método devuelve boolean y no texto de consola.",
+        "Anota cómo quedarían esos casos en tres métodos JUnit con nombres distintos.",
       ],
       "Escribe el esqueleto de una clase de test JUnit con tres metodos separados para borde, suspenso y caso claramente aprobado.",
       [
         "La nota 0 para confirmar un suspenso claro.",
         "La nota 5 exacta para fijar el borde que mas suele romperse.",
+        "La nota 10 para comprobar un caso claramente aprobado y sin ambigüedad.",
       ],
       [
         "Reduce la regla a una condicion simple que devuelva boolean.",
         "Prueba primero el caso 5, que es el borde mas importante.",
         "Separa los casos en comprobaciones independientes para que el fallo sea legible.",
+        "Nombra cada test por comportamiento esperado, no por la implementación interna.",
       ],
     ),
     "java-spring-intro": guide(
@@ -2172,16 +2196,26 @@ public static void main(String[] args) {
   }
 }
 
-// assertTrue(new TaskValidator().isValidTitle("Repasar DOM"));`,
+// import static org.junit.jupiter.api.Assertions.*;
+// import org.junit.jupiter.api.Test;
+//
+// class TaskValidatorTest {
+//   @Test
+//   void aceptaTituloValido() {
+//     assertTrue(new TaskValidator().isValidTitle("Repasar DOM"));
+//   }
+// }`,
       [
         "Cubre un caso válido, uno vacío y uno demasiado corto.",
         "Refactoriza después de tener una base mínima de comprobaciones.",
         "Comprueba que un cambio de nombre o trim no rompe los tests.",
+        "Mantén cada test con una sola intención para que el fallo sea fácil de localizar.",
       ],
       [
         "La función principal cabe en pocas líneas y su intención sigue siendo obvia.",
         "Los casos de prueba cubren contrato normal, borde y error sin mezclar objetivos.",
         "Cambiar la implementación sin romper comportamiento sería ahora mucho más seguro.",
+        "La suite JUnit se entiende leyendo solo los nombres de sus métodos.",
       ],
     ),
     "java-spring-intro": projectBrief(

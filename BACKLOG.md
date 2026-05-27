@@ -196,9 +196,12 @@ legibilidad, extensibilidad y mantenibilidad según crece el problema.
 
 ### 11. Módulo de testing
 
-- tests de funciones JS
-- introducción a JUnit en Java
-- casos normales y casos límite
+Estado:
+primer corte ya visible en JavaScript y Java. Falta ampliar cobertura, pero la introducción práctica ya existe.
+
+- [x] tests de funciones JS
+- [x] introducción a JUnit en Java
+- [x] casos normales y casos límite
 
 ### 12. Ruta hacia backend con Spring
 
