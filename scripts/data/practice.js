@@ -670,6 +670,35 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "text", selector: "#fetchList li:first-child", expected: "Estado local | Intermedio" },
           ],
         },
+        {
+          label: "Mantiene el orden recibido al recargar con varios items JavaScript",
+          actions: [
+            {
+              type: "call",
+              name: "cargarYRenderizar",
+              args: [async () => ({
+                items: [
+                  { title: "Colecciones", language: "Java", level: "Intermedio" },
+                ],
+              })],
+            },
+            {
+              type: "call",
+              name: "cargarYRenderizar",
+              args: [async () => ({
+                items: [
+                  { title: "Async", language: "JavaScript", level: "Intermedio" },
+                  { title: "DOM", language: "JavaScript", level: "Base" },
+                ],
+              })],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#fetchList li", expected: 2 },
+            { type: "text", selector: "#fetchList li:first-child", expected: "Async | Intermedio" },
+            { type: "text", selector: "#fetchList li:last-child", expected: "DOM | Base" },
+          ],
+        },
       ],
     }),
     "js-ui-states": exercise({
@@ -789,6 +818,63 @@ Object.assign(learningRoot.LEARNING_DATA, {
                   { title: "Estado local", level: "Intermedio" },
                 ],
               })],
+            },
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({ items: [] })],
+            },
+          ],
+          assertions: [
+            { type: "text", selector: "#status", expected: "No hay resultados." },
+            { type: "count", selector: "#courseList li", expected: 0 },
+          ],
+        },
+        {
+          label: "Sustituye resultados anteriores cuando llega una segunda carga válida",
+          actions: [
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                items: [
+                  { title: "map y filter", level: "Base" },
+                  { title: "Estado local", level: "Intermedio" },
+                ],
+              })],
+            },
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                items: [
+                  { title: "Testing", level: "Avanzado" },
+                ],
+              })],
+            },
+          ],
+          assertions: [
+            { type: "text", selector: "#status", expected: "Resultados listos." },
+            { type: "count", selector: "#courseList li", expected: 1 },
+            { type: "text", selector: "#courseList li:first-child", expected: "Testing | Avanzado" },
+          ],
+        },
+        {
+          label: "Puede pasar de error a vacío sin dejar resultados antiguos",
+          actions: [
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                items: [
+                  { title: "map y filter", level: "Base" },
+                ],
+              })],
+            },
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => { throw new Error("fallo de red"); }],
             },
             {
               type: "call",
