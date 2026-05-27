@@ -985,6 +985,7 @@ function renderPracticeBank() {
   const entries = sortPracticeBankEntries(filterPracticeBankEntries(allEntries));
   renderPracticeBankSpotlight(entries);
   renderPracticeBankPhases(entries);
+  renderPracticeBankTopics(allEntries);
   renderPracticeBankStats(entries);
 
   if (!entries.length) {
@@ -1003,6 +1004,7 @@ function renderPracticeBank() {
         <div class="practice-card__meta">
           <span class="language-mark language-mark--${entry.trackId}">${entry.trackLabel}</span>
           <span class="badge">${escapeHtml(entry.family)}</span>
+          ${entry.topics.map((topic) => `<span class="badge practice-card__topic">${escapeHtml(topic)}</span>`).join("")}
           <span class="badge">${escapeHtml(entry.difficulty)}</span>
           ${entry.hasEvolution ? '<span class="badge practice-card__badge">Escala después</span>' : ""}
           ${entry.evolutionPhase ? `<span class="badge practice-card__phase">${escapeHtml(entry.evolutionPhase)}</span>` : ""}
@@ -1018,6 +1020,23 @@ function renderPracticeBank() {
           ${entry.hasEvolution ? `<button type="button" class="practice-card__secondary" data-base-lesson="${entry.evolutionBaseLessonId}">Ver base</button>` : ""}
         </div>
       </article>
+    `)
+    .join("");
+}
+
+function renderPracticeBankTopics(entries) {
+  const topics = getPracticeTopicStats(entries);
+  if (!topics.length) {
+    elements.practiceBankTopics.innerHTML = "";
+    return;
+  }
+
+  elements.practiceBankTopics.innerHTML = topics
+    .map((item) => `
+      <button class="practice-topic-pill ${state.practiceTopicFilter === item.topic ? "is-active" : ""}" type="button" data-practice-topic-pick="${escapeHtml(item.topic)}">
+        <strong>${escapeHtml(item.topic)}</strong>
+        <span>${item.done}/${item.total} hechas</span>
+      </button>
     `)
     .join("");
 }
@@ -1128,12 +1147,16 @@ function renderPracticeBankSpotlight(entries) {
 
 function renderPracticeBankFilters(entries) {
   const families = ["all", ...new Set(entries.map((entry) => entry.family))];
+  const topics = ["all", ...new Set(entries.flatMap((entry) => entry.topics))];
   const difficulties = ["all", ...new Set(entries.map((entry) => entry.difficulty))];
   const types = ["all", ...new Set(entries.map((entry) => entry.practiceType))];
   const phases = ["all", ...new Set(entries.map((entry) => entry.evolutionPhase).filter(Boolean))];
 
   elements.practiceFamilyFilter.innerHTML = families
     .map((family) => `<option value="${escapeHtml(family)}">${family === "all" ? "Todas" : escapeHtml(family)}</option>`)
+    .join("");
+  elements.practiceTopicFilter.innerHTML = topics
+    .map((topic) => `<option value="${escapeHtml(topic)}">${topic === "all" ? "Todos" : escapeHtml(topic)}</option>`)
     .join("");
   elements.practiceDifficultyFilter.innerHTML = difficulties
     .map((difficulty) => `<option value="${escapeHtml(difficulty)}">${difficulty === "all" ? "Todas" : escapeHtml(difficulty)}</option>`)
@@ -1147,6 +1170,9 @@ function renderPracticeBankFilters(entries) {
 
   elements.practiceFamilyFilter.value = families.includes(state.practiceFamilyFilter)
     ? state.practiceFamilyFilter
+    : "all";
+  elements.practiceTopicFilter.value = topics.includes(state.practiceTopicFilter)
+    ? state.practiceTopicFilter
     : "all";
   elements.practiceDifficultyFilter.value = difficulties.includes(state.practiceDifficultyFilter)
     ? state.practiceDifficultyFilter
@@ -1165,6 +1191,7 @@ function renderPracticeBankFilters(entries) {
 function filterPracticeBankEntries(entries) {
   return entries.filter((entry) => {
     const familyMatch = state.practiceFamilyFilter === "all" || entry.family === state.practiceFamilyFilter;
+    const topicMatch = state.practiceTopicFilter === "all" || entry.topics.includes(state.practiceTopicFilter);
     const difficultyMatch =
       state.practiceDifficultyFilter === "all" || entry.difficulty === state.practiceDifficultyFilter;
     const typeMatch = state.practiceTypeFilter === "all" || entry.practiceType === state.practiceTypeFilter;
@@ -1180,7 +1207,7 @@ function filterPracticeBankEntries(entries) {
       state.practicePhaseFilter === "all" ||
       entry.evolutionPhase === state.practicePhaseFilter;
 
-    return familyMatch && difficultyMatch && typeMatch && statusMatch && evolutionMatch && phaseMatch;
+    return familyMatch && topicMatch && difficultyMatch && typeMatch && statusMatch && evolutionMatch && phaseMatch;
   });
 }
 

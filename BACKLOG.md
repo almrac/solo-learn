@@ -94,14 +94,17 @@ Alcance mínimo:
 
 ### 5. Banco de ejercicios por tema
 
-- arrays
-- objetos
-- `map`, `filter`, `reduce`
-- DOM
-- `fetch`
-- renderizado de listas y filtros en UI
-- POO en Java
-- colecciones en Java
+Estado:
+base ya visible en el banco con filtro por tema y agrupación útil. Falta seguir ampliando catálogo fino.
+
+- [x] arrays
+- [x] objetos
+- [x] `map`, `filter`, `reduce`
+- [x] DOM
+- [x] `fetch`
+- [x] renderizado de listas y filtros en UI
+- [x] POO en Java
+- [x] colecciones en Java
 
 ### 6. Sistema de repaso por errores
 

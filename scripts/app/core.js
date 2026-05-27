@@ -80,6 +80,7 @@ const defaultState = {
   filter: "all",
   lessonSort: "default",
   practiceFamilyFilter: "all",
+  practiceTopicFilter: "all",
   practiceDifficultyFilter: "all",
   practiceTypeFilter: "all",
   practiceStatusFilter: "all",
@@ -232,7 +233,9 @@ const elements = {
   practiceBankSpotlight: document.querySelector("#practiceBankSpotlight"),
   practiceBankPhases: document.querySelector("#practiceBankPhases"),
   practiceBankStats: document.querySelector("#practiceBankStats"),
+  practiceBankTopics: document.querySelector("#practiceBankTopics"),
   practiceFamilyFilter: document.querySelector("#practiceFamilyFilter"),
+  practiceTopicFilter: document.querySelector("#practiceTopicFilter"),
   practiceDifficultyFilter: document.querySelector("#practiceDifficultyFilter"),
   practiceTypeFilter: document.querySelector("#practiceTypeFilter"),
   practiceStatusFilter: document.querySelector("#practiceStatusFilter"),
@@ -341,6 +344,42 @@ function getTrackTopicProgress(trackId, limit = 3) {
       left.family.localeCompare(right.family),
     )
     .slice(0, limit);
+}
+
+function getPracticeTopics(entry) {
+  const topics = new Set();
+  const lessonId = entry.lessonId;
+
+  if (lessonId.includes("array")) topics.add("arrays");
+  if (lessonId.includes("object")) topics.add("objetos");
+  if (
+    lessonId === "js-arrays" ||
+    lessonId === "js-map-filter" ||
+    lessonId === "js-objects" ||
+    lessonId === "js-json-fetch"
+  ) topics.add("map/filter/reduce");
+  if (
+    lessonId.includes("dom") ||
+    lessonId.includes("component") ||
+    lessonId.includes("ui-state")
+  ) topics.add("DOM");
+  if (
+    lessonId.includes("fetch") ||
+    lessonId.includes("async") ||
+    lessonId.includes("json-fetch")
+  ) topics.add("fetch");
+  if (
+    lessonId.includes("data-to-dom") ||
+    lessonId.includes("json-to-dom") ||
+    lessonId.includes("fetch-to-dom") ||
+    lessonId.includes("ui-states") ||
+    lessonId.includes("state") ||
+    lessonId.includes("project")
+  ) topics.add("renderizado UI");
+  if (lessonId.includes("java-oop") || lessonId.includes("inheritance")) topics.add("POO en Java");
+  if (lessonId.includes("collections")) topics.add("colecciones en Java");
+
+  return [...topics];
 }
 
 function getTrackSessionSnapshot(trackId) {
@@ -602,6 +641,9 @@ function normalizeState(value) {
   const practiceTypeFilter = typeof value?.practiceTypeFilter === "string"
     ? value.practiceTypeFilter
     : defaultState.practiceTypeFilter;
+  const practiceTopicFilter = typeof value?.practiceTopicFilter === "string"
+    ? value.practiceTopicFilter
+    : defaultState.practiceTopicFilter;
   const practiceStatusFilter = ["all", "pending", "done"].includes(value?.practiceStatusFilter)
     ? value.practiceStatusFilter
     : defaultState.practiceStatusFilter;
@@ -621,6 +663,7 @@ function normalizeState(value) {
     lessonSort,
     quickstartDismissed,
     practiceFamilyFilter: typeof value?.practiceFamilyFilter === "string" ? value.practiceFamilyFilter : "all",
+    practiceTopicFilter,
     practiceDifficultyFilter: typeof value?.practiceDifficultyFilter === "string" ? value.practiceDifficultyFilter : "all",
     practiceTypeFilter,
     practiceStatusFilter,
@@ -841,6 +884,7 @@ function getPracticeBankEntries(trackId) {
           practiceType: exercise.practiceType ?? "Práctica",
           title: lesson.title,
           summary: exercise.prompt,
+          topics: [],
           target: "practice",
           isDone: state.solvedExercises.includes(lessonId),
           hasEvolution: Boolean(evolution),
@@ -851,6 +895,10 @@ function getPracticeBankEntries(trackId) {
         };
       })
       .filter(Boolean)
+      .map((entry) => ({
+        ...entry,
+        topics: getPracticeTopics(entry),
+      }))
       .sort((left, right) => left.family.localeCompare(right.family) || left.title.localeCompare(right.title));
   }
 
@@ -870,6 +918,7 @@ function getPracticeBankEntries(trackId) {
         practiceType: guideEntry.practiceType ?? "Consola",
         title: lesson.title,
         summary: guideEntry.prompt,
+        topics: [],
         target: "study",
         isDone: state.practiceDone.includes(lessonId) || state.completed.includes(lessonId),
         hasEvolution: Boolean(evolution),
@@ -880,7 +929,44 @@ function getPracticeBankEntries(trackId) {
       };
     })
     .filter(Boolean)
+    .map((entry) => ({
+      ...entry,
+      topics: getPracticeTopics(entry),
+    }))
     .sort((left, right) => left.family.localeCompare(right.family) || left.title.localeCompare(right.title));
+}
+
+function getPracticeTopicStats(entries) {
+  const grouped = new Map();
+
+  entries.forEach((entry) => {
+    entry.topics.forEach((topic) => {
+      if (!grouped.has(topic)) {
+        grouped.set(topic, {
+          topic,
+          total: 0,
+          done: 0,
+          started: 0,
+        });
+      }
+
+      const current = grouped.get(topic);
+      current.total += 1;
+      if (entry.progressState.key === "done") {
+        current.done += 1;
+      } else if (entry.progressState.key === "started") {
+        current.started += 1;
+      }
+    });
+  });
+
+  return [...grouped.values()]
+    .map((item) => ({
+      ...item,
+      pending: item.total - item.done,
+      percent: item.total ? Math.round((item.done / item.total) * 100) : 0,
+    }))
+    .sort((left, right) => right.total - left.total || left.topic.localeCompare(right.topic));
 }
 
 function getPracticeProgressState(lessonId, trackId) {

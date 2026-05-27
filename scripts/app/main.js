@@ -47,6 +47,12 @@ elements.practiceFamilyFilter.addEventListener("change", () => {
   render();
 });
 
+elements.practiceTopicFilter.addEventListener("change", () => {
+  state.practiceTopicFilter = elements.practiceTopicFilter.value || "all";
+  persist();
+  render();
+});
+
 elements.practiceDifficultyFilter.addEventListener("change", () => {
   state.practiceDifficultyFilter = elements.practiceDifficultyFilter.value || "all";
   persist();
@@ -91,6 +97,7 @@ elements.practiceSort.addEventListener("change", () => {
 
 elements.practiceResetFilters.addEventListener("click", () => {
   state.practiceFamilyFilter = "all";
+  state.practiceTopicFilter = "all";
   state.practiceDifficultyFilter = "all";
   state.practiceTypeFilter = "all";
   state.practiceStatusFilter = "all";
@@ -525,6 +532,16 @@ elements.practiceBankStats.addEventListener("click", (event) => {
   if (!button) return;
 
   state.practiceFamilyFilter = button.dataset.practiceFamilyPick;
+  persist();
+  render();
+  document.querySelector(".practice-bank").scrollIntoView({ behavior: "smooth" });
+});
+
+elements.practiceBankTopics.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-practice-topic-pick]");
+  if (!button) return;
+
+  state.practiceTopicFilter = button.dataset.practiceTopicPick;
   persist();
   render();
   document.querySelector(".practice-bank").scrollIntoView({ behavior: "smooth" });
