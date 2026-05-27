@@ -112,6 +112,30 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Mantener sincronizados estado visual y datos reales en cada recarga.",
       ],
     ),
+    // Estas evoluciones ya no enseñan solo a resolver el caso base:
+    // enseñan a reabrir el mismo problema cuando el alcance crece.
+    "js-project": evolutionBrief(
+      "js-components",
+      "Componentes y plantillas",
+      "Pintar una lista sencilla de tareas desde un array y un único render.",
+      "Convertir esa lista en un dashboard con filtros, contadores y persistencia local sin mezclar estado, reglas y presentación.",
+      [
+        "Separar el estado de filtros de la colección principal.",
+        "Crear helpers para contar pendientes, completadas y visibles.",
+        "Re-renderizar toda la vista desde una única fuente de verdad.",
+      ],
+    ),
+    "java-spring-intro": evolutionBrief(
+      "java-collections",
+      "Colecciones y mapas",
+      "Guardar notas o tareas en memoria y recorrer una colección para resumirlas.",
+      "Replantear ese mismo caso como un flujo con DTO, servicio y validación, listo para dar el salto a Spring sin perder claridad de dominio.",
+      [
+        "Separar entrada, validación y lógica de negocio en piezas distintas.",
+        "Usar un DTO pequeño para transportar datos de alta o edición.",
+        "Mantener la colección en memoria, pero con una API interna más limpia.",
+      ],
+    ),
   },
 
   evolutionCases: {
@@ -267,6 +291,49 @@ function buildFrontendPayroll(list) {
 }`,
       true,
     ),
+    "js-project": evolutionCase(
+      "Dashboard y filtros",
+      "Lista de tareas de estudio",
+      "El problema deja de ser pintar una lista y pasa a exigir estado visible, filtros, contadores y persistencia razonable.",
+      "Guardas un array de tareas, lo recorres y renderizas cada título en pantalla.",
+      "Mantienes un `state` con tareas y filtro activo, calculas resumen de pendientes/completadas, persistes en `localStorage` y repintas un dashboard limpio en cada cambio.",
+      [
+        "Separa `tasks` y `activeFilter` dentro del estado.",
+        "Extrae helpers como `getVisibleTasks(state)` y `buildTaskSummary(state)`.",
+        "Haz que un único `render()` regenere lista, contador y texto de estado.",
+      ],
+      `const state = {
+  tasks: [
+    { id: 1, title: "Repasar arrays", done: false, track: "javascript" },
+    { id: 2, title: "Practicar colecciones", done: true, track: "java" },
+    { id: 3, title: "Montar preview DOM", done: false, track: "javascript" },
+  ],
+  activeFilter: "pending",
+};
+
+function getVisibleTasks(currentState) {
+  if (currentState.activeFilter === "completed") {
+    return currentState.tasks.filter((task) => task.done);
+  }
+
+  if (currentState.activeFilter === "javascript") {
+    return currentState.tasks.filter((task) => task.track === "javascript");
+  }
+
+  return currentState.tasks.filter((task) => !task.done);
+}
+
+function buildTaskSummary(currentState) {
+  const completed = currentState.tasks.filter((task) => task.done).length;
+
+  return {
+    total: currentState.tasks.length,
+    completed,
+    pending: currentState.tasks.length - completed,
+  };
+}`,
+      true,
+    ),
     "java-oop": evolutionCase(
       "Refactor",
       "Salario por antigüedad",
@@ -390,6 +457,37 @@ class SmsNotifier implements Notificable {
 // assertTrue(new TaskValidator().isValidTitle("Repasar DOM"));
 // assertFalse(new TaskValidator().isValidTitle(" "));
 // assertFalse(new TaskValidator().isValidTitle("JS"));`,
+      false,
+    ),
+    "java-spring-intro": evolutionCase(
+      "Capas y validación",
+      "Gestor de notas",
+      "El mismo caso deja de estar resuelto solo con listas y bucles y pasa a organizarse como una pequeña aplicación con contrato de entrada y servicio propio.",
+      "Lees notas, las guardas en memoria y calculas media o aprobados recorriendo una colección.",
+      "Defines un `GradeRequest`, validas datos antes de crear la entidad y delegas el alta/resumen en un servicio con responsabilidades claras.",
+      [
+        "Usa un DTO de entrada con `studentName` y `grade`.",
+        "Valida rango y nombre antes de persistir en memoria.",
+        "Mueve el alta y el resumen a un servicio en vez de resolverlo todo en `main`.",
+      ],
+      `public record GradeRequest(String studentName, int grade) {}
+
+public class GradeService {
+  private final List<GradeRecord> records = new ArrayList<>();
+
+  public boolean addGrade(GradeRequest request) {
+    if (request.studentName() == null || request.studentName().isBlank()) {
+      return false;
+    }
+
+    if (request.grade() < 0 || request.grade() > 10) {
+      return false;
+    }
+
+    records.add(new GradeRecord(request.studentName().trim(), request.grade()));
+    return true;
+  }
+}`,
       false,
     ),
   },
