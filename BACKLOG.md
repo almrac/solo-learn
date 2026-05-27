@@ -151,7 +151,7 @@ base ya visible en el banco con filtro por tema y agrupación útil. Falta segui
 ### 9. Mini proyectos guiados
 
 Estado:
-base ya en marcha con briefs, starters y validación manual. La densidad de varios proyectos ya subió y sigue alineándose con práctica ejecutable; varios flujos JSON/fetch ya están bastante mejor cubiertos, pero queda seguir ampliando catálogo y cerrar más casos fuertes.
+base ya en marcha con briefs, starters y validación manual. La densidad de varios proyectos ya subió y sigue alineándose con práctica ejecutable; JSON/fetch y varios proyectos Java ya están mejor cubiertos, pero queda seguir ampliando catálogo y cerrar más casos fuertes.
 
 JavaScript:
 

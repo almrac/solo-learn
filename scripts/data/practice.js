@@ -2090,18 +2090,20 @@ class TaskService {
 
   projectBriefs: {
     "java-oop": projectBrief(
-      "Modela una biblioteca pequeña con objetos reales y operaciones básicas de préstamo.",
-      "Definir clases con atributos privados y comportamientos claros para dejar atrás soluciones planas con variables sueltas y empezar a pensar en reglas de dominio.",
+      "Modela una biblioteca pequeña con objetos reales, catálogo y operaciones básicas de préstamo.",
+      "Definir clases con atributos privados y comportamientos claros para dejar atrás soluciones planas con variables sueltas y empezar a pensar en reglas de dominio y coordinación entre objetos.",
       [
         "Crea una clase `Book` con título, autor y disponibilidad.",
         "Añade métodos como `borrow()` y `giveBack()` con mensajes o estados distintos según la situación.",
         "Crea una clase `Library` o un bloque coordinador mínimo para guardar varios libros.",
+        "Añade una búsqueda simple por título o autor antes de prestar.",
         "Instancia varios libros y muestra una secuencia de préstamo y devolución desde `main`.",
       ],
       [
         "Clase `Book`",
         "Comportamiento de préstamo y devolución",
         "Colección simple de libros",
+        "Búsqueda o selección básica",
         "Pequeña demo en `main`",
       ],
       `import java.util.ArrayList;
@@ -2133,6 +2135,11 @@ class Library {
     books.add(book);
   }
 
+  public Book findByTitle(String title) {
+    // TODO
+    return null;
+  }
+
   public void printCatalog() {
     // TODO
   }
@@ -2140,12 +2147,14 @@ class Library {
       [
         "Comprueba que pedir prestado dos veces no deje el mismo resultado que la primera.",
         "Verifica que `giveBack()` restaure la disponibilidad del libro.",
+        "Busca un libro por título antes de prestar para no depender de variables sueltas en `main`.",
         "Verifica que el catálogo se siga entendiendo al añadir dos o tres libros.",
         "Desde `main`, imprime el estado antes y después de cada operación.",
       ],
       [
         "El libro cambia de disponible a prestado y vuelve a disponible sin estados ambiguos.",
         "El comportamiento principal se entiende leyendo `borrow()` y `giveBack()` sin depender de `main`.",
+        "La biblioteca coordina búsqueda y catálogo sin que `main` tenga que conocer cada detalle.",
         "La biblioteca puede listar varios libros sin duplicar lógica de impresión por cada uno.",
         "La demo final enseña una secuencia completa, no solo una impresión aislada.",
       ],
@@ -2242,20 +2251,22 @@ List<Notificable> canales = new ArrayList<>();`,
       ],
     ),
     "java-exceptions": projectBrief(
-      "Crea un mini gestor de notas resistente a entradas inválidas.",
-      "Unir parseo, validación de rango y tratamiento claro del error en una utilidad pequeña pero ya cercana a un flujo real de captura de datos.",
+      "Crea un mini gestor de notas resistente a entradas inválidas y con informe final claro.",
+      "Unir parseo, validación de rango y tratamiento claro del error en una utilidad pequeña pero ya cercana a un flujo real de captura de datos y resumen final.",
       [
         "Escribe un método `parseGrade(String text)` que convierta texto a entero.",
         "Devuelve `-1` si el valor no es numérico o cae fuera del rango 0-10.",
         "Guarda varias entradas válidas en una colección simple y rechaza las inválidas.",
         "Muestra un resumen final con cuántas notas válidas aceptaste y su media.",
         "Prueba varios casos desde `main`, incluidos vacío, texto y nota válida.",
+        "Cuenta también cuántas entradas inválidas descartaste para no perder visibilidad del error.",
       ],
       [
         "Método de parseo",
         "Validación de rango",
         "Colección de notas válidas",
         "Resumen final",
+        "Conteo de descartes",
         "Casos de prueba manuales",
       ],
       `import java.util.ArrayList;
@@ -2270,18 +2281,20 @@ public static void main(String[] args) {
   List<Integer> grades = new ArrayList<>();
   String[] inputs = {"8", "hola", "12", "6"};
 
-  // TODO: parsear, aceptar solo válidas y mostrar resumen.
+  // TODO: parsear, aceptar solo válidas, contar descartes y mostrar resumen.
 }`,
       [
         "Prueba una nota válida, una fuera de rango y un texto no numérico.",
         "Comprueba que todos los casos inválidos devuelven `-1`.",
         "Verifica que no capturas una excepción genérica si no hace falta.",
         "Comprueba que la media final solo use las notas aceptadas.",
+        "Cuenta cuántas entradas descartas para confirmar que no desaparecen en silencio.",
       ],
       [
         "El contrato de error es estable: cualquier entrada inválida termina igual.",
         "La conversión y la validación de rango se leen como una sola pieza pequeña y clara.",
         "La colección final solo contiene datos válidos y el resumen se calcula sobre ella.",
+        "El informe final deja claro qué aceptaste y qué descartaste, no solo la media.",
         "Los casos manuales enseñan que el método falla de forma controlada, no ruidosa.",
       ],
     ),
