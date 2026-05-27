@@ -877,6 +877,24 @@ Object.assign(learningRoot.LEARNING_DATA, {
             "<li>Estados UI | JavaScript | Intermedio |  | 70 XP</li><li>Testing | JavaScript | Avanzado | tests | 110 XP</li>",
           compare: "html",
         },
+        {
+          label: "Conserva XP 0 y varias tags sin alterar el formato",
+          args: [{
+            course: "Solo Learn",
+            items: [
+              {
+                title: "Primeros pasos",
+                language: "JavaScript",
+                level: "Cero",
+                tags: ["inicio", "setup", "variables"],
+                stats: { xp: 0 },
+              },
+            ],
+          }],
+          expected:
+            "<li>Primeros pasos | JavaScript | Cero | inicio, setup, variables | 0 XP</li>",
+          compare: "html",
+        },
       ],
     }),
     "js-modules": exercise({
@@ -1047,6 +1065,31 @@ Object.assign(learningRoot.LEARNING_DATA, {
             pending: 1,
             completed: 1,
             visibleTitles: [],
+          },
+        },
+        {
+          label: "Devuelve resumen vacío coherente cuando no hay tareas",
+          args: [[], { status: "all" }],
+          expected: {
+            total: 0,
+            pending: 0,
+            completed: 0,
+            visibleTitles: [],
+          },
+        },
+        {
+          label: "Mantiene el orden original de pendientes al filtrar",
+          args: [[
+            { title: "Arrays", done: false },
+            { title: "Fetch", done: true },
+            { title: "DOM", done: false },
+            { title: "Testing", done: false },
+          ], { status: "pending" }],
+          expected: {
+            total: 4,
+            pending: 3,
+            completed: 1,
+            visibleTitles: ["Arrays", "DOM", "Testing"],
           },
         },
       ],
