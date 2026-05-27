@@ -261,12 +261,13 @@ Pendiente:
 ### 16. Modo examen
 
 Estado:
-primer corte ya visible sobre el sistema de retos. Falta decidir si más adelante se amplía a ejercicios evaluables, pero la mecánica base ya existe.
+primer corte ya visible sobre el sistema de retos. Ya permite elegir alcance y revisar fallos al final. Falta decidir si más adelante se amplía a ejercicios evaluables.
 
 - [x] límite de tiempo
 - [x] sin ayudas
 - [x] puntuación final
 - [x] repaso al terminar
+- [x] alcance configurable por track / área / nivel
 
 ## Fuera de alcance por ahora
 

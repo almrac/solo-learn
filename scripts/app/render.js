@@ -1015,6 +1015,7 @@ function renderChallenge() {
   if (state.examMode.finishedAt && !state.examMode.active) {
     const score = getExamScore();
     const total = state.examMode.lessonIds.length;
+    const review = getExamReviewSummary();
     const reason = state.examMode.reason === "time"
       ? "Tiempo agotado"
       : state.examMode.reason === "manual"
@@ -1027,7 +1028,16 @@ function renderChallenge() {
       <div class="challenge__meta-row">
         <span class="badge">${total} preguntas</span>
         <span class="badge">${score} aciertos</span>
+        <span class="badge">Sin XP</span>
         <button class="button" type="button" data-exam-action="restart">Repetir examen</button>
+      </div>
+      <div class="challenge__summary">
+        ${review.byTrack.length
+          ? `<p>Fallos por lenguaje: ${escapeHtml(review.byTrack.map((item) => `${item.label} ${item.count}`).join(" · "))}</p>`
+          : "<p>Sin fallos por lenguaje.</p>"}
+        ${review.byLevel.length
+          ? `<p>Fallos por nivel: ${escapeHtml(review.byLevel.map((item) => `${item.label} ${item.count}`).join(" · "))}</p>`
+          : "<p>Sin fallos por nivel.</p>"}
       </div>
     `;
     elements.challengeOptions.innerHTML = state.examMode.lessonIds
@@ -1075,6 +1085,7 @@ function renderChallenge() {
         <span class="badge">${tracks[getTrackIdByLesson(lesson.id)].label}</span>
         <span class="badge">Tiempo ${minutes}:${seconds}</span>
         <span class="badge">Aciertos ${getExamScore()}</span>
+        <span class="badge">Sin XP</span>
         <button class="button" type="button" data-exam-action="finish">Terminar examen</button>
       </div>
     `;
@@ -1082,11 +1093,45 @@ function renderChallenge() {
   } else {
     elements.challengeTitle.textContent = lesson.title;
     elements.challengePrompt.textContent = lesson.challenge.prompt;
+    const lessonCount = buildExamLessonIds().length;
     elements.challengeMeta.innerHTML = `
       <div class="challenge__meta-row">
         <span class="badge">${tracks[getTrackIdByLesson(lesson.id)].label}</span>
-        <button class="button" type="button" data-exam-action="start">Iniciar modo examen</button>
+        <span class="badge">${lessonCount} preguntas candidatas</span>
+        <button class="button" type="button" data-exam-action="start" ${lessonCount ? "" : "disabled"}>Iniciar modo examen</button>
       </div>
+      <div class="challenge__exam-setup">
+        <label class="challenge__config">
+          <span>Track</span>
+          <select data-exam-config="trackScope">
+            <option value="active" ${state.examSetup.trackScope === "active" ? "selected" : ""}>Activo</option>
+            <option value="all" ${state.examSetup.trackScope === "all" ? "selected" : ""}>Ambos</option>
+            <option value="java" ${state.examSetup.trackScope === "java" ? "selected" : ""}>Java</option>
+            <option value="javascript" ${state.examSetup.trackScope === "javascript" ? "selected" : ""}>JavaScript</option>
+          </select>
+        </label>
+        <label class="challenge__config">
+          <span>Área</span>
+          <select data-exam-config="learningAreaScope">
+            <option value="current" ${state.examSetup.learningAreaScope === "current" ? "selected" : ""}>Actual</option>
+            <option value="all" ${state.examSetup.learningAreaScope === "all" ? "selected" : ""}>Todas</option>
+            <option value="frontend" ${state.examSetup.learningAreaScope === "frontend" ? "selected" : ""}>Frontend</option>
+            <option value="backend" ${state.examSetup.learningAreaScope === "backend" ? "selected" : ""}>Backend</option>
+          </select>
+        </label>
+        <label class="challenge__config">
+          <span>Nivel</span>
+          <select data-exam-config="levelScope">
+            <option value="current" ${state.examSetup.levelScope === "current" ? "selected" : ""}>Actual</option>
+            <option value="all" ${state.examSetup.levelScope === "all" ? "selected" : ""}>Todos</option>
+            <option value="Cero" ${state.examSetup.levelScope === "Cero" ? "selected" : ""}>Cero</option>
+            <option value="Base" ${state.examSetup.levelScope === "Base" ? "selected" : ""}>Base</option>
+            <option value="Intermedio" ${state.examSetup.levelScope === "Intermedio" ? "selected" : ""}>Intermedio</option>
+            <option value="Avanzado" ${state.examSetup.levelScope === "Avanzado" ? "selected" : ""}>Avanzado</option>
+          </select>
+        </label>
+      </div>
+      <p class="challenge__exam-note">${lessonCount ? "El examen usa retos y no otorga XP extra." : "No hay preguntas que cumplan el filtro actual."}</p>
     `;
     submitButton.textContent = "Comprobar";
   }

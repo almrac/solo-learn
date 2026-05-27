@@ -376,22 +376,26 @@ elements.challengeForm.addEventListener("submit", (event) => {
     return;
   }
 
-  if (selected === lesson.challenge.answer) {
-    if (!state.solvedChallenges.includes(lesson.id)) {
-      state.solvedChallenges.push(lesson.id);
-      state.xp += 25;
-      recordChallengeSuccess(lesson.id);
-      recordStudyDay();
-    }
-    state.failedChallenges = state.failedChallenges.filter((lessonId) => lessonId !== lesson.id);
-    relieveLessonStruggle(lesson.id, { type: "error", source: "challenge", amount: 2 });
-    setFeedback("Correcto. Has desbloqueado XP extra.", "correct");
+  if (state.examMode.active) {
+    setFeedback(selected === lesson.challenge.answer ? "Respuesta registrada." : "Respuesta registrada.", "correct");
   } else {
-    if (!state.failedChallenges.includes(lesson.id)) {
-      state.failedChallenges.push(lesson.id);
+    if (selected === lesson.challenge.answer) {
+      if (!state.solvedChallenges.includes(lesson.id)) {
+        state.solvedChallenges.push(lesson.id);
+        state.xp += 25;
+        recordChallengeSuccess(lesson.id);
+        recordStudyDay();
+      }
+      state.failedChallenges = state.failedChallenges.filter((lessonId) => lessonId !== lesson.id);
+      relieveLessonStruggle(lesson.id, { type: "error", source: "challenge", amount: 2 });
+      setFeedback("Correcto. Has desbloqueado XP extra.", "correct");
+    } else {
+      if (!state.failedChallenges.includes(lesson.id)) {
+        state.failedChallenges.push(lesson.id);
+      }
+      recordLessonStruggle(lesson.id, "error", "challenge");
+      setFeedback("No es esa. Revisa el objetivo de la lección y vuelve a probar.", "wrong");
     }
-    recordLessonStruggle(lesson.id, "error", "challenge");
-    setFeedback("No es esa. Revisa el objetivo de la lección y vuelve a probar.", "wrong");
   }
 
   if (state.examMode.active) {
@@ -449,6 +453,17 @@ elements.challengeMeta.addEventListener("click", (event) => {
     persist();
     render();
   }
+});
+
+elements.challengeMeta.addEventListener("change", (event) => {
+  const input = event.target.closest("[data-exam-config]");
+  if (!input || state.examMode.active) return;
+
+  const key = input.dataset.examConfig;
+  if (!["trackScope", "learningAreaScope", "levelScope"].includes(key)) return;
+  state.examSetup[key] = input.value;
+  persist();
+  renderChallenge();
 });
 
 elements.continueButton.addEventListener("click", () => {

@@ -148,6 +148,39 @@
   gap: var(--space-3);
 }
 
+.challenge__summary,
+.challenge__exam-setup {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.challenge__summary p,
+.challenge__exam-note {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.challenge__config {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.challenge__config span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.challenge__config select {
+  min-height: 2.6rem;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--ink);
+  padding: 0 var(--space-3);
+}
+
 .challenge__option {
   flex: 1 1 11.25rem;
   display: flex;

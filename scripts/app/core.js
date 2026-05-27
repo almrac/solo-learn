@@ -124,6 +124,11 @@ const defaultState = {
     finishedAt: null,
     reason: "",
   },
+  examSetup: {
+    trackScope: "active",
+    learningAreaScope: "current",
+    levelScope: "current",
+  },
 };
 
 // "state" es el objeto central de la app:
@@ -315,7 +320,19 @@ function firstVisibleLesson() {
 }
 
 function buildExamLessonIds() {
-  return sortVisibleLessons(visibleLessons()).map((lesson) => lesson.id);
+  const examTrackScope = state.examSetup?.trackScope ?? "active";
+  const examAreaScope = state.examSetup?.learningAreaScope ?? "current";
+  const examLevelScope = state.examSetup?.levelScope ?? "current";
+  const selectedTrack = examTrackScope === "active" ? state.activeTrack : examTrackScope;
+  const selectedArea = examAreaScope === "current" ? state.learningAreaFilter : examAreaScope;
+  const selectedLevel = examLevelScope === "current" ? state.filter : examLevelScope;
+
+  return sortVisibleLessons(allLessons().filter((lesson) => {
+    const trackMatch = selectedTrack === "all" || getTrackIdByLesson(lesson.id) === selectedTrack;
+    const areaMatch = matchesLearningAreaFilter(lesson.id, selectedArea);
+    const levelMatch = selectedLevel === "all" || lesson.level === selectedLevel;
+    return trackMatch && areaMatch && levelMatch;
+  })).map((lesson) => lesson.id);
 }
 
 function allLessons() {
@@ -371,6 +388,37 @@ function getExamRemainingSeconds() {
 
 function getExamScore() {
   return (state.examMode.answers ?? []).filter((entry) => entry.isCorrect).length;
+}
+
+function getExamReviewSummary() {
+  const wrongLessonIds = state.examMode.lessonIds.filter((lessonId) => {
+    const entry = state.examMode.answers.find((item) => item.lessonId === lessonId);
+    return !entry?.isCorrect;
+  });
+
+  const byTrack = new Map();
+  const byLevel = new Map();
+
+  wrongLessonIds.forEach((lessonId) => {
+    const lesson = findLesson(lessonId);
+    const trackId = getTrackIdByLesson(lessonId);
+    if (!lesson || !trackId) return;
+
+    byTrack.set(trackId, (byTrack.get(trackId) ?? 0) + 1);
+    byLevel.set(lesson.level, (byLevel.get(lesson.level) ?? 0) + 1);
+  });
+
+  return {
+    wrongLessonIds,
+    byTrack: [...byTrack.entries()].map(([trackId, count]) => ({
+      label: tracks[trackId].label,
+      count,
+    })),
+    byLevel: [...byLevel.entries()].map(([level, count]) => ({
+      label: level,
+      count,
+    })),
+  };
 }
 
 function startExamMode() {
@@ -893,6 +941,7 @@ function normalizeState(value) {
           isCorrect: Boolean(entry.isCorrect),
         }))
     : [];
+  const rawExamSetup = value?.examSetup;
 
   return {
     activeTrack,
@@ -940,6 +989,17 @@ function normalizeState(value) {
       answers: examAnswers,
       finishedAt: Number.isFinite(rawExamMode?.finishedAt) ? rawExamMode.finishedAt : null,
       reason: typeof rawExamMode?.reason === "string" ? rawExamMode.reason : "",
+    },
+    examSetup: {
+      trackScope: ["active", "all", "java", "javascript"].includes(rawExamSetup?.trackScope)
+        ? rawExamSetup.trackScope
+        : defaultState.examSetup.trackScope,
+      learningAreaScope: ["current", "all", "frontend", "backend"].includes(rawExamSetup?.learningAreaScope)
+        ? rawExamSetup.learningAreaScope
+        : defaultState.examSetup.learningAreaScope,
+      levelScope: ["current", "all", "Cero", "Base", "Intermedio", "Avanzado"].includes(rawExamSetup?.levelScope)
+        ? rawExamSetup.levelScope
+        : defaultState.examSetup.levelScope,
     },
   };
 }
