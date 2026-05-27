@@ -162,6 +162,7 @@ function evaluateActiveExercise() {
         if (solved) {
           addProgressOnce("practiceDone", lesson.id, 20);
           addProgressOnce("solvedExercises", lesson.id, 35);
+          recordExerciseSuccess(lesson.id);
         }
         persist();
         render();
@@ -305,6 +306,7 @@ function evaluateDomExercise(lesson, exercise, code) {
       if (solved) {
         addProgressOnce("practiceDone", lesson.id, 20);
         addProgressOnce("solvedExercises", lesson.id, 35);
+        recordExerciseSuccess(lesson.id);
       }
       persist();
       render();

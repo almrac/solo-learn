@@ -274,6 +274,7 @@ function renderHistoryPanel() {
     <p class="eyebrow">Historial reciente</p>
     <h3>${history.studiedDays.length}/7 días con actividad</h3>
     <p>${history.closedDays.length} cierres de sesión · ~${history.approxMinutes} min.</p>
+    <p>${history.solvedChallengesCount} retos · ${history.solvedExercisesCount} tests validados</p>
     <div class="history-panel__week">
       ${history.recentDays
         .map((day) => {

@@ -110,6 +110,7 @@ const defaultState = {
     javascript: [],
   },
   challengeSuccessLog: [],
+  exerciseSuccessLog: [],
   streak: 0,
   xp: 0,
 };
@@ -452,6 +453,8 @@ function getHistorySnapshot(days = 7) {
     approxMinutes,
     topTopics,
     trackBreakdown,
+    solvedChallengesCount: getWeeklySolvedChallengesCount(),
+    solvedExercisesCount: getWeeklySolvedExercisesCount(),
   };
 }
 
@@ -461,9 +464,23 @@ function recordChallengeSuccess(lessonId) {
   state.challengeSuccessLog = [item, ...(state.challengeSuccessLog ?? []).filter((entry) => entry !== item)].slice(0, 30);
 }
 
+function recordExerciseSuccess(lessonId) {
+  const today = new Date().toISOString().slice(0, 10);
+  const item = `${today}:${lessonId}`;
+  state.exerciseSuccessLog = [item, ...(state.exerciseSuccessLog ?? []).filter((entry) => entry !== item)].slice(0, 30);
+}
+
 function getWeeklySolvedChallengesCount() {
   const currentWeek = new Set(getCurrentWeekDateKeys());
   return (state.challengeSuccessLog ?? [])
+    .filter((entry) => typeof entry === "string")
+    .filter((entry) => currentWeek.has(entry.split(":")[0]))
+    .length;
+}
+
+function getWeeklySolvedExercisesCount() {
+  const currentWeek = new Set(getCurrentWeekDateKeys());
+  return (state.exerciseSuccessLog ?? [])
     .filter((entry) => typeof entry === "string")
     .filter((entry) => currentWeek.has(entry.split(":")[0]))
     .length;
@@ -758,6 +775,7 @@ function normalizeState(value) {
     lastTrackActivity: cleanTrackActivity(value?.lastTrackActivity),
     trackSessionLog: cleanTrackSessionLog(value?.trackSessionLog),
     challengeSuccessLog: cleanChallengeSuccessLog(value?.challengeSuccessLog, lessonIds),
+    exerciseSuccessLog: cleanChallengeSuccessLog(value?.exerciseSuccessLog, lessonIds),
     streak: Number.isFinite(value?.streak) ? Math.max(0, value.streak) : 0,
     xp: Number.isFinite(value?.xp) ? Math.max(0, value.xp) : 0,
   };
@@ -946,6 +964,7 @@ function createDefaultState() {
       javascript: [],
     },
     challengeSuccessLog: [],
+    exerciseSuccessLog: [],
     streak: 0,
   };
 }
