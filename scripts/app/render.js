@@ -57,6 +57,7 @@ function renderTrackProgress() {
     .map(([trackId, track]) => {
       const snapshot = getTrackProgressSnapshot(trackId);
       const topics = getTrackTopicProgress(trackId);
+      const sessions = getTrackSessionSnapshot(trackId);
       const lastSession = state.lastTrackActivity[trackId];
       const completed = snapshot.completed;
       const total = snapshot.total;
@@ -86,6 +87,12 @@ function renderTrackProgress() {
                   .join("")
               : "<span>Sin temas tocados aún</span>"}
           </div>
+          <p class="track-progress-row__meta">
+            7d: ${sessions.weeklyCount} ${sessions.weeklyCount === 1 ? "sesión" : "sesiones"}
+            ${sessions.recent.length
+              ? `· Recientes: ${escapeHtml(sessions.recent.map((date) => formatStudyDate(date)).join(", "))}`
+              : "· Sin histórico reciente"}
+          </p>
           <p class="track-progress-row__meta">
             Última sesión: ${escapeHtml(formatStudyDate(lastSession))}
           </p>

@@ -78,7 +78,7 @@ sube mucho el valor formativo sin meter compilación remota.
 ### 4. Revisión de progreso más fina
 
 Estado:
-base implementada. Falta refinar más la lectura por tema y quizá cerrar mejor el histórico.
+base ya bastante madura. Tema y lectura temporal reciente ya visibles; queda solo afinar si hace falta más histórico.
 
 Objetivo:
 medir mejor el aprendizaje real.

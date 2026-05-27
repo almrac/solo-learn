@@ -104,6 +104,10 @@ const defaultState = {
     java: null,
     javascript: null,
   },
+  trackSessionLog: {
+    java: [],
+    javascript: [],
+  },
   streak: 0,
   xp: 0,
 };
@@ -339,6 +343,23 @@ function getTrackTopicProgress(trackId, limit = 3) {
     .slice(0, limit);
 }
 
+function getTrackSessionSnapshot(trackId) {
+  const dates = state.trackSessionLog[trackId] ?? [];
+  const recent = dates.slice(0, 3);
+  const today = new Date();
+  const lastSevenDays = Array.from({ length: 7 }, (_, offset) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - offset);
+    return date.toISOString().slice(0, 10);
+  });
+  const weeklyCount = lastSevenDays.filter((day) => dates.includes(day)).length;
+
+  return {
+    weeklyCount,
+    recent,
+  };
+}
+
 function formatStudyDate(dateKey) {
   if (typeof dateKey !== "string" || !dateKey) return "Sin sesión aún";
 
@@ -436,6 +457,11 @@ function recordStudyDay() {
   const today = new Date().toISOString().slice(0, 10);
   const trackId = getTrackIdByLesson(state.activeLessonId) ?? state.activeTrack;
   state.lastTrackActivity[trackId] = today;
+  const currentTrackHistory = new Set(state.trackSessionLog[trackId] ?? []);
+  currentTrackHistory.add(today);
+  state.trackSessionLog[trackId] = [...currentTrackHistory]
+    .sort((left, right) => right.localeCompare(left))
+    .slice(0, 14);
 
   if (state.lastStudyDate === today) return;
 
@@ -617,6 +643,7 @@ function normalizeState(value) {
     completedDailySessions: cleanDateArray(value?.completedDailySessions),
     lastStudyDate: typeof value?.lastStudyDate === "string" ? value.lastStudyDate : null,
     lastTrackActivity: cleanTrackActivity(value?.lastTrackActivity),
+    trackSessionLog: cleanTrackSessionLog(value?.trackSessionLog),
     streak: Number.isFinite(value?.streak) ? Math.max(0, value.streak) : 0,
     xp: Number.isFinite(value?.xp) ? Math.max(0, value.xp) : 0,
   };
@@ -663,6 +690,13 @@ function cleanTrackActivity(value) {
   return {
     java: typeof value?.java === "string" ? value.java : null,
     javascript: typeof value?.javascript === "string" ? value.javascript : null,
+  };
+}
+
+function cleanTrackSessionLog(value) {
+  return {
+    java: cleanDateArray(value?.java),
+    javascript: cleanDateArray(value?.javascript),
   };
 }
 
@@ -780,6 +814,10 @@ function createDefaultState() {
     lastTrackActivity: {
       java: null,
       javascript: null,
+    },
+    trackSessionLog: {
+      java: [],
+      javascript: [],
     },
     streak: 0,
   };
