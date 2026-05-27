@@ -243,6 +243,9 @@ function renderWeeklyMissions() {
   `;
 }
 
+// La caja de repaso y el plan diario necesitan decidir a dónde enviar al usuario.
+// Esta traducción mantiene coherencia entre señales internas
+// (reto, tests, transferencia, atasco) y destino real en la interfaz.
 function getReviewEntryRoute(entry) {
   if (entry.reasons.includes("Reto")) {
     return {

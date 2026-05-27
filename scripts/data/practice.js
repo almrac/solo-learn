@@ -1,6 +1,12 @@
 var learningRoot = typeof window === "undefined" ? globalThis : window;
 
 Object.assign(learningRoot.LEARNING_DATA, {
+  // Aquí viven los artefactos de práctica reales:
+  // - ejercicios evaluables JS
+  // - problemas guiados Java
+  // - mini proyectos
+  // La idea es que cada pieza de contenido sea legible por sí misma
+  // cuando alguien abre este archivo para estudiar cómo está montada la app.
   exercises: {
     "js-values": exercise({
       family: "Fundamentos",

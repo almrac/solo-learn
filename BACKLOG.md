@@ -10,21 +10,21 @@ la naturaleza estática del proyecto.
 ### 1. Ejercicios evaluables de JavaScript
 
 Estado:
-primera versión ya implementada. Falta ampliarla.
+base implementada y ampliándose de forma incremental.
 
 Objetivo:
 añadir ejercicios con tests automáticos y feedback claro.
 
 Alcance mínimo:
 
-- definir estructura de ejercicio en `scripts/data/foundations.js`,
+- [x] definir estructura de ejercicio en `scripts/data/foundations.js`,
   `scripts/data/practice.js` y `scripts/data/evolution.js`
-- cargar starter distinto por lección
-- ejecutar solución del usuario en sandbox simple
-- comparar con casos esperados
-- mostrar tests pasados y fallidos
-- guardar ejercicios resueltos en progreso
-- ampliar cobertura más allá de las primeras lecciones soportadas
+- [x] cargar starter distinto por lección
+- [x] ejecutar solución del usuario en sandbox simple
+- [x] comparar con casos esperados
+- [x] mostrar tests pasados y fallidos
+- [x] guardar ejercicios resueltos en progreso
+- [~] ampliar cobertura más allá de las primeras lecciones soportadas
 
 Valor:
 convierte el laboratorio en una herramienta de práctica deliberada.
@@ -32,51 +32,57 @@ convierte el laboratorio en una herramienta de práctica deliberada.
 ### 2. Práctica DOM con preview real
 
 Estado:
-primera versión ya implementada para algunas lecciones. Falta ampliarla.
+primera versión sólida ya implementada. Se está endureciendo cobertura y casos.
 
 Objetivo:
 permitir ejercicios donde el usuario pinte items en pantalla a partir de datos.
 
 Alcance mínimo:
 
-- editor HTML
-- editor JS
-- iframe o contenedor de preview aislado
-- carga de JSON local
-- validaciones básicas sobre el DOM renderizado
-- ampliar cobertura a listas, filtros y renderizado desde datos reales
+- [x] editor HTML
+- [x] editor JS
+- [x] iframe o contenedor de preview aislado
+- [x] carga de JSON local
+- [x] validaciones básicas sobre el DOM renderizado
+- [~] ampliar cobertura a listas, filtros y renderizado desde datos reales
 
 Valor:
 mejora mucho la parte frontend útil para DAM.
 
 ### 3. Ejercicios Java guiados
 
+Estado:
+estructura guiada ya fuerte. Falta seguir ampliando densidad y validación.
+
 Objetivo:
 dar estructura real a Java aunque no se ejecute en navegador.
 
 Alcance mínimo:
 
-- plantillas de ejercicio
-- enunciado
-- entrada esperada
-- salida esperada
-- checklist de solución
-- errores comunes
+- [x] plantillas de ejercicio
+- [x] enunciado
+- [x] entrada esperada
+- [x] salida esperada
+- [x] checklist de solución
+- [x] errores comunes
 
 Valor:
 sube mucho el valor formativo sin meter compilación remota.
 
 ### 4. Revisión de progreso más fina
 
+Estado:
+base implementada. Falta refinar más la lectura por tema y quizá cerrar mejor el histórico.
+
 Objetivo:
 medir mejor el aprendizaje real.
 
 Alcance mínimo:
 
-- distinguir lección vista, práctica hecha y ejercicio evaluado
-- mostrar avance por tema
-- registrar última sesión por track
-- añadir contador de repasos pendientes
+- [x] distinguir lección vista, práctica hecha y ejercicio evaluado
+- [~] mostrar avance por tema
+- [x] registrar última sesión por track
+- [x] añadir contador de repasos pendientes
 
 ## Corto plazo
 
@@ -93,16 +99,16 @@ Alcance mínimo:
 
 ### 6. Sistema de repaso por errores
 
-- guardar qué falló el usuario
-- reinyectar ejercicios fallados
-- priorizar temas repetidos
+- [x] guardar qué falló el usuario
+- [x] reinyectar ejercicios fallados
+- [x] priorizar temas repetidos
 
 ### 7. Misiones semanales
 
-- completar X prácticas
-- resolver X retos
-- estudiar ambos lenguajes
-- cerrar una fase del roadmap
+- [x] completar X prácticas
+- [ ] resolver X retos
+- [x] estudiar ambos lenguajes
+- [~] cerrar una fase del roadmap
 
 ### 8. Mejor diferenciación visual por lenguaje
 

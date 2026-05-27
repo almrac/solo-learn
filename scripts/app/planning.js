@@ -1,4 +1,6 @@
 // Planning, recommendation, and study-session helpers for scripts/app/main.js.
+// Este módulo intenta responder una pregunta concreta:
+// "dado el estado real del alumno, ¿qué conviene hacer ahora?".
 
 function recommendNextLesson() {
   const pendingLessons = allLessons().filter((lesson) => !state.completed.includes(lesson.id));
@@ -750,6 +752,9 @@ function getWeeklyContext() {
   };
 }
 
+// Las misiones semanales no son un sistema paralelo de progreso:
+// reutilizan señales que ya existen en la app para convertirlas
+// en metas visibles y accionables dentro del sidebar.
 function hasTrackActivityInWindow(trackId, dateKeys) {
   const lastActivity = state.lastTrackActivity[trackId];
   return typeof lastActivity === "string" && dateKeys.includes(lastActivity);
