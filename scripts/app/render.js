@@ -751,6 +751,8 @@ function renderProjectBrief(projectBrief) {
     elements.studyProjectStarter.textContent = "";
     elements.studyProjectValidationBlock.hidden = true;
     elements.studyProjectValidation.innerHTML = "";
+    elements.studyProjectSignalsBlock.hidden = true;
+    elements.studyProjectSignals.innerHTML = "";
     return;
   }
 
@@ -780,6 +782,16 @@ function renderProjectBrief(projectBrief) {
   } else {
     elements.studyProjectValidationBlock.hidden = true;
     elements.studyProjectValidation.innerHTML = "";
+  }
+
+  if (Array.isArray(projectBrief.successSignals) && projectBrief.successSignals.length > 0) {
+    elements.studyProjectSignalsBlock.hidden = false;
+    elements.studyProjectSignals.innerHTML = projectBrief.successSignals
+      .map((item) => `<li>${escapeHtml(item)}</li>`)
+      .join("");
+  } else {
+    elements.studyProjectSignalsBlock.hidden = true;
+    elements.studyProjectSignals.innerHTML = "";
   }
 }
 

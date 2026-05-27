@@ -1358,6 +1358,11 @@ class TaskController {
         "Verifica que `giveBack()` restaure la disponibilidad del libro.",
         "Desde `main`, imprime el estado antes y después de cada operación.",
       ],
+      [
+        "El libro cambia de disponible a prestado y vuelve a disponible sin estados ambiguos.",
+        "El comportamiento principal se entiende leyendo `borrow()` y `giveBack()` sin depender de `main`.",
+        "La demo final enseña una secuencia completa, no solo una impresión aislada.",
+      ],
     ),
     "java-collections": projectBrief(
       "Construye un registro de progreso por lenguaje usando colecciones.",
@@ -1386,6 +1391,11 @@ xpByTrack.put("javascript", 160);
         "Comprueba cuántas tareas quedan pendientes y que el recuento coincide con la lista.",
         "Verifica que el mapa devuelve el XP correcto para cada lenguaje.",
         "Añade un tercer dato y confirma que el resumen sigue saliendo legible.",
+      ],
+      [
+        "La salida final resume tareas y XP sin depender de variables sueltas repetidas.",
+        "Añadir una tarea o un lenguaje nuevo no obliga a reescribir la estructura principal.",
+        "Lista y mapa tienen responsabilidades distintas y eso se nota en el código.",
       ],
     ),
     "java-inheritance": projectBrief(
@@ -1417,6 +1427,11 @@ List<Notificable> canales = new ArrayList<>();`,
         "Verifica que el código cliente usa `Notificable` y no depende de una clase concreta.",
         "Añade una tercera implementación pequeña para comprobar que el diseño escala.",
       ],
+      [
+        "El envío funciona para varios canales sin cambiar el código que los recorre.",
+        "La interfaz expresa una capacidad concreta y no una jerarquía artificial.",
+        "Agregar otro notificador es un cambio local, no una reescritura del flujo.",
+      ],
     ),
     "java-exceptions": projectBrief(
       "Crea un validador de notas resistente a entradas inválidas.",
@@ -1439,6 +1454,11 @@ List<Notificable> canales = new ArrayList<>();`,
         "Prueba una nota válida, una fuera de rango y un texto no numérico.",
         "Comprueba que todos los casos inválidos devuelven `-1`.",
         "Verifica que no capturas una excepción genérica si no hace falta.",
+      ],
+      [
+        "El contrato de error es estable: cualquier entrada inválida termina igual.",
+        "La conversión y la validación de rango se leen como una sola pieza pequeña y clara.",
+        "Los casos manuales enseñan que el método falla de forma controlada, no ruidosa.",
       ],
     ),
     "java-testing": projectBrief(
@@ -1467,6 +1487,11 @@ List<Notificable> canales = new ArrayList<>();`,
         "Refactoriza después de tener una base mínima de comprobaciones.",
         "Comprueba que un cambio de nombre o trim no rompe los tests.",
       ],
+      [
+        "La función principal cabe en pocas líneas y su intención sigue siendo obvia.",
+        "Los casos de prueba cubren contrato normal, borde y error sin mezclar objetivos.",
+        "Cambiar la implementación sin romper comportamiento sería ahora mucho más seguro.",
+      ],
     ),
     "java-spring-intro": projectBrief(
       "Diseña una API REST mínima para tareas de estudio.",
@@ -1493,6 +1518,11 @@ class TaskController {
         "Revisa que cada endpoint tenga una intención clara y un verbo HTTP coherente.",
         "Comprueba que controller y service no mezclen responsabilidades.",
         "Valida que el DTO expone solo lo necesario para la respuesta.",
+      ],
+      [
+        "La API se entiende por recursos y casos de uso, no por acciones técnicas sueltas.",
+        "El controller queda fino y delega la lógica real fuera de HTTP.",
+        "La estructura ya parece escalable aunque todavía no haya base de datos real.",
       ],
     ),
     "js-components": projectBrief(

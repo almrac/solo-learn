@@ -658,7 +658,7 @@ function guide(prompt, input, output, checklist, family, difficulty, practiceTyp
   };
 }
 
-function projectBrief(summary, outcome, milestones, deliverables, starterCode = "", validationChecklist = []) {
+function projectBrief(summary, outcome, milestones, deliverables, starterCode = "", validationChecklist = [], successSignals = []) {
   return {
     summary,
     outcome,
@@ -666,6 +666,7 @@ function projectBrief(summary, outcome, milestones, deliverables, starterCode = 
     deliverables,
     starterCode,
     validationChecklist,
+    successSignals,
   };
 }
 
