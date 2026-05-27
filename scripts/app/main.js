@@ -18,10 +18,23 @@ elements.tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     // Al cambiar de track actualizamos state y después repintamos la interfaz.
     state.activeTrack = tab.dataset.track;
+    if (state.learningAreaFilter !== "all" && getTrackLearningArea(state.activeTrack) !== state.learningAreaFilter) {
+      state.learningAreaFilter = getTrackLearningArea(state.activeTrack);
+    }
     state.activeLessonId = firstVisibleLesson()?.id ?? tracks[state.activeTrack].lessons[0].id;
     persist();
     render();
   });
+});
+
+elements.learningAreaFilter.addEventListener("change", () => {
+  state.learningAreaFilter = ["all", "frontend", "backend"].includes(elements.learningAreaFilter.value)
+    ? elements.learningAreaFilter.value
+    : "all";
+  syncTrackWithLearningArea();
+  state.activeLessonId = firstVisibleLesson()?.id ?? tracks[state.activeTrack].lessons[0].id;
+  persist();
+  render();
 });
 
 elements.filters.forEach((filter) => {

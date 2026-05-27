@@ -142,6 +142,8 @@ base ya visible en el banco con filtro por tema y agrupación útil. Falta segui
 - la lección activa debe cambiar según el modo
 - brand, nav activa y acentos del header también deben teñirse por modo
 - el lateral debe cambiar su contenido según el lenguaje activo
+- ya existe una base funcional previa con filtro `Aprendizaje: frontend/backend`
+  para no mezclar rutas innecesariamente antes del rediseño completo
 - aplicar esto al integrar el rediseño, no antes, para no duplicar trabajo
 
 ## Medio plazo

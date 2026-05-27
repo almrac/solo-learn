@@ -26,6 +26,7 @@ function render() {
   elements.filters.forEach((filter) => {
     filter.classList.toggle("is-active", filter.dataset.filter === state.filter);
   });
+  elements.learningAreaFilter.value = state.learningAreaFilter;
   elements.lessonSort.value = state.lessonSort;
 
   elements.trackLabel.textContent = track.label;
@@ -46,10 +47,15 @@ function render() {
 }
 
 function renderActiveTrack(track) {
+  const effectiveArea = state.learningAreaFilter === "all"
+    ? getTrackLearningArea(state.activeTrack)
+    : state.learningAreaFilter;
+  const learningAreaLabel = effectiveArea === "frontend" ? "Frontend" : "Backend";
   elements.activeTrack.innerHTML = `
     <p class="eyebrow">Ruta activa</p>
     <strong class="language-mark language-mark--${state.activeTrack}">${track.label}</strong>
     <span>${track.title}</span>
+    <small>Aprendizaje: ${learningAreaLabel}</small>
   `;
 }
 
@@ -410,8 +416,12 @@ function renderDailyQueue() {
 function renderPlan() {
   elements.planGrid.innerHTML = studyPlan
     .map((phase) => {
-      const completedInPhase = phase.lessonIds.filter((lessonId) => state.completed.includes(lessonId));
-      const progress = Math.round((completedInPhase.length / phase.lessonIds.length) * 100);
+      const visibleLessonIds = phase.lessonIds.filter((lessonId) => matchesLearningAreaFilter(lessonId));
+      if (!visibleLessonIds.length) {
+        return "";
+      }
+      const completedInPhase = visibleLessonIds.filter((lessonId) => state.completed.includes(lessonId));
+      const progress = Math.round((completedInPhase.length / visibleLessonIds.length) * 100);
 
       return `
         <article class="roadmap-card">
@@ -422,7 +432,7 @@ function renderPlan() {
           <h3 class="roadmap-card__title">${phase.title}</h3>
           <p class="roadmap-card__text">${phase.goal}</p>
           <ul class="roadmap-card__list">
-            ${phase.lessonIds
+            ${visibleLessonIds
               .map((lessonId) => {
                 const lesson = findLesson(lessonId);
                 const completed = state.completed.includes(lessonId);
@@ -1238,6 +1248,8 @@ function renderPracticeBankFilters(entries) {
 
 function filterPracticeBankEntries(entries) {
   return entries.filter((entry) => {
+    const learningAreaMatch =
+      state.learningAreaFilter === "all" || entry.learningArea === state.learningAreaFilter;
     const familyMatch = state.practiceFamilyFilter === "all" || entry.family === state.practiceFamilyFilter;
     const topicMatch = state.practiceTopicFilter === "all" || entry.topics.includes(state.practiceTopicFilter);
     const difficultyMatch =
@@ -1255,7 +1267,7 @@ function filterPracticeBankEntries(entries) {
       state.practicePhaseFilter === "all" ||
       entry.evolutionPhase === state.practicePhaseFilter;
 
-    return familyMatch && topicMatch && difficultyMatch && typeMatch && statusMatch && evolutionMatch && phaseMatch;
+    return learningAreaMatch && familyMatch && topicMatch && difficultyMatch && typeMatch && statusMatch && evolutionMatch && phaseMatch;
   });
 }
 

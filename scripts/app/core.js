@@ -77,6 +77,7 @@ const achievements = [
 
 const defaultState = {
   activeTrack: "java",
+  learningAreaFilter: "all",
   filter: "all",
   lessonSort: "default",
   practiceFamilyFilter: "all",
@@ -140,6 +141,7 @@ const elements = {
   focusModeButton: document.querySelector("#focusModeButton"),
   tabs: document.querySelectorAll(".language-tabs__button"),
   filters: document.querySelectorAll(".level-filters__button"),
+  learningAreaFilter: document.querySelector("#learningAreaFilter"),
   trackLabel: document.querySelector("#trackLabel"),
   trackTitle: document.querySelector("#trackTitle"),
   trackSummary: document.querySelector("#trackSummary"),
@@ -273,7 +275,9 @@ function setFeedback(message, type) {
 
 function visibleLessons() {
   return tracks[state.activeTrack].lessons.filter(
-    (lesson) => state.filter === "all" || lesson.level === state.filter,
+    (lesson) =>
+      (state.filter === "all" || lesson.level === state.filter) &&
+      matchesLearningAreaFilter(lesson.id),
   );
 }
 
@@ -311,6 +315,31 @@ function getTrackIdByLesson(lessonId) {
   return Object.entries(tracks).find(([, track]) =>
     track.lessons.some((lesson) => lesson.id === lessonId),
   )?.[0];
+}
+
+function getTrackLearningArea(trackId) {
+  return trackId === "javascript" ? "frontend" : "backend";
+}
+
+function getLessonLearningArea(lessonId) {
+  const trackId = getTrackIdByLesson(lessonId);
+  return trackId ? getTrackLearningArea(trackId) : "backend";
+}
+
+function matchesLearningAreaFilter(lessonId, learningArea = state.learningAreaFilter) {
+  return learningArea === "all" || getLessonLearningArea(lessonId) === learningArea;
+}
+
+function syncTrackWithLearningArea() {
+  // Hoy frontend/backend sigue muy alineado con JavaScript/Java.
+  // Sincronizamos ambos para no dejar vistas vacías mientras el catálogo crece.
+  if (state.learningAreaFilter === "frontend" && state.activeTrack !== "javascript") {
+    state.activeTrack = "javascript";
+  }
+
+  if (state.learningAreaFilter === "backend" && state.activeTrack !== "java") {
+    state.activeTrack = "java";
+  }
 }
 
 function countCompletedByTrack(currentState, trackId) {
@@ -714,7 +743,15 @@ function loadState() {
 
 function normalizeState(value) {
   const lessonIds = allLessons().map((lesson) => lesson.id);
-  const activeTrack = tracks[value?.activeTrack] ? value.activeTrack : defaultState.activeTrack;
+  const learningAreaFilter = ["all", "frontend", "backend"].includes(value?.learningAreaFilter)
+    ? value.learningAreaFilter
+    : defaultState.learningAreaFilter;
+  const requestedTrack = tracks[value?.activeTrack] ? value.activeTrack : defaultState.activeTrack;
+  const activeTrack = learningAreaFilter === "frontend"
+    ? "javascript"
+    : learningAreaFilter === "backend"
+      ? "java"
+      : requestedTrack;
   const trackLessonIds = tracks[activeTrack].lessons.map((lesson) => lesson.id);
   const filter = ["all", "Cero", "Base", "Intermedio", "Avanzado"].includes(value?.filter)
     ? value.filter
@@ -746,6 +783,7 @@ function normalizeState(value) {
 
   return {
     activeTrack,
+    learningAreaFilter,
     filter,
     lessonSort,
     quickstartDismissed,
@@ -981,6 +1019,7 @@ function getPracticeBankEntries(trackId) {
           lessonId,
           trackId,
           trackLabel: tracks[trackId].label,
+          learningArea: getLessonLearningArea(lessonId),
           family: exercise.family ?? "Práctica",
           difficulty: exercise.difficulty ?? lesson.level,
           progressState: getPracticeProgressState(lessonId, "javascript"),
@@ -1015,6 +1054,7 @@ function getPracticeBankEntries(trackId) {
         lessonId,
         trackId,
         trackLabel: tracks[trackId].label,
+        learningArea: getLessonLearningArea(lessonId),
         family: guideEntry.family ?? "Problema",
         difficulty: guideEntry.difficulty ?? lesson.level,
         progressState: getPracticeProgressState(lessonId, "java"),
