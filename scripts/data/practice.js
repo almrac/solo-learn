@@ -358,6 +358,31 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "text", selector: "#taskCount", expected: "Pendientes: 0" },
           ],
         },
+        {
+          label: "Sustituye tareas anteriores al volver a renderizar",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarTareas",
+              args: [[
+                { title: "Repasar arrays", completada: false },
+                { title: "Practicar fetch", completada: true },
+              ]],
+            },
+            {
+              type: "call",
+              name: "renderizarTareas",
+              args: [[
+                { title: "Estado local", completada: false },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#taskList li", expected: 1 },
+            { type: "text", selector: "#taskList li:first-child", expected: "Estado local" },
+            { type: "text", selector: "#taskCount", expected: "Pendientes: 1" },
+          ],
+        },
       ],
     }),
     "js-data-to-dom": exercise({
@@ -412,6 +437,31 @@ Object.assign(learningRoot.LEARNING_DATA, {
           ],
           assertions: [
             { type: "count", selector: "#resultList li", expected: 0 },
+          ],
+        },
+        {
+          label: "Limpia resultados viejos al volver a renderizar con un solo visible",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "map y filter", language: "JavaScript", level: "Base", visible: true },
+                { title: "JSON local", language: "JavaScript", level: "Intermedio", visible: true },
+              ]],
+            },
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "Spring", language: "Java", level: "Avanzado", visible: false },
+                { title: "Estado local", language: "JavaScript", level: "Intermedio", visible: true },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#resultList li", expected: 1 },
+            { type: "text", selector: "#resultList li:first-child", expected: "Estado local | JavaScript | Intermedio" },
           ],
         },
       ],
