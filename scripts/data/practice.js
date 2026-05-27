@@ -2100,30 +2100,46 @@ List<Notificable> canales = new ArrayList<>();`,
       ],
     ),
     "java-exceptions": projectBrief(
-      "Crea un validador de notas resistente a entradas inválidas.",
-      "Unir parseo, validación de rango y tratamiento claro del error en una utilidad simple pero realista.",
+      "Crea un mini gestor de notas resistente a entradas inválidas.",
+      "Unir parseo, validación de rango y tratamiento claro del error en una utilidad pequeña pero ya cercana a un flujo real de captura de datos.",
       [
         "Escribe un método `parseGrade(String text)` que convierta texto a entero.",
         "Devuelve `-1` si el valor no es numérico o cae fuera del rango 0-10.",
+        "Guarda varias entradas válidas en una colección simple y rechaza las inválidas.",
+        "Muestra un resumen final con cuántas notas válidas aceptaste y su media.",
         "Prueba varios casos desde `main`, incluidos vacío, texto y nota válida.",
       ],
       [
         "Método de parseo",
         "Validación de rango",
+        "Colección de notas válidas",
+        "Resumen final",
         "Casos de prueba manuales",
       ],
-      `public static int parseGrade(String text) {
+      `import java.util.ArrayList;
+import java.util.List;
+
+public static int parseGrade(String text) {
   // TODO: convertir y validar 0-10.
   return -1;
+}
+
+public static void main(String[] args) {
+  List<Integer> grades = new ArrayList<>();
+  String[] inputs = {"8", "hola", "12", "6"};
+
+  // TODO: parsear, aceptar solo válidas y mostrar resumen.
 }`,
       [
         "Prueba una nota válida, una fuera de rango y un texto no numérico.",
         "Comprueba que todos los casos inválidos devuelven `-1`.",
         "Verifica que no capturas una excepción genérica si no hace falta.",
+        "Comprueba que la media final solo use las notas aceptadas.",
       ],
       [
         "El contrato de error es estable: cualquier entrada inválida termina igual.",
         "La conversión y la validación de rango se leen como una sola pieza pequeña y clara.",
+        "La colección final solo contiene datos válidos y el resumen se calcula sobre ella.",
         "Los casos manuales enseñan que el método falla de forma controlada, no ruidosa.",
       ],
     ),
@@ -2223,17 +2239,49 @@ class TaskController {
       ],
     ),
     "js-json-fetch": projectBrief(
-      "Lee un JSON local y conviértelo en un resumen útil.",
-      "Dar el paso desde `fetch` y `response.json()` hasta una transformación real de datos sin tocar todavía una API externa.",
+      "Construye un visor de JSON local con resumen y filtros básicos.",
+      "Dar el paso desde `fetch` y `response.json()` hasta una pequeña utilidad real que cargue datos, los resuma y permita ver solo una parte útil.",
       [
         "Carga un JSON local con `fetch`.",
         "Convierte la respuesta con `await response.json()`.",
         "Construye un resumen: total de items, cuántos son JavaScript y cuántos son destacados.",
+        "Permite aplicar un filtro simple por lenguaje o nivel antes de renderizar la lista visible.",
+        "Haz que la vista sustituya siempre el contenido anterior al cambiar de filtro.",
       ],
       [
         "Carga desde JSON local",
         "Conversión a objeto",
         "Resumen calculado",
+        "Filtro activo",
+        "Lista visible",
+      ],
+      `const state = {
+  language: "all",
+  level: "all",
+  items: [],
+};
+
+async function loadJsonViewer() {
+  // TODO: cargar JSON local, guardar items y renderizar.
+}
+
+function getVisibleItems(items) {
+  // TODO: aplicar filtros actuales.
+  return items;
+}
+
+function renderJsonViewer() {
+  // TODO: pintar resumen y lista visible sin arrastrar contenido anterior.
+}`,
+      [
+        "Comprueba que el resumen cambie cuando el JSON tiene otro número de items destacados.",
+        "Verifica que cambiar un filtro no deje elementos de la vista anterior.",
+        "Asegúrate de que el estado `all` siga mostrando el conjunto completo.",
+      ],
+      [
+        "La vista carga el JSON una vez y re-renderiza desde estado local.",
+        "Resumen y lista visible salen de la misma fuente de datos, no de cálculos duplicados.",
+        "Cambiar filtros sustituye la vista anterior completa y no solo hace append.",
       ],
     ),
     "js-fetch-to-dom": projectBrief(
