@@ -1163,6 +1163,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Lee `data.items`.",
         "Usa title, language, level, tags y stats.xp.",
         "Devuelve un string HTML con un `<li>` por item.",
+        "Mantén un formato estable aunque falten tags o XP.",
       ],
       starter: `function crearItemsHtml(data) {
   return "";
@@ -1244,6 +1245,47 @@ Object.assign(learningRoot.LEARNING_DATA, {
           }],
           expected:
             "<li>Primeros pasos | JavaScript | Cero | inicio, setup, variables | 0 XP</li>",
+          compare: "html",
+        },
+        {
+          label: "Soporta tags ausentes y usa 0 XP si faltan stats",
+          args: [{
+            course: "Solo Learn",
+            items: [
+              {
+                title: "Spring intro",
+                language: "Java",
+                level: "Avanzado",
+              },
+            ],
+          }],
+          expected:
+            "<li>Spring intro | Java | Avanzado |  | 0 XP</li>",
+          compare: "html",
+        },
+        {
+          label: "Mantiene el orden aunque mezcle lenguajes y formatos distintos",
+          args: [{
+            course: "Solo Learn",
+            items: [
+              {
+                title: "Objetos",
+                language: "JavaScript",
+                level: "Cero",
+                tags: ["objetos"],
+                stats: { xp: 45 },
+              },
+              {
+                title: "Colecciones",
+                language: "Java",
+                level: "Intermedio",
+                tags: [],
+                stats: { xp: 90 },
+              },
+            ],
+          }],
+          expected:
+            "<li>Objetos | JavaScript | Cero | objetos | 45 XP</li><li>Colecciones | Java | Intermedio |  | 90 XP</li>",
           compare: "html",
         },
       ],
@@ -2384,14 +2426,15 @@ class TaskController {
       ],
     ),
     "js-json-fetch": projectBrief(
-      "Construye un visor de JSON local con resumen y filtros básicos.",
-      "Dar el paso desde `fetch` y `response.json()` hasta una pequeña utilidad real que cargue datos, los resuma y permita ver solo una parte útil.",
+      "Construye un visor de JSON local con resumen, filtros y recarga limpia.",
+      "Dar el paso desde `fetch` y `response.json()` hasta una pequeña utilidad real que cargue datos, los resuma y permita ver solo una parte útil sin arrastrar estado viejo.",
       [
         "Carga un JSON local con `fetch`.",
         "Convierte la respuesta con `await response.json()`.",
         "Construye un resumen: total de items, cuántos son JavaScript y cuántos son destacados.",
         "Permite aplicar un filtro simple por lenguaje o nivel antes de renderizar la lista visible.",
         "Haz que la vista sustituya siempre el contenido anterior al cambiar de filtro.",
+        "Añade una acción de recarga o cambio de dataset sin duplicar listeners ni recalcular fuera de estado.",
       ],
       [
         "Carga desde JSON local",
@@ -2399,6 +2442,7 @@ class TaskController {
         "Resumen calculado",
         "Filtro activo",
         "Lista visible",
+        "Recarga controlada",
       ],
       `const state = {
   language: "all",
@@ -2422,11 +2466,13 @@ function renderJsonViewer() {
         "Comprueba que el resumen cambie cuando el JSON tiene otro número de items destacados.",
         "Verifica que cambiar un filtro no deje elementos de la vista anterior.",
         "Asegúrate de que el estado `all` siga mostrando el conjunto completo.",
+        "Prueba una recarga con otro lote para confirmar que resumen y lista se actualizan a la vez.",
       ],
       [
         "La vista carga el JSON una vez y re-renderiza desde estado local.",
         "Resumen y lista visible salen de la misma fuente de datos, no de cálculos duplicados.",
         "Cambiar filtros sustituye la vista anterior completa y no solo hace append.",
+        "La recarga actualiza resumen y lista como una sola operación visible.",
       ],
     ),
     "js-fetch-to-dom": projectBrief(
