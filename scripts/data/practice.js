@@ -2022,18 +2022,18 @@ class Library {
       ],
     ),
     "java-collections": projectBrief(
-      "Construye una agenda de estudio simple con tareas y XP por lenguaje usando colecciones.",
-      "Pasar de variables sueltas a estructuras que permitan crecer: listas de tareas, mapas de XP y una vista resumida que se pueda ampliar sin rehacer el programa.",
+      "Construye un mini CRUD en memoria para tareas de estudio usando colecciones.",
+      "Pasar de variables sueltas a estructuras que permitan crear, listar, completar y resumir tareas sin rehacer el programa cada vez que crece.",
       [
-        "Usa `ArrayList` para tareas pendientes o completadas.",
-        "Usa `HashMap` para asociar lenguaje con XP acumulado.",
-        "Añade una operación mínima para marcar una tarea como completada o moverla entre listas.",
-        "Muestra un resumen final recorriendo ambas estructuras.",
+        "Usa `ArrayList` para guardar tareas en memoria.",
+        "Usa `HashMap` para asociar lenguaje con XP acumulado o con otro dato útil del dominio.",
+        "Añade operaciones mínimas para crear tarea, completarla y listar estado actual.",
+        "Muestra un resumen final recorriendo las estructuras.",
       ],
       [
-        "Lista de tareas pendientes",
-        "Lista de tareas completadas",
+        "Lista principal de tareas",
         "Mapa de XP",
+        "Operaciones CRUD básicas",
         "Resumen por consola",
       ],
       `import java.util.ArrayList;
@@ -2041,26 +2041,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-List<String> pendingTasks = new ArrayList<>();
-List<String> completedTasks = new ArrayList<>();
+class StudyTask {
+  String title;
+  boolean done;
+
+  StudyTask(String title) {
+    this.title = title;
+    this.done = false;
+  }
+}
+
+List<StudyTask> tasks = new ArrayList<>();
 Map<String, Integer> xpByTrack = new HashMap<>();
 
-pendingTasks.add("Repasar arrays");
-pendingTasks.add("Practicar DOM");
+tasks.add(new StudyTask("Repasar arrays"));
+tasks.add(new StudyTask("Practicar DOM"));
 
 xpByTrack.put("java", 120);
 xpByTrack.put("javascript", 160);
 
-// TODO: completar una tarea y mostrar resumen final.`,
+// TODO: crear otra tarea, completar una y mostrar resumen final.`,
       [
-        "Comprueba cuántas tareas quedan pendientes y que el recuento coincide con la lista.",
+        "Comprueba cuántas tareas siguen pendientes y cuántas aparecen como hechas.",
         "Verifica que el mapa devuelve el XP correcto para cada lenguaje.",
-        "Comprueba que mover una tarea a completadas no la deja duplicada en pendientes.",
+        "Comprueba que completar una tarea cambia su estado sin duplicarla ni perderla.",
         "Añade un tercer dato y confirma que el resumen sigue saliendo legible.",
       ],
       [
-        "La salida final resume pendientes, completadas y XP sin depender de variables sueltas repetidas.",
-        "Añadir una tarea o un lenguaje nuevo no obliga a reescribir la estructura principal.",
+        "La salida final resume tareas y XP sin depender de variables sueltas repetidas.",
+        "Crear o completar tareas es un cambio local, no un parche repartido por todo `main`.",
         "Lista y mapa tienen responsabilidades distintas y eso se nota en el código.",
       ],
     ),
@@ -2285,15 +2294,18 @@ function renderJsonViewer() {
       ],
     ),
     "js-fetch-to-dom": projectBrief(
-      "Carga y pinta una lista filtrada desde datos asíncronos.",
-      "Unir `async/await`, filtrado de datos y renderizado básico para montar una vista útil de verdad.",
+      "Construye una vista de consumo de API pública con filtrado y render limpio.",
+      "Unir `async/await`, filtrado de datos y renderizado básico para montar una vista útil de verdad a partir de una API pública o una fuente remota equivalente.",
       [
-        "Crea una función async que espere datos de `fetchItems`.",
-        "Filtra solo los items que interesan.",
-        "Pinta una lista final con `title` y `level` en el DOM.",
+        "Crea una función async que espere datos de `fetchItems` o de una API pública.",
+        "Transforma la respuesta a una lista homogénea para la interfaz.",
+        "Filtra solo los items que interesan antes de pintar.",
+        "Pinta una lista final con nombre y metadatos útiles en el DOM.",
+        "Haz que una segunda carga sustituya siempre el contenido anterior completo.",
       ],
       [
         "Función async",
+        "Transformación de respuesta remota",
         "Lista renderizada",
         "Filtro aplicado",
       ],
@@ -2301,8 +2313,18 @@ function renderJsonViewer() {
   const data = await fetchItems();
   const items = data.items ?? [];
 
-  // TODO: filtrar y pintar.
+  // TODO: transformar, filtrar y pintar.
 }`,
+      [
+        "Comprueba que una segunda carga válida sustituya la lista anterior en vez de hacer append.",
+        "Verifica que si la API devuelve más campos de los necesarios, la vista siga pintando solo lo importante.",
+        "Asegúrate de que el filtro deja fuera los elementos no relevantes sin romper el orden útil.",
+      ],
+      [
+        "La vista puede adaptarse a una API pública porque primero transforma la respuesta y luego renderiza.",
+        "El render final no depende del formato bruto remoto, sino de una lista ya normalizada.",
+        "Recargar datos vuelve a pintar la vista completa sin residuos del lote anterior.",
+      ],
     ),
     "js-ui-states": projectBrief(
       "Diseña una vista resiliente con carga, vacío y error.",
