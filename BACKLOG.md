@@ -5,6 +5,22 @@
 Ordenado por impacto real en aprendizaje y por facilidad de integrar sin romper
 la naturaleza estática del proyecto.
 
+## Punto de corte actual
+
+La app ya ha ganado suficiente densidad de contenido como para que el rediseño
+deje de ser solo una mejora visual y pase a ser una necesidad de navegación.
+
+Decisión:
+
+- dejar como mucho una o dos tandas funcionales pequeñas más antes de rediseñar
+- no seguir aplazando la separación fuerte entre salas Java/JavaScript
+- cuando entre el rediseño, priorizar primero estructura y flujo de uso:
+  - separar estudiar / practicar / examinarse
+  - separar Java / JavaScript
+  - separar frontend / backend
+  - ordenar dashboard, práctica, examen e historial
+- evitar que el rediseño se convierta en “solo estética” sin resolver carga cognitiva
+
 ## Ahora
 
 ### 1. Ejercicios evaluables de JavaScript
