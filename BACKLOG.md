@@ -32,7 +32,7 @@ convierte el laboratorio en una herramienta de práctica deliberada.
 ### 2. Práctica DOM con preview real
 
 Estado:
-primera versión sólida ya implementada. Ahora pasa a frente principal para endurecer cobertura y casos.
+base ya bastante madura. Queda apretar algunos casos finos, pero el bloque principal está muy adelantado.
 
 Objetivo:
 permitir ejercicios donde el usuario pinte items en pantalla a partir de datos.
@@ -45,6 +45,7 @@ Alcance mínimo:
 - [x] carga de JSON local
 - [x] validaciones básicas sobre el DOM renderizado
 - [~] ampliar cobertura a listas, filtros y renderizado desde datos reales
+- [x] cubrir rerender, vaciado y sustitución de tandas sucesivas en ejercicios clave
 
 Valor:
 mejora mucho la parte frontend útil para DAM.
@@ -52,7 +53,7 @@ mejora mucho la parte frontend útil para DAM.
 ### 3. Ejercicios Java guiados
 
 Estado:
-estructura guiada ya muy madura. Quedará prácticamente cerrada con pistas graduales.
+estructura guiada ya muy madura y prácticamente cerrada.
 
 Objetivo:
 dar estructura real a Java aunque no se ejecute en navegador.

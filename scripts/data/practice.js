@@ -565,6 +565,37 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "text", selector: "#resultList li:first-child", expected: "Testing | JavaScript | Avanzado" },
           ],
         },
+        {
+          label: "Ignora metadatos extra y pinta solo la forma pedida",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                {
+                  title: "Eventos",
+                  language: "JavaScript",
+                  level: "Intermedio",
+                  visible: true,
+                  tags: ["dom", "events"],
+                  stats: { xp: 90 },
+                },
+                {
+                  title: "Colecciones",
+                  language: "Java",
+                  level: "Intermedio",
+                  visible: false,
+                  tags: ["collections"],
+                  stats: { xp: 80 },
+                },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#resultList li", expected: 1 },
+            { type: "text", selector: "#resultList li:first-child", expected: "Eventos | JavaScript | Intermedio" },
+          ],
+        },
       ],
     }),
     "js-json-to-dom": exercise({
@@ -754,6 +785,39 @@ Object.assign(learningRoot.LEARNING_DATA, {
           assertions: [
             { type: "count", selector: "#featuredList li", expected: 1 },
             { type: "text", selector: "#featuredList li:first-child", expected: "Colecciones | Java | Intermedio" },
+          ],
+        },
+        {
+          label: "Ignora metadatos adicionales y mantiene solo el render pedido",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  {
+                    title: "APIs",
+                    language: "JavaScript",
+                    level: "Avanzado",
+                    featured: true,
+                    tags: ["http", "json"],
+                    stats: { xp: 120 },
+                  },
+                  {
+                    title: "Spring",
+                    language: "Java",
+                    level: "Avanzado",
+                    featured: false,
+                    tags: ["api"],
+                    stats: { xp: 140 },
+                  },
+                ],
+              }],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#featuredList li", expected: 1 },
+            { type: "text", selector: "#featuredList li:first-child", expected: "APIs | JavaScript | Avanzado" },
           ],
         },
       ],
