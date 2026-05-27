@@ -539,6 +539,32 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "text", selector: "#resultList li:last-child", expected: "Fetch | JavaScript | Intermedio" },
           ],
         },
+        {
+          label: "Sustituye una tanda mixta por otra sin arrastrar visibles previos",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "Arrays", language: "JavaScript", level: "Base", visible: true, tags: ["arrays"] },
+                { title: "POO", language: "Java", level: "Intermedio", visible: false, tags: ["oop"] },
+                { title: "Fetch", language: "JavaScript", level: "Intermedio", visible: true, tags: ["async"] },
+              ]],
+            },
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "Testing", language: "JavaScript", level: "Avanzado", visible: true, tags: ["tests"] },
+                { title: "Spring", language: "Java", level: "Avanzado", visible: false, tags: ["api"] },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#resultList li", expected: 1 },
+            { type: "text", selector: "#resultList li:first-child", expected: "Testing | JavaScript | Avanzado" },
+          ],
+        },
       ],
     }),
     "js-json-to-dom": exercise({
@@ -700,6 +726,34 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "count", selector: "#featuredList li", expected: 2 },
             { type: "text", selector: "#featuredList li:first-child", expected: "Testing | JavaScript | Avanzado" },
             { type: "text", selector: "#featuredList li:last-child", expected: "DOM | JavaScript | Base" },
+          ],
+        },
+        {
+          label: "Sustituye un lote destacado anterior por otro distinto sin residuos",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  { title: "Testing", language: "JavaScript", level: "Avanzado", featured: true, stats: { xp: 100 } },
+                  { title: "DOM", language: "JavaScript", level: "Base", featured: true, stats: { xp: 40 } },
+                ],
+              }],
+            },
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  { title: "Colecciones", language: "Java", level: "Intermedio", featured: true, stats: { xp: 85 } },
+                ],
+              }],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#featuredList li", expected: 1 },
+            { type: "text", selector: "#featuredList li:first-child", expected: "Colecciones | Java | Intermedio" },
           ],
         },
       ],
