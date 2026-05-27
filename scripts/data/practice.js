@@ -1057,6 +1057,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Edad 0 o una nota media con decimales largos para comprobar el formateo.",
         "Texto vacio en el nombre para ver si la salida sigue siendo legible.",
       ],
+      [
+        "Empieza declarando cada dato con el tipo que mejor represente su valor.",
+        "Construye primero una salida simple con todos los campos antes de pensar en el formato final.",
+        "Si la linea queda confusa, introduce separadores claros entre cada dato.",
+      ],
     ),
     "java-methods": guide(
       "Escribe un programa con un método `calcularNivel(int xp)` que devuelva el nivel del usuario.",
@@ -1097,6 +1102,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "XP exactamente en el borde de cambio de nivel, como 150 o 300.",
         "XP negativo para decidir si lo normalizas, lo rechazas o documentas que no se contempla.",
       ],
+      [
+        "Piensa cuantos bloques completos de 150 hay dentro del XP recibido.",
+        "Recuerda que el primer nivel existe incluso cuando el XP es 0.",
+        "Prueba el metodo con valores justo antes y justo despues del cambio de tramo.",
+      ],
     ),
     "java-control": guide(
       "Lee una nota ya fijada en una variable y clasifícala con condicionales.",
@@ -1135,6 +1145,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
       [
         "Nota 5 y nota 9 para comprobar dos bordes de tramo.",
         "Nota fuera de rango, como -1 u 11, para decidir si la validas antes de clasificar.",
+      ],
+      [
+        "Ordena las condiciones de la mas exigente a la mas amplia para no tapar casos.",
+        "Haz primero que solo salga una clasificacion correcta.",
+        "Despues anade el bucle de tres mensajes sin duplicar `println` manuales.",
       ],
     ),
     "java-arrays": guide(
@@ -1176,6 +1191,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
       [
         "Todas las notas iguales para comprobar que maxima y media siguen siendo coherentes.",
         "Un array con una sola nota para ver si la inicializacion y el bucle siguen teniendo sentido.",
+      ],
+      [
+        "Usa la primera nota como referencia inicial para la maxima.",
+        "En el mismo bucle, suma y compara, en vez de hacer dos recorridos separados.",
+        "Calcula la media solo cuando ya hayas terminado de acumular el total.",
       ],
     ),
     "java-oop": guide(
@@ -1221,6 +1241,11 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Un libro de exactamente 400 paginas para fijar bien el borde de la regla.",
         "Titulos o autores con espacios para comprobar que el constructor conserva bien el texto.",
       ],
+      [
+        "Decide primero que estado minimo debe guardar un libro para ser util.",
+        "Haz que el constructor deje esos datos listos en los atributos privados.",
+        "El metodo `esLargo()` solo necesita mirar `pages` y devolver un boolean.",
+      ],
     ),
     "java-inheritance": guide(
       "Diseña una interfaz `Notificable` y dos clases que la implementen.",
@@ -1264,6 +1289,11 @@ class SmsNotifier implements Notificable {
         "Mensaje vacio para decidir si lo permites, lo transformas o lo rechazas.",
         "Una tercera implementacion muy corta para comprobar que el consumo polimorfico no cambia.",
       ],
+      [
+        "Empieza por una interfaz con una sola firma y una sola responsabilidad.",
+        "Haz una implementacion minima de Email y otra de SMS cambiando solo el comportamiento.",
+        "Comprueba despues que una variable del tipo interfaz puede apuntar a cualquiera de las dos.",
+      ],
     ),
     "java-collections": guide(
       "Construye un pequeño registro de progreso por lenguaje usando List y Map.",
@@ -1306,6 +1336,11 @@ public class ProgressRegistry {
         "Una lista vacia para comprobar que el resumen no rompe el programa.",
         "Una clave de lenguaje que no exista en el mapa para decidir el valor por defecto.",
       ],
+      [
+        "Decide primero que guarda la lista y que guarda el mapa para no mezclar responsabilidades.",
+        "Rellena unas pocas tareas y un par de claves de XP antes de imprimir nada.",
+        "Recorre cada estructura por separado y solo al final compone el resumen.",
+      ],
     ),
     "java-exceptions": guide(
       "Crea un método `parsearNota(String texto)` que convierta texto a número y maneje errores.",
@@ -1344,6 +1379,11 @@ public class ProgressRegistry {
       [
         "Texto con espacios alrededor, como ` 8 `, para decidir si haces trim antes del parseo.",
         "Valores numericos fuera de rango, como 12 o -3, si anades validacion de dominio.",
+      ],
+      [
+        "Primero resuelve solo el parseo con `Integer.parseInt` dentro de `try/catch`.",
+        "Haz que todos los fallos de parseo vuelvan al mismo valor acordado, `-1`.",
+        "Si anades validacion de rango, separala en otra funcion para no mezclar responsabilidades.",
       ],
     ),
     "java-testing": guide(
@@ -1385,6 +1425,11 @@ public class ProgressRegistry {
         "La nota 0 para confirmar un suspenso claro.",
         "La nota 5 exacta para fijar el borde que mas suele romperse.",
       ],
+      [
+        "Reduce la regla a una condicion simple que devuelva boolean.",
+        "Prueba primero el caso 5, que es el borde mas importante.",
+        "Separa los casos en comprobaciones independientes para que el fallo sea legible.",
+      ],
     ),
     "java-spring-intro": guide(
       "Diseña la estructura base de una API de tareas con Spring.",
@@ -1425,6 +1470,11 @@ class TaskController {
       [
         "Crear una tarea con titulo vacio para decidir donde iria la validacion.",
         "Completar una tarea inexistente para pensar la respuesta HTTP y el contrato del service.",
+      ],
+      [
+        "Piensa primero en los recursos y acciones que vera el cliente, no en las clases internas.",
+        "Reparte la responsabilidad: el controller recibe y responde, el service resuelve la logica.",
+        "Define un DTO minimo para crear y otro para devolver tareas antes de hablar de persistencia.",
       ],
     ),
   },

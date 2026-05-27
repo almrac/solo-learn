@@ -657,6 +657,7 @@ function guide(
   manualChecks = [],
   nextVariation = "",
   edgeCases = [],
+  hints = [],
 ) {
   return {
     prompt,
@@ -671,6 +672,7 @@ function guide(
     manualChecks,
     nextVariation,
     edgeCases,
+    hints,
   };
 }
 

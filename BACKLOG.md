@@ -52,7 +52,7 @@ mejora mucho la parte frontend útil para DAM.
 ### 3. Ejercicios Java guiados
 
 Estado:
-estructura guiada ya fuerte. Falta seguir ampliando densidad y validación.
+estructura guiada ya muy madura. Quedará prácticamente cerrada con pistas graduales.
 
 Objetivo:
 dar estructura real a Java aunque no se ejecute en navegador.
@@ -69,6 +69,7 @@ Alcance mínimo:
 - [x] pruebas manuales
 - [x] variación sugerida de continuación
 - [x] casos borde recomendados
+- [x] pistas graduales
 
 Valor:
 sube mucho el valor formativo sin meter compilación remota.
