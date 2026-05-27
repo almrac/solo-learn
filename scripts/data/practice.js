@@ -1350,6 +1350,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
       prompt: "Implementa `crearResumenDashboard(tasks, filters)` para preparar datos de un pequeño dashboard de estudio.",
       checklist: [
         "Recibe un array `tasks` y un objeto `filters` con `status`.",
+        "Acepta también `filters.track` para filtrar por lenguaje cuando exista.",
         "Calcula `total`, `pending` y `completed`.",
         "Genera `visibleTitles` según el filtro recibido.",
         "Si `filters.status` es `all`, muestra todos los títulos.",
@@ -1441,6 +1442,35 @@ Object.assign(learningRoot.LEARNING_DATA, {
             pending: 3,
             completed: 1,
             visibleTitles: ["Arrays", "DOM", "Testing"],
+          },
+        },
+        {
+          label: "Permite filtrar por track sin romper los contadores globales",
+          args: [[
+            { title: "Arrays", done: false, track: "javascript" },
+            { title: "Colecciones", done: true, track: "java" },
+            { title: "DOM", done: false, track: "javascript" },
+          ], { status: "all", track: "javascript" }],
+          expected: {
+            total: 3,
+            pending: 2,
+            completed: 1,
+            visibleTitles: ["Arrays", "DOM"],
+          },
+        },
+        {
+          label: "Combina filtro de estado y track manteniendo el orden visible",
+          args: [[
+            { title: "Arrays", done: false, track: "javascript" },
+            { title: "Spring", done: false, track: "java" },
+            { title: "Testing", done: true, track: "javascript" },
+            { title: "DOM", done: false, track: "javascript" },
+          ], { status: "pending", track: "javascript" }],
+          expected: {
+            total: 4,
+            pending: 3,
+            completed: 1,
+            visibleTitles: ["Arrays", "DOM"],
           },
         },
       ],
@@ -2400,20 +2430,22 @@ function renderJsonViewer() {
       ],
     ),
     "js-fetch-to-dom": projectBrief(
-      "Construye una vista de consumo de API pública con filtrado y render limpio.",
-      "Unir `async/await`, filtrado de datos y renderizado básico para montar una vista útil de verdad a partir de una API pública o una fuente remota equivalente.",
+      "Construye una vista de consumo de API pública con filtrado, recarga y render limpio.",
+      "Unir `async/await`, filtrado de datos, recarga y estados básicos para montar una vista útil de verdad a partir de una API pública o una fuente remota equivalente.",
       [
         "Crea una función async que espere datos de `fetchItems` o de una API pública.",
         "Transforma la respuesta a una lista homogénea para la interfaz.",
         "Filtra solo los items que interesan antes de pintar.",
         "Pinta una lista final con nombre y metadatos útiles en el DOM.",
         "Haz que una segunda carga sustituya siempre el contenido anterior completo.",
+        "Añade una acción de recarga o cambio de filtro sin duplicar listeners ni nodos.",
       ],
       [
         "Función async",
         "Transformación de respuesta remota",
         "Lista renderizada",
         "Filtro aplicado",
+        "Recarga controlada",
       ],
       `async function loadItems(fetchItems) {
   const data = await fetchItems();
@@ -2425,11 +2457,13 @@ function renderJsonViewer() {
         "Comprueba que una segunda carga válida sustituya la lista anterior en vez de hacer append.",
         "Verifica que si la API devuelve más campos de los necesarios, la vista siga pintando solo lo importante.",
         "Asegúrate de que el filtro deja fuera los elementos no relevantes sin romper el orden útil.",
+        "Prueba una recarga después de un lote vacío o distinto para confirmar que no quedan restos visuales.",
       ],
       [
         "La vista puede adaptarse a una API pública porque primero transforma la respuesta y luego renderiza.",
         "El render final no depende del formato bruto remoto, sino de una lista ya normalizada.",
         "Recargar datos vuelve a pintar la vista completa sin residuos del lote anterior.",
+        "La recarga y el filtro viven en un flujo claro y no en parches repartidos por el archivo.",
       ],
     ),
     "js-ui-states": projectBrief(
