@@ -964,6 +964,35 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "text", selector: "#fetchList li:last-child", expected: "DOM | Base" },
           ],
         },
+        {
+          label: "Recupera la lista tras una carga vacía y vuelve a pintar sin residuos",
+          actions: [
+            {
+              type: "call",
+              name: "cargarYRenderizar",
+              args: [async () => ({
+                items: [
+                  { title: "Colecciones", language: "Java", level: "Intermedio" },
+                ],
+              })],
+            },
+            {
+              type: "call",
+              name: "cargarYRenderizar",
+              args: [async () => ({
+                items: [
+                  { title: "Fetch local", language: "JavaScript", level: "Intermedio" },
+                  { title: "Estado UI", language: "JavaScript", level: "Avanzado" },
+                ],
+              })],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#fetchList li", expected: 2 },
+            { type: "text", selector: "#fetchList li:first-child", expected: "Fetch local | Intermedio" },
+            { type: "text", selector: "#fetchList li:last-child", expected: "Estado UI | Avanzado" },
+          ],
+        },
       ],
     }),
     "js-ui-states": exercise({
@@ -1286,6 +1315,23 @@ Object.assign(learningRoot.LEARNING_DATA, {
           }],
           expected:
             "<li>Objetos | JavaScript | Cero | objetos | 45 XP</li><li>Colecciones | Java | Intermedio |  | 90 XP</li>",
+          compare: "html",
+        },
+        {
+          label: "Tolera items sin objeto stats pero con tags vacías",
+          args: [{
+            course: "Solo Learn",
+            items: [
+              {
+                title: "UI states",
+                language: "JavaScript",
+                level: "Intermedio",
+                tags: [],
+              },
+            ],
+          }],
+          expected:
+            "<li>UI states | JavaScript | Intermedio |  | 0 XP</li>",
           compare: "html",
         },
       ],
