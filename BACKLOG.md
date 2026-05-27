@@ -148,6 +148,9 @@ base ya visible en el banco con filtro por tema y agrupación útil. Falta segui
 
 ### 9. Mini proyectos guiados
 
+Estado:
+base ya en marcha con briefs, starters y validación manual. Falta ampliar catálogo y densidad.
+
 JavaScript:
 
 - lista de tareas

@@ -1961,24 +1961,31 @@ class TaskController {
 
   projectBriefs: {
     "java-oop": projectBrief(
-      "Modela una biblioteca pequeña con objetos reales.",
-      "Definir clases con atributos privados y comportamientos claros para dejar atrás soluciones planas con variables sueltas.",
+      "Modela una biblioteca pequeña con objetos reales y operaciones básicas de préstamo.",
+      "Definir clases con atributos privados y comportamientos claros para dejar atrás soluciones planas con variables sueltas y empezar a pensar en reglas de dominio.",
       [
         "Crea una clase `Book` con título, autor y disponibilidad.",
-        "Añade métodos como `borrow()` y `giveBack()`.",
-        "Instancia varios libros y muestra su estado desde `main`.",
+        "Añade métodos como `borrow()` y `giveBack()` con mensajes o estados distintos según la situación.",
+        "Crea una clase `Library` o un bloque coordinador mínimo para guardar varios libros.",
+        "Instancia varios libros y muestra una secuencia de préstamo y devolución desde `main`.",
       ],
       [
         "Clase `Book`",
-        "Métodos de comportamiento",
+        "Comportamiento de préstamo y devolución",
+        "Colección simple de libros",
         "Pequeña demo en `main`",
       ],
-      `public class Book {
+      `import java.util.ArrayList;
+import java.util.List;
+
+public class Book {
   private String title;
+  private String author;
   private boolean available = true;
 
-  public Book(String title) {
+  public Book(String title, String author) {
     this.title = title;
+    this.author = author;
   }
 
   public void borrow() {
@@ -1988,32 +1995,54 @@ class TaskController {
   public void giveBack() {
     // TODO
   }
+}
+
+class Library {
+  private final List<Book> books = new ArrayList<>();
+
+  public void addBook(Book book) {
+    books.add(book);
+  }
+
+  public void printCatalog() {
+    // TODO
+  }
 }`,
       [
         "Comprueba que pedir prestado dos veces no deje el mismo resultado que la primera.",
         "Verifica que `giveBack()` restaure la disponibilidad del libro.",
+        "Verifica que el catálogo se siga entendiendo al añadir dos o tres libros.",
         "Desde `main`, imprime el estado antes y después de cada operación.",
       ],
       [
         "El libro cambia de disponible a prestado y vuelve a disponible sin estados ambiguos.",
         "El comportamiento principal se entiende leyendo `borrow()` y `giveBack()` sin depender de `main`.",
+        "La biblioteca puede listar varios libros sin duplicar lógica de impresión por cada uno.",
         "La demo final enseña una secuencia completa, no solo una impresión aislada.",
       ],
     ),
     "java-collections": projectBrief(
-      "Construye un registro de progreso por lenguaje usando colecciones.",
-      "Pasar de variables sueltas a estructuras que permitan crecer: listas de tareas y mapas de XP por categoría.",
+      "Construye una agenda de estudio simple con tareas y XP por lenguaje usando colecciones.",
+      "Pasar de variables sueltas a estructuras que permitan crecer: listas de tareas, mapas de XP y una vista resumida que se pueda ampliar sin rehacer el programa.",
       [
         "Usa `ArrayList` para tareas pendientes o completadas.",
         "Usa `HashMap` para asociar lenguaje con XP acumulado.",
+        "Añade una operación mínima para marcar una tarea como completada o moverla entre listas.",
         "Muestra un resumen final recorriendo ambas estructuras.",
       ],
       [
-        "Lista de tareas",
+        "Lista de tareas pendientes",
+        "Lista de tareas completadas",
         "Mapa de XP",
         "Resumen por consola",
       ],
-      `List<String> pendingTasks = new ArrayList<>();
+      `import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+List<String> pendingTasks = new ArrayList<>();
+List<String> completedTasks = new ArrayList<>();
 Map<String, Integer> xpByTrack = new HashMap<>();
 
 pendingTasks.add("Repasar arrays");
@@ -2022,14 +2051,15 @@ pendingTasks.add("Practicar DOM");
 xpByTrack.put("java", 120);
 xpByTrack.put("javascript", 160);
 
-// TODO: mostrar resumen final.`,
+// TODO: completar una tarea y mostrar resumen final.`,
       [
         "Comprueba cuántas tareas quedan pendientes y que el recuento coincide con la lista.",
         "Verifica que el mapa devuelve el XP correcto para cada lenguaje.",
+        "Comprueba que mover una tarea a completadas no la deja duplicada en pendientes.",
         "Añade un tercer dato y confirma que el resumen sigue saliendo legible.",
       ],
       [
-        "La salida final resume tareas y XP sin depender de variables sueltas repetidas.",
+        "La salida final resume pendientes, completadas y XP sin depender de variables sueltas repetidas.",
         "Añadir una tarea o un lenguaje nuevo no obliga a reescribir la estructura principal.",
         "Lista y mapa tienen responsabilidades distintas y eso se nota en el código.",
       ],
@@ -2248,26 +2278,49 @@ class TaskController {
 }`,
     ),
     "js-project": projectBrief(
-      "Construye un dashboard de estudio conectado a JSON local.",
-      "Unir fetch, filtrado, renderizado, estado local y persistencia en una app pequeña pero completa desplegable en GitHub Pages.",
+      "Construye un dashboard de estudio con filtros persistentes conectado a JSON local.",
+      "Unir fetch, filtrado, renderizado, estado local y persistencia en una app pequeña pero completa, cercana a una herramienta real de estudio.",
       [
         "Carga datos desde un JSON local con `fetch`.",
-        "Permite filtrar por lenguaje o dificultad sin recargar.",
+        "Permite filtrar por lenguaje y dificultad sin recargar.",
+        "Muestra contadores simples como total visible y total filtrado.",
         "Guarda una preferencia o progreso simple en `localStorage`.",
+        "Haz que re-renderizar sustituya siempre la vista anterior completa.",
       ],
       [
         "Vista principal con lista",
-        "Filtros activos",
+        "Filtros activos por lenguaje y dificultad",
+        "Contadores de resumen",
         "Persistencia local",
       ],
       `const state = {
   filter: "all",
+  level: "all",
   items: [],
 };
 
 async function loadDashboard() {
   // TODO: cargar datos y renderizar.
+}
+
+function renderDashboard() {
+  // TODO: pintar contadores y lista visible.
+}
+
+function applyFilters(items) {
+  // TODO: devolver solo los items que pasan los filtros actuales.
+  return items;
 }`,
+      [
+        "Comprueba que cambiar filtro actualice lista y contadores sin duplicar nodos viejos.",
+        "Verifica que recargar la página recupere al menos una preferencia guardada.",
+        "Asegúrate de que el estado `all` no oculte elementos por error.",
+      ],
+      [
+        "La lista visible cambia por filtros sin dejar restos del render anterior.",
+        "El dashboard enseña al menos un contador útil además de la lista.",
+        "El estado queda suficientemente pequeño y claro como para extenderlo después.",
+      ],
     ),
   },
 
