@@ -1945,6 +1945,7 @@ public class ProgressRegistry {
         "Piensa un DTO de entrada y otro de salida antes de tocar base de datos.",
         "Decide dónde vive la validación del título y cómo se traduce a respuesta HTTP.",
         "Añade un caso de `PATCH /complete` y decide qué devolver si la tarea no existe o ya estaba completada.",
+        "Diseña un `GET` con query param `done` para no crear endpoints duplicados solo por filtrado.",
       ],
       "Spring",
       "Avanzado",
@@ -1970,10 +1971,11 @@ class TaskController {
 
 record TaskCreateRequest(String title) {}
 record TaskResponse(long id, String title, boolean done) {}
+record TaskListItemResponse(long id, String title, boolean done) {}
 record ApiErrorResponse(String code, String message) {}
 
 class TaskService {
-  List<TaskResponse> listTasks() {
+  List<TaskListItemResponse> listTasks(Boolean done) {
     return List.of();
   }
 
@@ -1993,6 +1995,7 @@ class TaskService {
         "Verifica que los nombres de rutas y métodos HTTP se entienden sin comentarios extra.",
         "Decide qué código HTTP devolverías en alta válida, validación fallida y tarea inexistente.",
         "Decide si `PATCH /complete` devuelve la tarea actualizada, `204` sin cuerpo o un error de dominio si ya estaba completada.",
+        "Decide si el listado usa el mismo DTO que el detalle o uno más pequeño para no exponer más de la cuenta.",
       ],
       "Anade una cuarta operacion para filtrar tareas pendientes y decide si encaja mejor como query param en GET o como endpoint aparte.",
       [
@@ -2000,6 +2003,7 @@ class TaskService {
         "Completar una tarea inexistente para pensar la respuesta HTTP y el contrato del service.",
         "Enviar un titulo con espacios para decidir si normalizas antes de validar o rechazas tal cual.",
         "Completar una tarea ya hecha para decidir si repites `200`, devuelves `409` o simplemente no haces nada.",
+        "Listar con `?done=true` o `?done=false` para decidir si el filtrado vive en controller o en service.",
       ],
       [
         "Piensa primero en los recursos y acciones que vera el cliente, no en las clases internas.",
@@ -2007,6 +2011,7 @@ class TaskService {
         "Define un DTO minimo para crear y otro para devolver tareas antes de hablar de persistencia.",
         "Fija primero el contrato HTTP y luego adapta la implementación interna a ese contrato.",
         "Si introduces errores de dominio, dales nombre y forma estable antes de pensar en excepciones genéricas.",
+        "Usa query params para filtros simples del listado antes de inventar rutas nuevas.",
       ],
     ),
   },
@@ -2262,10 +2267,12 @@ public static void main(String[] args) {
         "Separa la lógica de negocio en un `Service` para no dejar todo en el controlador.",
         "Añade validación básica y decide respuestas HTTP para alta inválida o id inexistente.",
         "Diseña también `PATCH /api/tasks/{id}/complete` y un DTO de error mínimo para respuestas fallidas.",
+        "Permite filtrar el listado por `done` con query param y decide si la lista devuelve un DTO más corto que el detalle.",
       ],
       [
         "Modelo simple",
         "DTOs de entrada y salida",
+        "DTO de lista",
         "DTO de error",
         "Controller con endpoints",
         "Service con lógica básica",
@@ -2277,8 +2284,8 @@ class TaskController {
   private final TaskService taskService;
 
   @GetMapping
-  List<TaskDto> list() {
-    return taskService.list();
+  List<TaskListItemDto> list(@RequestParam(required = false) Boolean done) {
+    return taskService.list(done);
   }
 
   @PostMapping
@@ -2300,6 +2307,7 @@ class TaskController {
         "Comprueba que crear con título vacío tiene un contrato explícito y no una respuesta ambigua.",
         "Decide qué devolvería `PATCH /api/tasks/{id}/complete` si la tarea no existe.",
         "Comprueba que los errores de validación o conflicto tengan un cuerpo estable si decides devolver JSON de error.",
+        "Decide si el listado necesita un DTO corto distinto del detalle para no arrastrar datos innecesarios.",
       ],
       [
         "La API se entiende por recursos y casos de uso, no por acciones técnicas sueltas.",
@@ -2307,6 +2315,7 @@ class TaskController {
         "La estructura ya parece escalable aunque todavía no haya base de datos real.",
         "DTOs, validación y respuestas HTTP ya están alineados aunque la persistencia siga en memoria.",
         "El contrato de error ya no es improvisado: también tiene forma y intención claras.",
+        "El filtrado simple entra por query params y no deforma el diseño de rutas.",
       ],
     ),
     "js-components": projectBrief(
