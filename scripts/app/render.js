@@ -702,6 +702,8 @@ function renderGuidedProblem(problem) {
     elements.studyGuidedStarter.textContent = "";
     elements.studyGuidedChecksBlock.hidden = true;
     elements.studyGuidedChecks.innerHTML = "";
+    elements.studyGuidedVariationBlock.hidden = true;
+    elements.studyGuidedVariation.textContent = "";
     elements.studyGuidedMistakesBlock.hidden = true;
     elements.studyGuidedMistakes.innerHTML = "";
     return;
@@ -731,6 +733,14 @@ function renderGuidedProblem(problem) {
   } else {
     elements.studyGuidedChecksBlock.hidden = true;
     elements.studyGuidedChecks.innerHTML = "";
+  }
+
+  if (typeof problem.nextVariation === "string" && problem.nextVariation.trim()) {
+    elements.studyGuidedVariationBlock.hidden = false;
+    elements.studyGuidedVariation.textContent = problem.nextVariation;
+  } else {
+    elements.studyGuidedVariationBlock.hidden = true;
+    elements.studyGuidedVariation.textContent = "";
   }
 
   if (Array.isArray(problem.commonMistakes) && problem.commonMistakes.length > 0) {

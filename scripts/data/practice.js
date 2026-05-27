@@ -1052,6 +1052,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Verifica que el boolean no se pierda o se mezcle con el texto.",
         "Asegúrate de que cada dato aparece una sola vez en la ficha final.",
       ],
+      "Haz una segunda version con varios estudiantes y extrae un metodo `imprimirFicha(...)` para no duplicar la salida.",
     ),
     "java-methods": guide(
       "Escribe un programa con un método `calcularNivel(int xp)` que devuelva el nivel del usuario.",
@@ -1087,6 +1088,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Verifica que el nivel empieza en 1 y no en 0.",
         "Comprueba que mover la impresión fuera del método no cambia el cálculo.",
       ],
+      "Anade un segundo metodo que reciba tambien el tamano del bloque de XP para hacer el calculo configurable.",
     ),
     "java-control": guide(
       "Lee una nota ya fijada en una variable y clasifícala con condicionales.",
@@ -1121,6 +1123,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Comprueba que siempre salen exactamente tres mensajes de repaso.",
         "Verifica que no se imprimen dos clasificaciones para la misma nota.",
       ],
+      "Sustituye la variable fija por una lista de notas y clasifica varias en el mismo programa sin repetir bloques `if` enteros.",
     ),
     "java-arrays": guide(
       "Trabaja con un array de cinco notas y calcula un pequeño resumen.",
@@ -1157,6 +1160,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Comprueba que la media usa todas las notas y no solo parte del recorrido.",
         "Verifica que cambiar el tamaño del array no obliga a tocar el bucle.",
       ],
+      "Amplia el resumen para contar tambien cuantas notas estan aprobadas y cuantas suspendidas en el mismo recorrido.",
     ),
     "java-oop": guide(
       "Modela una clase Libro con un comportamiento útil.",
@@ -1196,6 +1200,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Comprueba que el constructor deja el objeto listo sin pasos extra.",
         "Verifica que la lógica depende del estado del libro y no de datos externos.",
       ],
+      "Anade un metodo `resumen()` que devuelva una cadena legible con los datos del libro sin imprimir directamente en la clase.",
     ),
     "java-inheritance": guide(
       "Diseña una interfaz `Notificable` y dos clases que la implementen.",
@@ -1234,6 +1239,7 @@ class SmsNotifier implements Notificable {
         "Verifica que el contrato de la interfaz obliga a mantener la misma firma.",
         "Añade un tercer notificador pequeño para comprobar que el diseño aguanta.",
       ],
+      "Crea un metodo que reciba un `Notificable` por parametro y lo use sin saber si es Email, SMS o cualquier otra implementacion.",
     ),
     "java-collections": guide(
       "Construye un pequeño registro de progreso por lenguaje usando List y Map.",
@@ -1271,6 +1277,7 @@ public class ProgressRegistry {
         "Verifica que cada clave del mapa devuelve el XP correcto.",
         "Cambia el orden de inserción y comprueba que el programa sigue teniendo sentido.",
       ],
+      "Calcula tambien cuantas tareas pertenecen a cada lenguaje para cruzar una `List` de tareas con el `Map` de XP.",
     ),
     "java-exceptions": guide(
       "Crea un método `parsearNota(String texto)` que convierta texto a número y maneje errores.",
@@ -1305,6 +1312,7 @@ public class ProgressRegistry {
         "Comprueba que los casos inválidos no rompen el programa principal.",
         "Verifica que el contrato `-1` se mantiene igual en todos los fallos.",
       ],
+      "Extrae una segunda funcion que valide si la nota esta entre 0 y 10 para separar parseo y regla de negocio.",
     ),
     "java-testing": guide(
       "Diseña una función `estaAprobado(int nota)` y plantea sus pruebas principales.",
@@ -1340,6 +1348,7 @@ public class ProgressRegistry {
         "Comprueba un caso claramente inválido y otro claramente válido.",
         "Asegúrate de que el método devuelve boolean y no texto de consola.",
       ],
+      "Escribe el esqueleto de una clase de test JUnit con tres metodos separados para borde, suspenso y caso claramente aprobado.",
     ),
     "java-spring-intro": guide(
       "Diseña la estructura base de una API de tareas con Spring.",
@@ -1376,6 +1385,7 @@ class TaskController {
         "Comprueba que listar, crear y completar no mezclan la misma responsabilidad.",
         "Verifica que los nombres de rutas y métodos HTTP se entienden sin comentarios extra.",
       ],
+      "Anade una cuarta operacion para filtrar tareas pendientes y decide si encaja mejor como query param en GET o como endpoint aparte.",
     ),
   },
 

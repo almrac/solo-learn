@@ -65,6 +65,9 @@ Alcance mínimo:
 - [x] salida esperada
 - [x] checklist de solución
 - [x] errores comunes
+- [x] plantilla inicial
+- [x] pruebas manuales
+- [x] variación sugerida de continuación
 
 Valor:
 sube mucho el valor formativo sin meter compilación remota.

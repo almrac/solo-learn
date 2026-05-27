@@ -644,7 +644,19 @@ function blueprint(title, concept, where, lessonId, phase, howToLearn, tags, pre
   };
 }
 
-function guide(prompt, input, output, checklist, family, difficulty, practiceType, commonMistakes = [], starterCode = "", manualChecks = []) {
+function guide(
+  prompt,
+  input,
+  output,
+  checklist,
+  family,
+  difficulty,
+  practiceType,
+  commonMistakes = [],
+  starterCode = "",
+  manualChecks = [],
+  nextVariation = "",
+) {
   return {
     prompt,
     input,
@@ -656,6 +668,7 @@ function guide(prompt, input, output, checklist, family, difficulty, practiceTyp
     commonMistakes,
     starterCode,
     manualChecks,
+    nextVariation,
   };
 }
 
