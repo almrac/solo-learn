@@ -224,6 +224,18 @@ function renderWeeklyMissions() {
               <span class="weekly-missions__badge weekly-missions__badge--${mission.tone}">${escapeHtml(mission.status)}</span>
             </div>
             <p>${escapeHtml(mission.metric)}</p>
+            ${mission.cta
+              ? `
+                <button
+                  type="button"
+                  data-target="${mission.cta.target}"
+                  ${mission.cta.lessonId ? `data-lesson-id="${mission.cta.lessonId}"` : ""}
+                  ${mission.cta.trackId ? `data-track="${mission.cta.trackId}"` : ""}
+                >
+                  ${escapeHtml(mission.cta.label)}
+                </button>
+              `
+              : ""}
           </article>
         `,
       )

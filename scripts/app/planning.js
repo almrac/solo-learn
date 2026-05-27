@@ -755,13 +755,30 @@ function hasTrackActivityInWindow(trackId, dateKeys) {
   return typeof lastActivity === "string" && dateKeys.includes(lastActivity);
 }
 
+function findNextTrackLesson(trackId) {
+  const candidate = tracks[trackId].lessons
+    .filter((lesson) => !state.completed.includes(lesson.id))
+    .sort((left, right) => left.xp - right.xp)[0];
+
+  return candidate ?? tracks[trackId].lessons[0] ?? null;
+}
+
 function buildWeeklyMissions() {
   const context = getWeeklyContext();
   const activeTrack = state.activeTrack;
   const closedTarget = context.closedCount >= 3 ? 3 : 3;
+  const firstPendingExercise = context.pendingExercises[0] ?? null;
+  const firstReviewEntry = context.reviewEntries[0] ?? null;
+  const firstReviewRoute = firstReviewEntry ? getReviewEntryRoute(firstReviewEntry) : null;
   const bothTracksTouched =
     hasTrackActivityInWindow("java", context.lastSevenDays) &&
     hasTrackActivityInWindow("javascript", context.lastSevenDays);
+  const missingTrackId = !hasTrackActivityInWindow("java", context.lastSevenDays)
+    ? "java"
+    : !hasTrackActivityInWindow("javascript", context.lastSevenDays)
+      ? "javascript"
+      : "";
+  const crossTrackLesson = missingTrackId ? findNextTrackLesson(missingTrackId) : null;
 
   return [
     {
@@ -769,24 +786,58 @@ function buildWeeklyMissions() {
       status: context.closedCount >= closedTarget ? "Hecha" : "En curso",
       metric: `${context.closedCount}/${closedTarget} sesiones esta semana`,
       tone: context.closedCount >= closedTarget ? "done" : "progress",
+      cta: context.closedCount >= closedTarget
+        ? null
+        : {
+            label: "Abrir plan",
+            target: "daily-queue",
+          },
     },
     {
       title: `Bajar práctica abierta en ${tracks[activeTrack].label}`,
       status: context.pendingExercises.length <= 2 ? "Controlada" : "Pendiente",
       metric: `${context.pendingExercises.length} prácticas abiertas`,
       tone: context.pendingExercises.length <= 2 ? "done" : "warning",
+      cta: firstPendingExercise
+        ? {
+            label: "Cerrar tests",
+            lessonId: firstPendingExercise.id,
+            target: "practice",
+          }
+        : null,
     },
     {
       title: `Limpiar repaso en ${tracks[activeTrack].label}`,
       status: context.reviewEntries.length <= 1 ? "Controlado" : "Pendiente",
       metric: `${context.reviewEntries.length} frentes de repaso`,
       tone: context.reviewEntries.length <= 1 ? "done" : "warning",
+      cta: firstReviewEntry && firstReviewRoute
+        ? {
+            label: firstReviewRoute.target === "practice"
+              ? "Abrir práctica"
+              : firstReviewRoute.target === "challenge"
+                ? "Abrir reto"
+                : firstReviewRoute.target === "evolution"
+                  ? "Ver escalada"
+                  : "Abrir lección",
+            lessonId: firstReviewEntry.lesson.id,
+            target: firstReviewRoute.target,
+          }
+        : null,
     },
     {
       title: "Tocar ambos lenguajes",
       status: bothTracksTouched ? "Hecha" : "En curso",
       metric: `${Number(hasTrackActivityInWindow("java", context.lastSevenDays)) + Number(hasTrackActivityInWindow("javascript", context.lastSevenDays))}/2 lenguajes esta semana`,
       tone: bothTracksTouched ? "done" : "progress",
+      cta: !bothTracksTouched && crossTrackLesson
+        ? {
+            label: `Abrir ${tracks[missingTrackId].label}`,
+            lessonId: crossTrackLesson.id,
+            target: "study",
+            trackId: missingTrackId,
+          }
+        : null,
     },
   ];
 }

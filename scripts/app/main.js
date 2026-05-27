@@ -223,6 +223,48 @@ elements.dailyQueue.addEventListener("click", (event) => {
   document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
 });
 
+elements.weeklyMissions.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+
+  if (button.dataset.target === "daily-queue") {
+    elements.dailyQueue.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  saveCurrentNotes();
+
+  if (button.dataset.track && tracks[button.dataset.track]) {
+    state.activeTrack = button.dataset.track;
+  }
+
+  if (button.dataset.lessonId) {
+    openLesson(button.dataset.lessonId);
+  }
+
+  persist();
+  render();
+
+  if (button.dataset.target === "practice") {
+    loadActiveExercise();
+    document.querySelector(".runner").scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (button.dataset.target === "evolution") {
+    const section = elements.studyEvolutionCase.hidden ? elements.studyEvolution : elements.studyEvolutionCase;
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (button.dataset.target === "challenge") {
+    document.querySelector(".challenge").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+
+  document.querySelector(".study").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
 elements.reviewBox.addEventListener("click", (event) => {
   const button = event.target.closest("button");
   if (!button) return;
