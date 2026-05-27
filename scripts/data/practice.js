@@ -1943,6 +1943,7 @@ public class ProgressRegistry {
         "Define al menos tres endpoints HTTP con intención clara.",
         "Separa qué devolvería el controller y qué resolvería el service.",
         "Piensa un DTO de entrada y otro de salida antes de tocar base de datos.",
+        "Decide dónde vive la validación del título y cómo se traduce a respuesta HTTP.",
       ],
       "Spring",
       "Avanzado",
@@ -1962,23 +1963,40 @@ class TaskController {
   }
 
   // TODO: GET listar tareas.
-  // TODO: POST crear tarea.
-  // TODO: PATCH completar tarea.
+  // TODO: POST crear tarea con TaskCreateRequest.
+  // TODO: PATCH completar tarea por id.
+}
+
+record TaskCreateRequest(String title) {}
+record TaskResponse(long id, String title, boolean done) {}
+
+class TaskService {
+  List<TaskResponse> listTasks() {
+    return List.of();
+  }
+
+  TaskResponse createTask(TaskCreateRequest request) {
+    // TODO: validar titulo y crear tarea.
+    return null;
+  }
 }`,
       [
         "Enumera qué respondería cada endpoint antes de pensar en base de datos.",
         "Comprueba que listar, crear y completar no mezclan la misma responsabilidad.",
         "Verifica que los nombres de rutas y métodos HTTP se entienden sin comentarios extra.",
+        "Decide qué código HTTP devolverías en alta válida, validación fallida y tarea inexistente.",
       ],
       "Anade una cuarta operacion para filtrar tareas pendientes y decide si encaja mejor como query param en GET o como endpoint aparte.",
       [
         "Crear una tarea con titulo vacio para decidir donde iria la validacion.",
         "Completar una tarea inexistente para pensar la respuesta HTTP y el contrato del service.",
+        "Enviar un titulo con espacios para decidir si normalizas antes de validar o rechazas tal cual.",
       ],
       [
         "Piensa primero en los recursos y acciones que vera el cliente, no en las clases internas.",
         "Reparte la responsabilidad: el controller recibe y responde, el service resuelve la logica.",
         "Define un DTO minimo para crear y otro para devolver tareas antes de hablar de persistencia.",
+        "Fija primero el contrato HTTP y luego adapta la implementación interna a ese contrato.",
       ],
     ),
   },
@@ -2232,29 +2250,43 @@ public static void main(String[] args) {
         "Define una entidad simple `Task` con `id`, `title` y `done`.",
         "Crea un endpoint GET para listar tareas y un POST para crear una nueva.",
         "Separa la lógica de negocio en un `Service` para no dejar todo en el controlador.",
+        "Añade validación básica y decide respuestas HTTP para alta inválida o id inexistente.",
       ],
       [
         "Modelo simple",
+        "DTOs de entrada y salida",
         "Controller con endpoints",
         "Service con lógica básica",
+        "Contratos HTTP y validación",
       ],
       `@RestController
 @RequestMapping("/api/tasks")
 class TaskController {
+  private final TaskService taskService;
+
   @GetMapping
   List<TaskDto> list() {
-    return List.of();
+    return taskService.list();
+  }
+
+  @PostMapping
+  ResponseEntity<TaskDto> create(@RequestBody TaskCreateRequest request) {
+    // TODO: validar y devolver 201 o 400.
+    return null;
   }
 }`,
       [
         "Revisa que cada endpoint tenga una intención clara y un verbo HTTP coherente.",
         "Comprueba que controller y service no mezclen responsabilidades.",
         "Valida que el DTO expone solo lo necesario para la respuesta.",
+        "Comprueba que crear con título vacío tiene un contrato explícito y no una respuesta ambigua.",
+        "Decide qué devolvería `PATCH /api/tasks/{id}/complete` si la tarea no existe.",
       ],
       [
         "La API se entiende por recursos y casos de uso, no por acciones técnicas sueltas.",
         "El controller queda fino y delega la lógica real fuera de HTTP.",
         "La estructura ya parece escalable aunque todavía no haya base de datos real.",
+        "DTOs, validación y respuestas HTTP ya están alineados aunque la persistencia siga en memoria.",
       ],
     ),
     "js-components": projectBrief(

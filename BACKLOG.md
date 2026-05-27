@@ -205,11 +205,14 @@ primer corte ya visible en JavaScript y Java. Falta ampliar cobertura, pero la i
 
 ### 12. Ruta hacia backend con Spring
 
-- DTOs
-- controllers
-- services
-- validación
-- endpoints REST
+Estado:
+primer corte ya visible en contenido guiado. Falta mucha más profundidad, pero DTOs, services, validación y endpoints REST ya tienen una base clara.
+
+- [x] DTOs
+- [x] controllers
+- [x] services
+- [x] validación
+- [x] endpoints REST
 
 ### 13. Historial y calendario
 
