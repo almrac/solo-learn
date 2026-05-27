@@ -523,6 +523,62 @@ function getSupportHint(support, topKey) {
   return `Idea clave: ${support.concept}`;
 }
 
+function getLessonReinforcementPlan(lesson) {
+  const summary = getLessonStruggleSummary(lesson.id);
+  if (!summary.total) return null;
+
+  const actions = [];
+  const topKey = summary.topKey;
+  const topSource = summary.topSourceKey;
+
+  let title = "Refuerzo recomendado";
+  let summaryText = "Conviene cerrar este atasco con una intervención corta antes de abrir más frente.";
+
+  if (topKey === "concept") {
+    summaryText = "El bloqueo dominante sigue siendo conceptual. Conviene fijar la idea antes de insistir en más práctica.";
+    actions.push("Relee teoría y deja una nota propia con una regla o ejemplo.");
+    actions.push("Vuelve a resolver una versión mínima del problema sin mirar el ejemplo completo.");
+  } else if (topKey === "logic") {
+    summaryText = "La deuda principal está en la ejecución del ejercicio, no en la teoría.";
+    actions.push(exercises[lesson.id]
+      ? "Carga la práctica o los tests y cierra un caso completo de principio a fin."
+      : "Repite la práctica completa y comprueba cada paso antes de pasar al siguiente.");
+    actions.push("Evita abrir otra lección hasta que la salida o el comportamiento sean estables.");
+  } else if (topKey === "error") {
+    summaryText = "Aquí no falta tanto teoría como corrección repetida del mismo fallo.";
+    actions.push("Vuelve al reto o al caso fallado e identifica exactamente qué condición o decisión se repite mal.");
+    actions.push("Escribe una regla corta en notas con el error típico que no quieres repetir.");
+  } else if (topKey === "transfer") {
+    summaryText = "El atasco aparece sobre todo al subir de nivel o cambiar de forma el mismo problema.";
+    actions.push("Retoma la base previa y compara qué cambia realmente en el salto avanzado.");
+    actions.push("Rehaz la versión evolucionada con una sola mejora clara: estructura, datos o separación de responsabilidades.");
+  }
+
+  if (topSource === "dom-tests") {
+    title = "Refuerzo DOM";
+    actions.unshift("Abre el preview DOM y limpia primero el contenido anterior antes de validar otra vez.");
+  } else if (topSource === "tests") {
+    title = "Refuerzo por tests";
+    actions.unshift("Cierra primero el test más simple y usa ese caso como ancla antes de tocar el resto.");
+  } else if (topSource === "challenge") {
+    title = "Refuerzo por reto";
+    actions.unshift("Repite el reto sin prisa y justifica por qué descartas cada opción que no eliges.");
+  } else if (topSource === "evolution") {
+    title = "Refuerzo de escalada";
+    actions.unshift("No rehagas todo: identifica qué pieza nueva introduce la versión avanzada y aísla ese cambio.");
+  }
+
+  if (summary.recurrenceScore >= 2) {
+    actions.push("Como ya hay patrón de recaída, cierra la sesión dejando una nota de verificación para la próxima vez.");
+  }
+
+  return {
+    title,
+    summary: summaryText,
+    actions: actions.slice(0, 3),
+  };
+}
+
 function getTrackStruggleCounts(trackId) {
   return tracks[trackId].lessons.reduce(
     (totals, lesson) => {

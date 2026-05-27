@@ -191,6 +191,7 @@ function buildDailyQueue() {
   const items = [];
   const seen = new Set();
   const struggleLeader = getTrackStruggleLeaders(state.activeTrack)[0];
+  const reviewEntries = getPendingReviewEntries(state.activeTrack);
 
   const addItem = (lesson, kind, reason, target = "study", priority = 0, focusKey = null) => {
     if (!lesson || seen.has(lesson.id)) return;
@@ -247,7 +248,7 @@ function buildDailyQueue() {
     .filter(Boolean)
     .sort((left, right) => scoreLessonRecommendation(right).score - scoreLessonRecommendation(left).score);
 
-  const saturation = getDailySaturationState(pendingExercises, failedLessons);
+  const saturation = getDailySaturationState(pendingExercises, failedLessons, reviewEntries);
   const sessionMode = determineDailySessionMode({
     recommendation,
     evolutionBaseLessons,
@@ -270,13 +271,14 @@ function buildDailyQueue() {
   }
 
   if (sessionMode === "review") {
-    failedLessons.slice(0, 2).forEach((lesson) => {
+    reviewEntries.slice(0, 2).forEach((entry) => {
+      const route = getReviewEntryRoute(entry);
       addItem(
-        lesson,
-        "Repaso",
-        "Tienes un reto fallado pendiente. Repetirlo ahora reduce olvido y arrastre.",
-        "study",
-        30,
+        entry.lesson,
+        route.target === "practice" ? "Tests" : route.target === "evolution" ? "Escalada" : "Repaso",
+        `Deuda prioritaria de repaso: ${entry.reasons.join(", ").toLowerCase()}. Conviene cerrarla antes de abrir teoría nueva.`,
+        route.target,
+        route.target === "practice" ? 31 : 30,
       );
     });
     pendingExercises.slice(0, 1).forEach((lesson) => {
@@ -380,13 +382,14 @@ function buildDailyQueue() {
         20,
       );
     });
-    failedLessons.slice(0, 1).forEach((lesson) => {
+    reviewEntries.slice(0, 1).forEach((entry) => {
+      const route = getReviewEntryRoute(entry);
       addItem(
-        lesson,
-        "Repaso",
-        "Revisar un fallo reciente te ayuda a no arrastrarlo a la siguiente fase.",
-        "study",
-        10,
+        entry.lesson,
+        route.target === "practice" ? "Tests" : route.target === "evolution" ? "Escalada" : "Repaso",
+        `Revisar ${entry.reasons.join(", ").toLowerCase()} evita arrastrar ese bloqueo a la siguiente fase.`,
+        route.target,
+        route.target === "practice" ? 12 : 10,
       );
     });
   }
@@ -413,13 +416,14 @@ function buildDailyQueue() {
       11,
     );
   });
-  failedLessons.slice(0, 2).forEach((lesson) => {
+  reviewEntries.slice(0, 2).forEach((entry) => {
+    const route = getReviewEntryRoute(entry);
     addItem(
-      lesson,
-      "Repaso",
-      "Un repaso corto evita que el error se convierta en hábito.",
-      "study",
-      10,
+      entry.lesson,
+      route.target === "practice" ? "Tests" : route.target === "evolution" ? "Escalada" : "Repaso",
+      `Un repaso corto de ${entry.reasons.join(", ").toLowerCase()} evita que el bloqueo se convierta en hábito.`,
+      route.target,
+      route.target === "practice" ? 12 : 10,
     );
   });
 
@@ -519,9 +523,9 @@ function getDailySessionProfile(queue) {
   };
 }
 
-function getDailySaturationState(pendingExercises, failedLessons) {
+function getDailySaturationState(pendingExercises, failedLessons, reviewEntries = []) {
   const openPracticeDebt = pendingExercises.length;
-  const reviewDebt = failedLessons.length;
+  const reviewDebt = Math.max(failedLessons.length, reviewEntries.length);
   const blockNewTheory = openPracticeDebt >= 3 || reviewDebt >= 2;
 
   return {
@@ -733,7 +737,8 @@ function getWeeklyContext() {
     .filter((lesson) => exercises[lesson.id] && !state.solvedExercises.includes(lesson.id))
     .filter((lesson) => state.readLessons.includes(lesson.id) || state.practiceDone.includes(lesson.id));
   const failedLessons = state.failedChallenges.filter((lessonId) => !state.solvedChallenges.includes(lessonId));
-  const saturation = getDailySaturationState(pendingExercises, failedLessons);
+  const reviewEntries = getPendingReviewEntries(state.activeTrack);
+  const saturation = getDailySaturationState(pendingExercises, failedLessons, reviewEntries);
 
   return {
     closedCount,

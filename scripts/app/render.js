@@ -266,6 +266,7 @@ function renderDailyQueue() {
       .filter((lessonId) => !state.solvedChallenges.includes(lessonId))
       .map((lessonId) => findLesson(lessonId))
       .filter(Boolean),
+    getPendingReviewEntries(state.activeTrack),
   );
   if (!queue.length) {
     elements.dailyQueue.innerHTML = `
@@ -519,6 +520,7 @@ function renderStudySupport(support) {
 
 function renderStudyStruggles(lesson, support) {
   const struggleSummary = getLessonStruggleSummary(lesson.id);
+  const reinforcement = getLessonReinforcementPlan(lesson);
   const closeout = getLessonCloseoutRecommendation(lesson, struggleSummary);
   const closeoutActions = getLessonCloseoutActions(lesson, struggleSummary);
   const closeoutState = getLessonCloseoutState(lesson.id);
@@ -558,6 +560,17 @@ function renderStudyStruggles(lesson, support) {
         )
         .join("")}
     </div>
+    ${reinforcement
+      ? `
+        <div class="study-struggles__plan">
+          <strong>${escapeHtml(reinforcement.title)}</strong>
+          <p>${escapeHtml(reinforcement.summary)}</p>
+          <ul>
+            ${reinforcement.actions.map((action) => `<li>${escapeHtml(action)}</li>`).join("")}
+          </ul>
+        </div>
+      `
+      : ""}
     ${closeoutActions.length
       ? `
         <div class="study-struggles__quick-actions">

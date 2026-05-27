@@ -209,6 +209,17 @@ elements.dailyQueue.addEventListener("click", (event) => {
     return;
   }
 
+  if (button.dataset.target === "evolution") {
+    const section = elements.studyEvolutionCase.hidden ? elements.studyEvolution : elements.studyEvolutionCase;
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (button.dataset.target === "challenge") {
+    document.querySelector(".challenge").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+
   document.querySelector(".study").scrollIntoView({ behavior: "smooth" });
 });
 
