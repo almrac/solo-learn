@@ -433,12 +433,25 @@ function getHistorySnapshot(days = 7) {
     .slice(0, 3)
     .map(([topic]) => topic);
 
+  const trackBreakdown = Object.keys(tracks).map((trackId) => {
+    const dates = state.trackSessionLog[trackId] ?? [];
+    const studiedCount = recentDays.filter((day) => dates.includes(day)).length;
+
+    return {
+      trackId,
+      label: tracks[trackId].label,
+      studiedCount,
+      recent: dates.slice(0, 2),
+    };
+  });
+
   return {
     recentDays,
     studiedDays,
     closedDays,
     approxMinutes,
     topTopics,
+    trackBreakdown,
   };
 }
 

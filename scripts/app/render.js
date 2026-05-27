@@ -287,6 +287,17 @@ function renderHistoryPanel() {
         })
         .join("")}
     </div>
+    <div class="history-panel__tracks">
+      ${history.trackBreakdown
+        .map((track) => `
+          <div class="history-panel__track">
+            <strong class="language-mark language-mark--${track.trackId}">${escapeHtml(track.label)}</strong>
+            <span>${track.studiedCount}/7 días</span>
+            <small>${track.recent.length ? track.recent.map((day) => formatStudyDate(day)).join(", ") : "Sin actividad reciente"}</small>
+          </div>
+        `)
+        .join("")}
+    </div>
     <p>${history.topTopics.length ? `Temas tocados: ${escapeHtml(history.topTopics.join(", "))}.` : "Aún no hay temas suficientes para resumir."}</p>
   `;
 }

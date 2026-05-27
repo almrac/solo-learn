@@ -195,6 +195,26 @@
   gap: var(--space-2);
 }
 
+.history-panel__tracks {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.history-panel__track {
+  display: grid;
+  gap: 0.15rem;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.history-panel__track span,
+.history-panel__track small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
 .history-panel__day {
   display: inline-flex;
   align-items: center;
