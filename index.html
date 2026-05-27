@@ -97,6 +97,18 @@ const progreso = retos.filter(r => r.done);</code></pre>
         <aside class="dashboard__sidebar">
           <div class="active-track" id="activeTrack"></div>
 
+          <section class="study-mode-panel" aria-label="Modo de estudio">
+            <div class="study-mode-panel__header">
+              <span class="eyebrow">Sala activa</span>
+              <p id="studyModeSummary">Vista global</p>
+            </div>
+            <div class="language-tabs language-tabs--study-mode" role="tablist" aria-label="Salas de estudio">
+              <button class="language-tabs__button is-active" type="button" data-study-mode="all">Todo</button>
+              <button class="language-tabs__button" type="button" data-study-mode="java">Java</button>
+              <button class="language-tabs__button" type="button" data-study-mode="javascript">JavaScript</button>
+            </div>
+          </section>
+
           <div class="progress-summary">
             <div class="progress-summary__label">
               <span>Progreso total</span>
@@ -121,13 +133,8 @@ const progreso = retos.filter(r => r.done);</code></pre>
 
           <div class="review-box" id="reviewBox"></div>
 
-          <div class="language-tabs" role="tablist" aria-label="Lenguajes">
-            <button class="language-tabs__button is-active" type="button" data-track="java">Java</button>
-            <button class="language-tabs__button" type="button" data-track="javascript">JavaScript</button>
-          </div>
-
           <label class="dashboard-filter" for="learningAreaFilter">
-            <span>Aprendizaje</span>
+            <span id="learningAreaFilterLabel">Aprendizaje</span>
             <select id="learningAreaFilter">
               <option value="all">Todo</option>
               <option value="frontend">Frontend</option>

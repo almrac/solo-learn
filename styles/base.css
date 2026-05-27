@@ -54,6 +54,31 @@ body {
     sans-serif;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: 0.25rem;
+  z-index: 30;
+  background: transparent;
+}
+
+body[data-study-mode="java"] {
+  background: #f4f7ff;
+}
+
+body[data-study-mode="javascript"] {
+  background: #fff6ef;
+}
+
+body[data-study-mode="java"]::before {
+  background: var(--java);
+}
+
+body[data-study-mode="javascript"]::before {
+  background: var(--js);
+}
+
 [hidden] {
   display: none !important;
 }
@@ -100,6 +125,16 @@ main {
   border-radius: var(--radius);
   background: rgba(255, 254, 252, 0.92);
   backdrop-filter: blur(var(--space-4));
+}
+
+body[data-study-mode="java"] .header {
+  border-color: rgba(38, 58, 99, 0.22);
+  background: rgba(244, 247, 255, 0.94);
+}
+
+body[data-study-mode="javascript"] .header {
+  border-color: rgba(232, 112, 79, 0.22);
+  background: rgba(255, 246, 239, 0.94);
 }
 
 .header::after {
@@ -151,6 +186,20 @@ h2 {
   text-decoration: none;
 }
 
+body[data-study-mode="java"] .header__brand,
+body[data-study-mode="java"] .header__nav a:hover,
+body[data-study-mode="java"] .header__nav button:hover,
+body[data-study-mode="java"] .header__nav button[aria-pressed="true"] {
+  color: var(--java);
+}
+
+body[data-study-mode="javascript"] .header__brand,
+body[data-study-mode="javascript"] .header__nav a:hover,
+body[data-study-mode="javascript"] .header__nav button:hover,
+body[data-study-mode="javascript"] .header__nav button[aria-pressed="true"] {
+  color: var(--js);
+}
+
 .header__brand-mark {
   display: grid;
   place-items: center;
@@ -160,6 +209,27 @@ h2 {
   background: var(--forest);
   color: var(--bg);
   font-weight: 700;
+}
+
+body[data-study-mode="java"] .header__brand-mark,
+body[data-study-mode="javascript"] .header__brand-mark {
+  color: var(--bg);
+}
+
+body[data-study-mode="java"] .header__brand-mark {
+  background: var(--java);
+}
+
+body[data-study-mode="javascript"] .header__brand-mark {
+  background: var(--js);
+}
+
+body[data-study-mode="java"] .header__stat-value {
+  color: var(--java);
+}
+
+body[data-study-mode="javascript"] .header__stat-value {
+  color: var(--js);
 }
 
 .header__brand-name {
@@ -427,4 +497,3 @@ pre {
   line-height: 1.6;
   white-space: pre-wrap;
 }
-

@@ -13,6 +13,8 @@ function render() {
   elements.progressText.textContent = `${progress}%`;
   elements.progressBar.style.width = `${progress}%`;
   document.body.classList.toggle("exam-mode", state.examMode.active);
+  document.body.dataset.studyMode = state.studyMode;
+  document.body.dataset.activeTrack = state.activeTrack;
   renderTrackProgress();
   renderQuickstart();
   renderNextSession();
@@ -22,18 +24,28 @@ function render() {
   renderReviewBox();
 
   elements.tabs.forEach((tab) => {
-    tab.classList.toggle("is-active", tab.dataset.track === state.activeTrack);
+    tab.classList.toggle("is-active", tab.dataset.studyMode === state.studyMode);
   });
   elements.filters.forEach((filter) => {
     filter.classList.toggle("is-active", filter.dataset.filter === state.filter);
   });
   elements.learningAreaFilter.value = state.learningAreaFilter;
+  elements.learningAreaFilter.disabled = state.studyMode !== "all";
+  if (elements.learningAreaFilterLabel) {
+    elements.learningAreaFilterLabel.textContent = state.studyMode === "all"
+      ? "Aprendizaje"
+      : `Aprendizaje bloqueado por sala ${tracks[state.activeTrack].label}`;
+  }
   elements.lessonSort.value = state.lessonSort;
 
-  elements.trackLabel.textContent = track.label;
-  elements.trackLabel.className = `eyebrow language-mark language-mark--${state.activeTrack}`;
-  elements.trackTitle.textContent = track.title;
-  elements.trackSummary.textContent = track.summary;
+  const trackHeading = getTrackHeadingState(track);
+  elements.trackLabel.textContent = trackHeading.label;
+  elements.trackLabel.className = `eyebrow ${trackHeading.className}`;
+  elements.trackTitle.textContent = trackHeading.title;
+  elements.trackSummary.textContent = trackHeading.summary;
+  if (elements.studyModeSummary) {
+    elements.studyModeSummary.textContent = trackHeading.modeSummary;
+  }
   renderActiveTrack(track);
 
   renderPlan();
@@ -47,16 +59,37 @@ function render() {
   renderBlueprint();
 }
 
+function getTrackHeadingState(track) {
+  if (state.studyMode === "all") {
+    return {
+      label: "Todo",
+      className: "language-mark",
+      title: "Ruta completa y salas separadas",
+      summary: "Vista global para revisar el catálogo. Cambia a Java o JavaScript para estudiar sin mezclar frentes.",
+      modeSummary: "Vista global · catálogo abierto",
+    };
+  }
+
+  return {
+    label: track.label,
+    className: `language-mark language-mark--${state.activeTrack}`,
+    title: track.title,
+    summary: track.summary,
+    modeSummary: `${track.label} · ${getTrackLearningArea(state.activeTrack) === "frontend" ? "Frontend" : "Backend"}`,
+  };
+}
+
 function renderActiveTrack(track) {
   const effectiveArea = state.learningAreaFilter === "all"
     ? getTrackLearningArea(state.activeTrack)
     : state.learningAreaFilter;
   const learningAreaLabel = effectiveArea === "frontend" ? "Frontend" : "Backend";
+  const roomLabel = state.studyMode === "all" ? "Vista global" : `Sala ${track.label}`;
   elements.activeTrack.innerHTML = `
-    <p class="eyebrow">Ruta activa</p>
+    <p class="eyebrow">${roomLabel}</p>
     <strong class="language-mark language-mark--${state.activeTrack}">${track.label}</strong>
     <span>${track.title}</span>
-    <small>Aprendizaje: ${learningAreaLabel}</small>
+    <small>${state.studyMode === "all" ? "Puedes revisar ambos lenguajes sin perder el track activo." : `Aprendizaje: ${learningAreaLabel}`}</small>
   `;
 }
 
@@ -435,7 +468,9 @@ function renderDailyQueue() {
 function renderPlan() {
   elements.planGrid.innerHTML = studyPlan
     .map((phase) => {
-      const visibleLessonIds = phase.lessonIds.filter((lessonId) => matchesLearningAreaFilter(lessonId));
+      const visibleLessonIds = phase.lessonIds.filter((lessonId) =>
+        matchesStudyMode(lessonId) && matchesLearningAreaFilter(lessonId),
+      );
       if (!visibleLessonIds.length) {
         return "";
       }
@@ -474,7 +509,6 @@ function renderPlan() {
 
 function renderLessons() {
   const lessons = sortVisibleLessons(visibleLessons());
-  const track = tracks[state.activeTrack];
 
   elements.lessonGrid.innerHTML = lessons
     .map((lesson) => {
@@ -486,10 +520,12 @@ function renderLessons() {
       const hasPracticed = state.practiceDone.includes(lesson.id);
       const recommendation = scoreLessonRecommendation(lesson);
       const impactLabel = recommendation.score >= 8 ? "Impacto alto" : recommendation.score >= 4 ? "Impacto medio" : "Impacto puntual";
+      const lessonTrackId = getTrackIdByLesson(lesson.id);
+      const lessonTrack = tracks[lessonTrackId];
       return `
         <article class="lesson-card ${isCompleted ? "is-completed" : ""} ${isActive ? "is-active" : ""}">
           <div class="lesson-card__meta">
-            <span class="language-mark language-mark--${state.activeTrack}">${track.label}</span>
+            <span class="language-mark language-mark--${lessonTrackId}">${lessonTrack.label}</span>
             <span class="badge">${lesson.level}</span>
             <span class="badge">${lesson.xp} XP</span>
             ${state.lessonSort === "impact" ? `<span class="badge">${impactLabel}</span>` : ""}
@@ -1165,7 +1201,9 @@ function renderAchievements() {
 }
 
 function renderPracticeBank() {
-  const allEntries = getPracticeBankEntries(state.activeTrack);
+  const allEntries = state.studyMode === "all"
+    ? getPracticeBankEntries("all")
+    : getPracticeBankEntries(state.activeTrack);
   renderPracticeBankFilters(allEntries);
   const entries = sortPracticeBankEntries(filterPracticeBankEntries(allEntries));
   renderPracticeBankSpotlight(entries);

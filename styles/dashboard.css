@@ -26,6 +26,27 @@
   top: 7rem;
 }
 
+.study-mode-panel {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.study-mode-panel__header {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.study-mode-panel__header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
 .progress-summary__label {
   display: flex;
   justify-content: space-between;
@@ -87,6 +108,12 @@
   background: var(--panel);
   color: var(--ink);
   padding: 0 var(--space-3);
+}
+
+.dashboard-filter select:disabled {
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  cursor: default;
 }
 
 .track-progress {
@@ -188,6 +215,48 @@
 
 .review-box {
   background: var(--keylime);
+}
+
+.language-tabs--study-mode {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.language-tabs--study-mode .language-tabs__button {
+  min-height: 2.9rem;
+}
+
+body[data-study-mode="java"] .dashboard__sidebar,
+body[data-study-mode="java"] .lessons,
+body[data-study-mode="java"] .roadmap,
+body[data-study-mode="java"] .study,
+body[data-study-mode="java"] .runner,
+body[data-study-mode="java"] .challenge,
+body[data-study-mode="java"] .achievements {
+  border-color: rgba(38, 58, 99, 0.18);
+}
+
+body[data-study-mode="javascript"] .dashboard__sidebar,
+body[data-study-mode="javascript"] .lessons,
+body[data-study-mode="javascript"] .roadmap,
+body[data-study-mode="javascript"] .study,
+body[data-study-mode="javascript"] .runner,
+body[data-study-mode="javascript"] .challenge,
+body[data-study-mode="javascript"] .achievements {
+  border-color: rgba(232, 112, 79, 0.18);
+}
+
+body[data-study-mode="java"] .study-mode-panel,
+body[data-study-mode="java"] .active-track,
+body[data-study-mode="java"] .daily-queue {
+  background: #eef3ff;
+}
+
+body[data-study-mode="javascript"] .study-mode-panel,
+body[data-study-mode="javascript"] .active-track,
+body[data-study-mode="javascript"] .daily-queue {
+  background: #fff1e8;
 }
 
 .quickstart h3,

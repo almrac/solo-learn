@@ -14,6 +14,11 @@ Decisión:
 
 - dejar como mucho una o dos tandas funcionales pequeñas más antes de rediseñar
 - no seguir aplazando la separación fuerte entre salas Java/JavaScript
+- rediseño ya arrancado en la app principal:
+  - modo global `Todo / Java / JavaScript`
+  - franja superior y tinte base por sala
+  - bloqueo del filtro `frontend/backend` dentro de salas específicas
+  - catálogo y banco ya responden al modo activo
 - cuando entre el rediseño, priorizar primero estructura y flujo de uso:
   - separar estudiar / practicar / examinarse
   - separar Java / JavaScript
@@ -137,30 +142,33 @@ base ya visible en el banco con filtro por tema y agrupación útil. Falta segui
 
 ### 8. Mejor diferenciación visual por lenguaje
 
-- sistema visual más consistente para Java y JavaScript
-- sin depender solo del color
-- posible iconografía o badges más fuertes
-- separar por completo las "salas" Java y JavaScript en el rediseño
-- usar un modo de estudio global con tres estados: `all`, `java`, `javascript`
-- franja superior de 4px por modo:
+Estado:
+primera iteración aplicada. La separación de salas ya existe y filtra partes
+centrales; falta rematar estructura completa y lenguaje visual.
+
+- [~] sistema visual más consistente para Java y JavaScript
+- [ ] sin depender solo del color
+- [ ] posible iconografía o badges más fuertes
+- [~] separar por completo las "salas" Java y JavaScript en el rediseño
+- [x] usar un modo de estudio global con tres estados: `all`, `java`, `javascript`
+- [x] franja superior de 4px por modo:
   - transparente en `all`
   - navy en `java`
   - terracota en `javascript`
-- tinte del papel por modo:
+- [x] tinte del papel por modo:
   - Java -> gris azulado sutil
   - JavaScript -> cream / melocotón sutil
-- selector segmentado prominente en la subbar con glifo del lenguaje
-- filtro duro por modo:
+- [x] selector segmentado prominente para elegir sala
+- [~] filtro duro por modo:
   - en `java`, desaparece todo el contenido JS
   - en `javascript`, desaparece todo el contenido Java
-  - afecta a plan, repaso, banco, grid y lateral
-- solo el lenguaje activo debe ser navegable
-- la lección activa debe cambiar según el modo
-- brand, nav activa y acentos del header también deben teñirse por modo
-- el lateral debe cambiar su contenido según el lenguaje activo
+  - afecta ya a plan, banco y grid; falta rematar lateral completo
+- [~] solo el lenguaje activo debe ser navegable
+- [x] la lección activa cambia según el modo
+- [~] brand, nav activa y acentos del header también se tiñen por modo
+- [ ] el lateral debe cambiar su contenido según el lenguaje activo
 - ya existe una base funcional previa con filtro `Aprendizaje: frontend/backend`
   para no mezclar rutas innecesariamente antes del rediseño completo
-- aplicar esto al integrar el rediseño, no antes, para no duplicar trabajo
 
 ## Medio plazo
 

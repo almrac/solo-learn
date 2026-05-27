@@ -77,6 +77,7 @@ const achievements = [
 
 const defaultState = {
   activeTrack: "java",
+  studyMode: "all",
   learningAreaFilter: "all",
   filter: "all",
   lessonSort: "default",
@@ -153,10 +154,12 @@ const elements = {
   historyPanel: document.querySelector("#historyPanel"),
   reviewBox: document.querySelector("#reviewBox"),
   activeTrack: document.querySelector("#activeTrack"),
+  studyModeSummary: document.querySelector("#studyModeSummary"),
   focusModeButton: document.querySelector("#focusModeButton"),
   tabs: document.querySelectorAll(".language-tabs__button"),
   filters: document.querySelectorAll(".level-filters__button"),
   learningAreaFilter: document.querySelector("#learningAreaFilter"),
+  learningAreaFilterLabel: document.querySelector("#learningAreaFilterLabel"),
   trackLabel: document.querySelector("#trackLabel"),
   trackTitle: document.querySelector("#trackTitle"),
   trackSummary: document.querySelector("#trackSummary"),
@@ -290,8 +293,9 @@ function setFeedback(message, type) {
 }
 
 function visibleLessons() {
-  return tracks[state.activeTrack].lessons.filter(
+  return allLessons().filter(
     (lesson) =>
+      matchesStudyMode(lesson.id) &&
       (state.filter === "all" || lesson.level === state.filter) &&
       matchesLearningAreaFilter(lesson.id),
   );
@@ -353,6 +357,18 @@ function getTrackLearningArea(trackId) {
   return trackId === "javascript" ? "frontend" : "backend";
 }
 
+function getStudyModeTrackIds(studyMode = state.studyMode) {
+  if (studyMode === "all") {
+    return Object.keys(tracks);
+  }
+
+  return tracks[studyMode] ? [studyMode] : [defaultState.activeTrack];
+}
+
+function matchesStudyMode(lessonId, studyMode = state.studyMode) {
+  return studyMode === "all" || getTrackIdByLesson(lessonId) === studyMode;
+}
+
 function getLessonLearningArea(lessonId) {
   const trackId = getTrackIdByLesson(lessonId);
   return trackId ? getTrackLearningArea(trackId) : "backend";
@@ -367,11 +383,36 @@ function syncTrackWithLearningArea() {
   // Sincronizamos ambos para no dejar vistas vacías mientras el catálogo crece.
   if (state.learningAreaFilter === "frontend" && state.activeTrack !== "javascript") {
     state.activeTrack = "javascript";
+    state.studyMode = "javascript";
   }
 
   if (state.learningAreaFilter === "backend" && state.activeTrack !== "java") {
     state.activeTrack = "java";
+    state.studyMode = "java";
   }
+
+  if (state.learningAreaFilter === "all" && state.studyMode !== "all") {
+    state.studyMode = "all";
+  }
+}
+
+// El rediseño usa una "sala" global de estudio: Todo, Java o JavaScript.
+// Este helper centraliza cómo se sincroniza esa sala con track activo y filtros.
+function applyStudyMode(studyMode) {
+  const nextMode = ["all", "java", "javascript"].includes(studyMode)
+    ? studyMode
+    : defaultState.studyMode;
+
+  state.studyMode = nextMode;
+
+  if (nextMode === "all") {
+    state.learningAreaFilter = "all";
+  } else {
+    state.activeTrack = nextMode;
+    state.learningAreaFilter = getTrackLearningArea(nextMode);
+  }
+
+  state.activeLessonId = firstVisibleLesson()?.id ?? tracks[state.activeTrack].lessons[0].id;
 }
 
 function getExamCurrentLesson() {
@@ -889,16 +930,25 @@ function loadState() {
 }
 
 function normalizeState(value) {
+  const studyMode = ["all", "java", "javascript"].includes(value?.studyMode)
+    ? value.studyMode
+    : defaultState.studyMode;
   const lessonIds = allLessons().map((lesson) => lesson.id);
   const learningAreaFilter = ["all", "frontend", "backend"].includes(value?.learningAreaFilter)
     ? value.learningAreaFilter
     : defaultState.learningAreaFilter;
   const requestedTrack = tracks[value?.activeTrack] ? value.activeTrack : defaultState.activeTrack;
-  const activeTrack = learningAreaFilter === "frontend"
+  const areaTrack = learningAreaFilter === "frontend"
     ? "javascript"
     : learningAreaFilter === "backend"
       ? "java"
       : requestedTrack;
+  const activeTrack = studyMode === "java" || studyMode === "javascript"
+    ? studyMode
+    : areaTrack;
+  const normalizedLearningArea = studyMode === "all"
+    ? learningAreaFilter
+    : getTrackLearningArea(activeTrack);
   const trackLessonIds = tracks[activeTrack].lessons.map((lesson) => lesson.id);
   const filter = ["all", "Cero", "Base", "Intermedio", "Avanzado"].includes(value?.filter)
     ? value.filter
@@ -945,7 +995,8 @@ function normalizeState(value) {
 
   return {
     activeTrack,
-    learningAreaFilter,
+    studyMode,
+    learningAreaFilter: normalizedLearningArea,
     filter,
     lessonSort,
     quickstartDismissed,
@@ -1193,6 +1244,15 @@ function createDefaultState() {
 }
 
 function getPracticeBankEntries(trackId) {
+  if (!trackId || trackId === "all") {
+    return [...getPracticeBankEntries("java"), ...getPracticeBankEntries("javascript")]
+      .sort((left, right) =>
+        left.trackLabel.localeCompare(right.trackLabel) ||
+        left.family.localeCompare(right.family) ||
+        left.title.localeCompare(right.title),
+      );
+  }
+
   if (trackId === "javascript") {
     return Object.entries(exercises)
       .map(([lessonId, exercise]) => {
