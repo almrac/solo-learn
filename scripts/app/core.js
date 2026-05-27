@@ -114,6 +114,16 @@ const defaultState = {
   exerciseSuccessLog: [],
   streak: 0,
   xp: 0,
+  examMode: {
+    active: false,
+    lessonIds: [],
+    currentIndex: 0,
+    startedAt: null,
+    durationSeconds: 0,
+    answers: [],
+    finishedAt: null,
+    reason: "",
+  },
 };
 
 // "state" es el objeto central de la app:
@@ -213,6 +223,7 @@ const elements = {
   challengePrompt: document.querySelector(".challenge__prompt"),
   challengeOptions: document.querySelector("#challengeOptions"),
   challengeForm: document.querySelector("#challengeForm"),
+  challengeMeta: document.querySelector("#challengeMeta"),
   challengeFeedback: document.querySelector("#challengeFeedback"),
   jsRunnerInput: document.querySelector("#jsRunnerInput"),
   jsRunnerHtml: document.querySelector("#jsRunnerHtml"),
@@ -303,6 +314,10 @@ function firstVisibleLesson() {
   return visibleLessons()[0];
 }
 
+function buildExamLessonIds() {
+  return sortVisibleLessons(visibleLessons()).map((lesson) => lesson.id);
+}
+
 function allLessons() {
   return Object.values(tracks).flatMap((track) => track.lessons);
 }
@@ -340,6 +355,62 @@ function syncTrackWithLearningArea() {
   if (state.learningAreaFilter === "backend" && state.activeTrack !== "java") {
     state.activeTrack = "java";
   }
+}
+
+function getExamCurrentLesson() {
+  if (!state.examMode.lessonIds.length) return null;
+  const lessonId = state.examMode.lessonIds[Math.min(state.examMode.currentIndex, state.examMode.lessonIds.length - 1)];
+  return findLesson(lessonId);
+}
+
+function getExamRemainingSeconds() {
+  if (!state.examMode.active || !Number.isFinite(state.examMode.startedAt)) return 0;
+  const elapsedSeconds = Math.floor((Date.now() - state.examMode.startedAt) / 1000);
+  return Math.max(0, state.examMode.durationSeconds - elapsedSeconds);
+}
+
+function getExamScore() {
+  return (state.examMode.answers ?? []).filter((entry) => entry.isCorrect).length;
+}
+
+function startExamMode() {
+  const lessonIds = buildExamLessonIds();
+  if (!lessonIds.length) return false;
+
+  state.examMode = {
+    active: true,
+    lessonIds,
+    currentIndex: 0,
+    startedAt: Date.now(),
+    durationSeconds: Math.max(lessonIds.length * 45, 180),
+    answers: [],
+    finishedAt: null,
+    reason: "",
+  };
+  openLesson(lessonIds[0]);
+  return true;
+}
+
+function finishExamMode(reason = "completed") {
+  state.examMode = {
+    ...state.examMode,
+    active: false,
+    finishedAt: Date.now(),
+    reason,
+  };
+}
+
+function resetExamMode() {
+  state.examMode = {
+    active: false,
+    lessonIds: [],
+    currentIndex: 0,
+    startedAt: null,
+    durationSeconds: 0,
+    answers: [],
+    finishedAt: null,
+    reason: "",
+  };
 }
 
 function countCompletedByTrack(currentState, trackId) {
@@ -808,6 +879,20 @@ function normalizeState(value) {
   const practiceSort = ["pending", "impact", "difficulty", "family"].includes(value?.practiceSort)
     ? value.practiceSort
     : defaultState.practiceSort;
+  const rawExamMode = value?.examMode;
+  const examLessonIds = Array.isArray(rawExamMode?.lessonIds)
+    ? rawExamMode.lessonIds.filter((lessonId) => lessonIds.includes(lessonId))
+    : [];
+  const examAnswers = Array.isArray(rawExamMode?.answers)
+    ? rawExamMode.answers
+        .filter((entry) => entry && lessonIds.includes(entry.lessonId))
+        .map((entry) => ({
+          lessonId: entry.lessonId,
+          selected: typeof entry.selected === "string" ? entry.selected : "",
+          correctAnswer: typeof entry.correctAnswer === "string" ? entry.correctAnswer : "",
+          isCorrect: Boolean(entry.isCorrect),
+        }))
+    : [];
 
   return {
     activeTrack,
@@ -844,6 +929,18 @@ function normalizeState(value) {
     exerciseSuccessLog: cleanChallengeSuccessLog(value?.exerciseSuccessLog, lessonIds),
     streak: Number.isFinite(value?.streak) ? Math.max(0, value.streak) : 0,
     xp: Number.isFinite(value?.xp) ? Math.max(0, value.xp) : 0,
+    examMode: {
+      active: Boolean(rawExamMode?.active) && examLessonIds.length > 0,
+      lessonIds: examLessonIds,
+      currentIndex: Number.isFinite(rawExamMode?.currentIndex)
+        ? Math.max(0, Math.min(rawExamMode.currentIndex, Math.max(0, examLessonIds.length - 1)))
+        : 0,
+      startedAt: Number.isFinite(rawExamMode?.startedAt) ? rawExamMode.startedAt : null,
+      durationSeconds: Number.isFinite(rawExamMode?.durationSeconds) ? Math.max(0, rawExamMode.durationSeconds) : 0,
+      answers: examAnswers,
+      finishedAt: Number.isFinite(rawExamMode?.finishedAt) ? rawExamMode.finishedAt : null,
+      reason: typeof rawExamMode?.reason === "string" ? rawExamMode.reason : "",
+    },
   };
 }
 

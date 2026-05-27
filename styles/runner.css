@@ -137,6 +137,17 @@
   gap: var(--space-4);
 }
 
+.challenge__meta {
+  margin-top: var(--space-3);
+}
+
+.challenge__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .challenge__option {
   flex: 1 1 11.25rem;
   display: flex;
@@ -169,7 +180,42 @@
   color: var(--muted);
 }
 
+.challenge__review {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.challenge__review strong {
+  color: var(--forest);
+}
+
+.challenge__review p,
+.challenge__review small {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.challenge__review.is-correct {
+  border-color: rgba(50, 140, 84, 0.35);
+}
+
+.challenge__review.is-wrong {
+  border-color: rgba(232, 112, 79, 0.3);
+}
+
+.exam-mode .dashboard,
+.exam-mode .roadmap,
+.exam-mode .study,
+.exam-mode .runner,
+.exam-mode .practice-bank,
+.exam-mode .achievements {
+  display: none;
+}
+
 .achievements {
   margin-bottom: var(--space-10);
 }
-

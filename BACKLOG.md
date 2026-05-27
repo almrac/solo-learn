@@ -260,10 +260,13 @@ Pendiente:
 
 ### 16. Modo examen
 
-- límite de tiempo
-- sin ayudas
-- puntuación final
-- repaso al terminar
+Estado:
+primer corte ya visible sobre el sistema de retos. Falta decidir si más adelante se amplía a ejercicios evaluables, pero la mecánica base ya existe.
+
+- [x] límite de tiempo
+- [x] sin ayudas
+- [x] puntuación final
+- [x] repaso al terminar
 
 ## Fuera de alcance por ahora
 

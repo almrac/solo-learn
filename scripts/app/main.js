@@ -4,6 +4,19 @@
 let brandTapCount = 0;
 let brandTapTimer = null;
 
+window.setInterval(() => {
+  if (!state.examMode.active) return;
+
+  if (getExamRemainingSeconds() <= 0) {
+    finishExamMode("time");
+    persist();
+    render();
+    return;
+  }
+
+  renderChallenge();
+}, 1000);
+
 render();
 
 elements.quickstart.addEventListener("click", (event) => {
@@ -352,7 +365,10 @@ elements.studyNotes.addEventListener("blur", () => {
 
 elements.challengeForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  const lesson = findLesson(state.activeLessonId);
+  const lesson = state.examMode.active
+    ? getExamCurrentLesson()
+    : findLesson(state.activeLessonId);
+  if (!lesson) return;
   const selected = new FormData(elements.challengeForm).get("answer");
 
   if (!selected) {
@@ -378,8 +394,61 @@ elements.challengeForm.addEventListener("submit", (event) => {
     setFeedback("No es esa. Revisa el objetivo de la lección y vuelve a probar.", "wrong");
   }
 
+  if (state.examMode.active) {
+    state.examMode.answers = [
+      ...state.examMode.answers.filter((entry) => entry.lessonId !== lesson.id),
+      {
+        lessonId: lesson.id,
+        selected: String(selected),
+        correctAnswer: lesson.challenge.answer,
+        isCorrect: selected === lesson.challenge.answer,
+      },
+    ];
+
+    if (state.examMode.currentIndex >= state.examMode.lessonIds.length - 1) {
+      finishExamMode("completed");
+    } else {
+      state.examMode.currentIndex += 1;
+      const nextLesson = getExamCurrentLesson();
+      if (nextLesson) {
+        openLesson(nextLesson.id);
+      }
+    }
+  }
+
   persist();
   render();
+});
+
+elements.challengeMeta.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-exam-action]");
+  if (!button) return;
+
+  const action = button.dataset.examAction;
+  if (action === "start") {
+    const started = startExamMode();
+    if (!started) return;
+    elements.challengeFeedback.textContent = "";
+    persist();
+    render();
+    return;
+  }
+
+  if (action === "finish" && state.examMode.active) {
+    finishExamMode("manual");
+    persist();
+    render();
+    return;
+  }
+
+  if (action === "restart") {
+    resetExamMode();
+    const started = startExamMode();
+    if (!started) return;
+    elements.challengeFeedback.textContent = "";
+    persist();
+    render();
+  }
 });
 
 elements.continueButton.addEventListener("click", () => {

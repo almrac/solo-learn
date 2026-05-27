@@ -12,6 +12,7 @@ function render() {
   elements.streakValue.textContent = state.streak;
   elements.progressText.textContent = `${progress}%`;
   elements.progressBar.style.width = `${progress}%`;
+  document.body.classList.toggle("exam-mode", state.examMode.active);
   renderTrackProgress();
   renderQuickstart();
   renderNextSession();
@@ -1011,12 +1012,85 @@ function renderEvolutionCase(evolutionCase, lessonId) {
 }
 
 function renderChallenge() {
-  const lesson = findLesson(state.activeLessonId) ?? visibleLessons()[0];
+  if (state.examMode.finishedAt && !state.examMode.active) {
+    const score = getExamScore();
+    const total = state.examMode.lessonIds.length;
+    const reason = state.examMode.reason === "time"
+      ? "Tiempo agotado"
+      : state.examMode.reason === "manual"
+        ? "Entrega manual"
+        : "Examen completado";
+
+    elements.challengeTitle.textContent = "Resultado del examen";
+    elements.challengePrompt.textContent = `${score}/${total} aciertos · ${reason}.`;
+    elements.challengeMeta.innerHTML = `
+      <div class="challenge__meta-row">
+        <span class="badge">${total} preguntas</span>
+        <span class="badge">${score} aciertos</span>
+        <button class="button" type="button" data-exam-action="restart">Repetir examen</button>
+      </div>
+    `;
+    elements.challengeOptions.innerHTML = state.examMode.lessonIds
+      .map((lessonId) => {
+        const lesson = findLesson(lessonId);
+        const entry = state.examMode.answers.find((item) => item.lessonId === lessonId);
+        return `
+          <article class="challenge__review ${entry?.isCorrect ? "is-correct" : "is-wrong"}">
+            <strong>${escapeHtml(lesson?.title ?? lessonId)}</strong>
+            <p>${escapeHtml(lesson?.challenge.prompt ?? "")}</p>
+            <small>
+              Tu respuesta: ${escapeHtml(entry?.selected ?? "Sin responder")} ·
+              Correcta: ${escapeHtml(entry?.correctAnswer ?? lesson?.challenge.answer ?? "")}
+            </small>
+          </article>
+        `;
+      })
+      .join("");
+    elements.challengeForm.querySelector('button[type="submit"]').hidden = true;
+    elements.challengeFeedback.textContent = "";
+    elements.challengeFeedback.className = "feedback";
+    return;
+  }
+
+  const lesson = state.examMode.active
+    ? getExamCurrentLesson()
+    : findLesson(state.activeLessonId) ?? visibleLessons()[0];
   if (!lesson) return;
 
   state.activeLessonId = lesson.id;
-  elements.challengeTitle.textContent = lesson.title;
-  elements.challengePrompt.textContent = lesson.challenge.prompt;
+  const submitButton = elements.challengeForm.querySelector('button[type="submit"]');
+  submitButton.hidden = false;
+
+  if (state.examMode.active) {
+    const current = state.examMode.currentIndex + 1;
+    const total = state.examMode.lessonIds.length;
+    const remaining = getExamRemainingSeconds();
+    const minutes = String(Math.floor(remaining / 60)).padStart(2, "0");
+    const seconds = String(remaining % 60).padStart(2, "0");
+
+    elements.challengeTitle.textContent = `Modo examen · ${current}/${total}`;
+    elements.challengePrompt.textContent = lesson.challenge.prompt;
+    elements.challengeMeta.innerHTML = `
+      <div class="challenge__meta-row">
+        <span class="badge">${tracks[getTrackIdByLesson(lesson.id)].label}</span>
+        <span class="badge">Tiempo ${minutes}:${seconds}</span>
+        <span class="badge">Aciertos ${getExamScore()}</span>
+        <button class="button" type="button" data-exam-action="finish">Terminar examen</button>
+      </div>
+    `;
+    submitButton.textContent = current >= total ? "Entregar respuesta" : "Responder y seguir";
+  } else {
+    elements.challengeTitle.textContent = lesson.title;
+    elements.challengePrompt.textContent = lesson.challenge.prompt;
+    elements.challengeMeta.innerHTML = `
+      <div class="challenge__meta-row">
+        <span class="badge">${tracks[getTrackIdByLesson(lesson.id)].label}</span>
+        <button class="button" type="button" data-exam-action="start">Iniciar modo examen</button>
+      </div>
+    `;
+    submitButton.textContent = "Comprobar";
+  }
+
   elements.challengeOptions.innerHTML = lesson.challenge.options
     .map(
       (option) => `
