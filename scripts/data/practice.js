@@ -2182,6 +2182,7 @@ public static void main(String[] args) {
       [
         "Diseña una clase `TaskValidator` con una responsabilidad concreta.",
         "Escribe al menos tres tests: válido, vacío y demasiado corto.",
+        "Añade un test de valor nulo o no válido para fijar el contrato de error.",
         "Refactoriza nombres o duplicaciones después de que los tests pasen.",
       ],
       [
@@ -2204,12 +2205,18 @@ public static void main(String[] args) {
 //   void aceptaTituloValido() {
 //     assertTrue(new TaskValidator().isValidTitle("Repasar DOM"));
 //   }
+//
+//   @Test
+//   void rechazaTituloVacio() {
+//     assertFalse(new TaskValidator().isValidTitle("   "));
+//   }
 // }`,
       [
         "Cubre un caso válido, uno vacío y uno demasiado corto.",
         "Refactoriza después de tener una base mínima de comprobaciones.",
         "Comprueba que un cambio de nombre o trim no rompe los tests.",
         "Mantén cada test con una sola intención para que el fallo sea fácil de localizar.",
+        "Añade un caso nulo o no string si decides endurecer más el contrato.",
       ],
       [
         "La función principal cabe en pocas líneas y su intención sigue siendo obvia.",
@@ -2380,6 +2387,49 @@ function renderJsonViewer() {
   status.textContent = "Cargando...";
   list.innerHTML = "";
 }`,
+    ),
+    "js-testing": projectBrief(
+      "Extrae helpers puros de un dashboard y cúbrelos con tests.",
+      "Separar reglas de filtrado y resumen del render DOM para poder refactorizar la interfaz con una red mínima de seguridad.",
+      [
+        "Crea una función `getVisibleTasks(tasks, filter)` que no toque el DOM.",
+        "Crea una función `buildTaskSummary(tasks)` que devuelva totales claros.",
+        "Escribe casos de prueba para filtro normal, lista vacía y filtro desconocido.",
+        "Deja el render como una capa fina que consuma esos helpers ya probados.",
+      ],
+      [
+        "Helper de filtrado",
+        "Helper de resumen",
+        "Casos de prueba",
+        "Render fino apoyado en helpers",
+      ],
+      `function getVisibleTasks(tasks, filter) {
+  // TODO
+  return tasks;
+}
+
+function buildTaskSummary(tasks) {
+  // TODO
+  return {
+    total: 0,
+    pending: 0,
+    completed: 0,
+  };
+}
+
+// expect(getVisibleTasks(tasks, "pending")).toHaveLength(2);
+// expect(buildTaskSummary(tasks)).toEqual({ total: 3, pending: 2, completed: 1 });`,
+      [
+        "Comprueba que el filtro `pending` conserve el orden original.",
+        "Verifica que la lista vacía devuelva un resumen coherente y sin errores.",
+        "Asegúrate de que un filtro desconocido no rompe la función y tiene un contrato claro.",
+        "Confirma que el render solo consume helpers y no recalcula reglas por su cuenta.",
+      ],
+      [
+        "La lógica de negocio ya no depende del DOM para probarse.",
+        "Los tests cubren caso normal, borde y contrato de error.",
+        "Cambiar el HTML del dashboard no obliga a rehacer la lógica central.",
+      ],
     ),
     "js-project": projectBrief(
       "Construye un dashboard de estudio con filtros persistentes conectado a JSON local.",
