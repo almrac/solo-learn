@@ -519,6 +519,26 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "count", selector: "#resultList li", expected: 0 },
           ],
         },
+        {
+          label: "Ignora invisibles intercalados y conserva el orden de los visibles",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "Arrays", language: "JavaScript", level: "Base", visible: true },
+                { title: "POO", language: "Java", level: "Intermedio", visible: false },
+                { title: "Fetch", language: "JavaScript", level: "Intermedio", visible: true },
+                { title: "Spring", language: "Java", level: "Avanzado", visible: false },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#resultList li", expected: 2 },
+            { type: "text", selector: "#resultList li:first-child", expected: "Arrays | JavaScript | Base" },
+            { type: "text", selector: "#resultList li:last-child", expected: "Fetch | JavaScript | Intermedio" },
+          ],
+        },
       ],
     }),
     "js-json-to-dom": exercise({
@@ -658,6 +678,28 @@ Object.assign(learningRoot.LEARNING_DATA, {
           ],
           assertions: [
             { type: "count", selector: "#featuredList li", expected: 0 },
+          ],
+        },
+        {
+          label: "Filtra destacados entre items mixtos y conserva su orden original",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  { title: "Testing", language: "JavaScript", level: "Avanzado", featured: true },
+                  { title: "POO", language: "Java", level: "Intermedio", featured: false },
+                  { title: "DOM", language: "JavaScript", level: "Base", featured: true },
+                  { title: "Colecciones", language: "Java", level: "Intermedio", featured: false },
+                ],
+              }],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#featuredList li", expected: 2 },
+            { type: "text", selector: "#featuredList li:first-child", expected: "Testing | JavaScript | Avanzado" },
+            { type: "text", selector: "#featuredList li:last-child", expected: "DOM | JavaScript | Base" },
           ],
         },
       ],
