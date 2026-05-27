@@ -117,7 +117,7 @@ base ya visible en el banco con filtro por tema y agrupación útil. Falta segui
 - [x] completar X prácticas
 - [x] resolver X retos
 - [x] estudiar ambos lenguajes
-- [~] cerrar una fase del roadmap
+- [x] cerrar una fase del roadmap
 
 ### 8. Mejor diferenciación visual por lenguaje
 

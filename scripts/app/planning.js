@@ -806,6 +806,9 @@ function buildWeeklyMissions() {
   const crossTrackLesson = missingTrackId ? findNextTrackLesson(missingTrackId) : null;
   const closestPhase = getClosestOpenPhase();
   const closestPhaseLesson = closestPhase?.pendingLessonId ? findLesson(closestPhase.pendingLessonId) : null;
+  const roadmapDetail = !closestPhaseLesson
+    ? ""
+    : `Siguiente cierre útil: ${closestPhaseLesson.title} en ${closestPhase.title}.`;
 
   return [
     {
@@ -824,6 +827,9 @@ function buildWeeklyMissions() {
       title: "Resolver 2 retos",
       status: context.solvedChallengesCount >= solvedChallengesTarget ? "Hecha" : "En curso",
       metric: `${context.solvedChallengesCount}/${solvedChallengesTarget} retos resueltos esta semana`,
+      detail: context.solvedChallengesCount >= solvedChallengesTarget
+        ? "Ya no dependes solo del histórico total: esta meta se mide por semana real."
+        : `El reto activo de ${findLesson(state.activeLessonId)?.title ?? tracks[activeTrack].label} cuenta para esta misión.`,
       tone: context.solvedChallengesCount >= solvedChallengesTarget ? "done" : "progress",
       cta: context.solvedChallengesCount >= solvedChallengesTarget
         ? null
@@ -885,6 +891,7 @@ function buildWeeklyMissions() {
       metric: !closestPhase
         ? "Todas las fases ya están cerradas"
         : `${closestPhase.title}: ${closestPhase.completedCount}/${closestPhase.lessonIds.length} lecciones · ${closestPhase.pendingCount} pendientes`,
+      detail: !closestPhase ? "No queda ninguna fase abierta en el plan." : roadmapDetail,
       tone: !closestPhase ? "done" : closestPhase.pendingCount <= 2 ? "progress" : "warning",
       cta: closestPhaseLesson
         ? {

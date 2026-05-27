@@ -246,6 +246,7 @@ function renderWeeklyMissions() {
               <span class="weekly-missions__badge weekly-missions__badge--${mission.tone}">${escapeHtml(mission.status)}</span>
             </div>
             <p>${escapeHtml(mission.metric)}</p>
+            ${mission.detail ? `<p>${escapeHtml(mission.detail)}</p>` : ""}
             ${mission.cta
               ? `
                 <button
