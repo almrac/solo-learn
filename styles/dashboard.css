@@ -133,6 +133,7 @@
 .quickstart,
 .daily-queue,
 .weekly-missions,
+.history-panel,
 .review-box {
   display: grid;
   gap: var(--space-2);
@@ -150,6 +151,11 @@
   border: var(--border-width) solid var(--line);
 }
 
+.history-panel {
+  background: rgba(255, 255, 255, 0.62);
+  border: var(--border-width) solid var(--line);
+}
+
 .quickstart {
   background: var(--panel);
   border: var(--border-width) solid var(--line);
@@ -163,6 +169,7 @@
 .next-session h3,
 .daily-queue h3,
 .weekly-missions h3,
+.history-panel h3,
 .review-box h3 {
   margin: 0;
   color: var(--forest);
@@ -174,11 +181,42 @@
 .quickstart p:not(.eyebrow),
 .daily-queue p:not(.eyebrow),
 .weekly-missions p:not(.eyebrow),
+.history-panel p:not(.eyebrow),
 .review-box p:not(.eyebrow) {
   margin: 0;
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.45;
+}
+
+.history-panel__week {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.history-panel__day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.8rem;
+  padding: 0.25rem 0.45rem;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.history-panel__day.is-studied {
+  border-color: rgba(38, 58, 99, 0.24);
+  color: var(--ink);
+}
+
+.history-panel__day.is-closed {
+  background: var(--study);
+  border-color: var(--forest);
+  color: var(--forest);
 }
 
 .weekly-missions__item {

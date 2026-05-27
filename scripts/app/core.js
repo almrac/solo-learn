@@ -133,6 +133,7 @@ const elements = {
   nextSession: document.querySelector("#nextSession"),
   dailyQueue: document.querySelector("#dailyQueue"),
   weeklyMissions: document.querySelector("#weeklyMissions"),
+  historyPanel: document.querySelector("#historyPanel"),
   reviewBox: document.querySelector("#reviewBox"),
   activeTrack: document.querySelector("#activeTrack"),
   focusModeButton: document.querySelector("#focusModeButton"),
@@ -395,6 +396,50 @@ function getCurrentWeekDateKeys(days = 7) {
     date.setDate(today.getDate() - offset);
     return date.toISOString().slice(0, 10);
   });
+}
+
+function getLessonTopicsForHistory(lessonId) {
+  const topics = getPracticeTopics({ lessonId });
+  if (topics.length) return topics;
+
+  const trackId = getTrackIdByLesson(lessonId);
+  return trackId ? [tracks[trackId].label] : [];
+}
+
+function getHistorySnapshot(days = 7) {
+  const recentDays = getCurrentWeekDateKeys(days);
+  const studiedDays = recentDays.filter((day) =>
+    (state.trackSessionLog.java ?? []).includes(day) || (state.trackSessionLog.javascript ?? []).includes(day),
+  );
+  const closedDays = recentDays.filter((day) => state.completedDailySessions.includes(day));
+  const approxMinutes = recentDays.reduce((total, day) => {
+    const items = state.dailyQueueLog[day] ?? [];
+    return total + Math.min(items.length * 15, 60);
+  }, 0);
+
+  const topicCounts = new Map();
+  recentDays.forEach((day) => {
+    const items = state.dailyQueueLog[day] ?? [];
+    items.forEach((item) => {
+      const [, lessonId] = String(item).split(":");
+      getLessonTopicsForHistory(lessonId).forEach((topic) => {
+        topicCounts.set(topic, (topicCounts.get(topic) ?? 0) + 1);
+      });
+    });
+  });
+
+  const topTopics = [...topicCounts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .slice(0, 3)
+    .map(([topic]) => topic);
+
+  return {
+    recentDays,
+    studiedDays,
+    closedDays,
+    approxMinutes,
+    topTopics,
+  };
 }
 
 function recordChallengeSuccess(lessonId) {

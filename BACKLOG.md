@@ -202,9 +202,12 @@ legibilidad, extensibilidad y mantenibilidad según crece el problema.
 
 ### 13. Historial y calendario
 
-- días estudiados
-- tiempo aproximado
-- temas tocados
+Estado:
+primer corte funcional ya visible en sidebar. Falta decidir si más adelante compensa un calendario más rico.
+
+- [x] días estudiados
+- [x] tiempo aproximado
+- [x] temas tocados
 
 ## Largo plazo
 

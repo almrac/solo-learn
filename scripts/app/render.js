@@ -17,6 +17,7 @@ function render() {
   renderNextSession();
   renderDailyQueue();
   renderWeeklyMissions();
+  renderHistoryPanel();
   renderReviewBox();
 
   elements.tabs.forEach((tab) => {
@@ -263,6 +264,30 @@ function renderWeeklyMissions() {
         `,
       )
       .join("")}
+  `;
+}
+
+function renderHistoryPanel() {
+  const history = getHistorySnapshot(7);
+
+  elements.historyPanel.innerHTML = `
+    <p class="eyebrow">Historial reciente</p>
+    <h3>${history.studiedDays.length}/7 días con actividad</h3>
+    <p>${history.closedDays.length} cierres de sesión · ~${history.approxMinutes} min.</p>
+    <div class="history-panel__week">
+      ${history.recentDays
+        .map((day) => {
+          const studied = history.studiedDays.includes(day);
+          const closed = history.closedDays.includes(day);
+          return `
+            <span class="history-panel__day ${studied ? "is-studied" : ""} ${closed ? "is-closed" : ""}">
+              ${escapeHtml(formatStudyDate(day))}
+            </span>
+          `;
+        })
+        .join("")}
+    </div>
+    <p>${history.topTopics.length ? `Temas tocados: ${escapeHtml(history.topTopics.join(", "))}.` : "Aún no hay temas suficientes para resumir."}</p>
   `;
 }
 
