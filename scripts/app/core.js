@@ -944,17 +944,27 @@ function getPracticeTopicStats(entries) {
         current.done += 1;
       } else if (entry.progressState.key === "started") {
         current.started += 1;
+      } else {
+        current.newCount = (current.newCount ?? 0) + 1;
       }
     });
   });
 
-  return [...grouped.values()]
+  const sorted = [...grouped.values()]
     .map((item) => ({
       ...item,
       pending: item.total - item.done,
       percent: item.total ? Math.round((item.done / item.total) * 100) : 0,
+      debtScore: (item.newCount ?? 0) * 2 + item.started,
     }))
-    .sort((left, right) => right.total - left.total || left.topic.localeCompare(right.topic));
+    .sort((left, right) => right.debtScore - left.debtScore || right.total - left.total || left.topic.localeCompare(right.topic));
+
+  const priorityTopic = sorted.find((item) => item.debtScore > 0)?.topic ?? "";
+
+  return sorted.map((item) => ({
+    ...item,
+    isPriority: item.topic === priorityTopic,
+  }));
 }
 
 function getPracticeProgressState(lessonId, trackId) {

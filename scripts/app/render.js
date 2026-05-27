@@ -1033,9 +1033,10 @@ function renderPracticeBankTopics(entries) {
 
   elements.practiceBankTopics.innerHTML = topics
     .map((item) => `
-      <button class="practice-topic-pill ${state.practiceTopicFilter === item.topic ? "is-active" : ""}" type="button" data-practice-topic-pick="${escapeHtml(item.topic)}">
+      <button class="practice-topic-pill ${state.practiceTopicFilter === item.topic ? "is-active" : ""} ${item.isPriority ? "is-priority" : ""}" type="button" data-practice-topic-pick="${escapeHtml(item.topic)}">
         <strong>${escapeHtml(item.topic)}</strong>
         <span>${item.done}/${item.total} hechas</span>
+        ${item.isPriority ? "<small>Prioridad útil ahora</small>" : ""}
       </button>
     `)
     .join("");
