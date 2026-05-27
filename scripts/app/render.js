@@ -1118,16 +1118,22 @@ function renderPracticeBankPhases(entries) {
 
 function renderPracticeBankSpotlight(entries) {
   const recommended = entries.find((entry) => !entry.isDone) ?? entries[0];
+  const priorityTopic = getPriorityPracticeTopic(entries);
   if (!recommended) {
     elements.practiceBankSpotlight.innerHTML = "";
     return;
   }
+
+  const spotlightTopic = priorityTopic && recommended.topics.includes(priorityTopic.topic)
+    ? priorityTopic.topic
+    : recommended.topics[0] ?? "";
 
   elements.practiceBankSpotlight.innerHTML = `
     <article class="practice-spotlight">
       <div class="practice-spotlight__meta">
         <span class="eyebrow">Más útil ahora</span>
         <span class="badge">${escapeHtml(recommended.family)}</span>
+        ${spotlightTopic ? `<span class="badge practice-card__topic">${escapeHtml(spotlightTopic)}</span>` : ""}
         <span class="badge">${escapeHtml(recommended.difficulty)}</span>
         ${recommended.hasEvolution ? '<span class="badge practice-card__badge">Escala después</span>' : ""}
         ${recommended.evolutionPhase ? `<span class="badge practice-card__phase">${escapeHtml(recommended.evolutionPhase)}</span>` : ""}
@@ -1136,6 +1142,9 @@ function renderPracticeBankSpotlight(entries) {
       </div>
       <h3>${escapeHtml(recommended.title)}</h3>
       <p>${escapeHtml(getPracticeSpotlightReason(recommended))}</p>
+      ${spotlightTopic
+        ? `<p><strong>Tema empujado ahora:</strong> ${escapeHtml(spotlightTopic)}.</p>`
+        : ""}
       <div class="practice-spotlight__actions">
         <button type="button" data-practice-lesson="${recommended.lessonId}" data-practice-target="${recommended.target}">
           ${recommended.target === "practice" ? "Abrir práctica" : "Abrir problema"}

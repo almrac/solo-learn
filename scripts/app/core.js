@@ -967,6 +967,10 @@ function getPracticeTopicStats(entries) {
   }));
 }
 
+function getPriorityPracticeTopic(entries) {
+  return getPracticeTopicStats(entries).find((item) => item.isPriority) ?? null;
+}
+
 function getPracticeProgressState(lessonId, trackId) {
   if (trackId === "javascript") {
     if (state.solvedExercises.includes(lessonId)) {
