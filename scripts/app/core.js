@@ -165,6 +165,8 @@ const elements = {
   studyGuidedChecks: document.querySelector("#studyGuidedChecks"),
   studyGuidedVariationBlock: document.querySelector("#studyGuidedVariationBlock"),
   studyGuidedVariation: document.querySelector("#studyGuidedVariation"),
+  studyGuidedEdgeCasesBlock: document.querySelector("#studyGuidedEdgeCasesBlock"),
+  studyGuidedEdgeCases: document.querySelector("#studyGuidedEdgeCases"),
   studyGuidedMistakesBlock: document.querySelector("#studyGuidedMistakesBlock"),
   studyGuidedMistakes: document.querySelector("#studyGuidedMistakes"),
   studyProject: document.querySelector("#studyProject"),

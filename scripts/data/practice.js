@@ -1053,6 +1053,10 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Asegúrate de que cada dato aparece una sola vez en la ficha final.",
       ],
       "Haz una segunda version con varios estudiantes y extrae un metodo `imprimirFicha(...)` para no duplicar la salida.",
+      [
+        "Edad 0 o una nota media con decimales largos para comprobar el formateo.",
+        "Texto vacio en el nombre para ver si la salida sigue siendo legible.",
+      ],
     ),
     "java-methods": guide(
       "Escribe un programa con un método `calcularNivel(int xp)` que devuelva el nivel del usuario.",
@@ -1089,6 +1093,10 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Comprueba que mover la impresión fuera del método no cambia el cálculo.",
       ],
       "Anade un segundo metodo que reciba tambien el tamano del bloque de XP para hacer el calculo configurable.",
+      [
+        "XP exactamente en el borde de cambio de nivel, como 150 o 300.",
+        "XP negativo para decidir si lo normalizas, lo rechazas o documentas que no se contempla.",
+      ],
     ),
     "java-control": guide(
       "Lee una nota ya fijada en una variable y clasifícala con condicionales.",
@@ -1124,6 +1132,10 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Verifica que no se imprimen dos clasificaciones para la misma nota.",
       ],
       "Sustituye la variable fija por una lista de notas y clasifica varias en el mismo programa sin repetir bloques `if` enteros.",
+      [
+        "Nota 5 y nota 9 para comprobar dos bordes de tramo.",
+        "Nota fuera de rango, como -1 u 11, para decidir si la validas antes de clasificar.",
+      ],
     ),
     "java-arrays": guide(
       "Trabaja con un array de cinco notas y calcula un pequeño resumen.",
@@ -1161,6 +1173,10 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Verifica que cambiar el tamaño del array no obliga a tocar el bucle.",
       ],
       "Amplia el resumen para contar tambien cuantas notas estan aprobadas y cuantas suspendidas en el mismo recorrido.",
+      [
+        "Todas las notas iguales para comprobar que maxima y media siguen siendo coherentes.",
+        "Un array con una sola nota para ver si la inicializacion y el bucle siguen teniendo sentido.",
+      ],
     ),
     "java-oop": guide(
       "Modela una clase Libro con un comportamiento útil.",
@@ -1201,6 +1217,10 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Verifica que la lógica depende del estado del libro y no de datos externos.",
       ],
       "Anade un metodo `resumen()` que devuelva una cadena legible con los datos del libro sin imprimir directamente en la clase.",
+      [
+        "Un libro de exactamente 400 paginas para fijar bien el borde de la regla.",
+        "Titulos o autores con espacios para comprobar que el constructor conserva bien el texto.",
+      ],
     ),
     "java-inheritance": guide(
       "Diseña una interfaz `Notificable` y dos clases que la implementen.",
@@ -1240,6 +1260,10 @@ class SmsNotifier implements Notificable {
         "Añade un tercer notificador pequeño para comprobar que el diseño aguanta.",
       ],
       "Crea un metodo que reciba un `Notificable` por parametro y lo use sin saber si es Email, SMS o cualquier otra implementacion.",
+      [
+        "Mensaje vacio para decidir si lo permites, lo transformas o lo rechazas.",
+        "Una tercera implementacion muy corta para comprobar que el consumo polimorfico no cambia.",
+      ],
     ),
     "java-collections": guide(
       "Construye un pequeño registro de progreso por lenguaje usando List y Map.",
@@ -1278,6 +1302,10 @@ public class ProgressRegistry {
         "Cambia el orden de inserción y comprueba que el programa sigue teniendo sentido.",
       ],
       "Calcula tambien cuantas tareas pertenecen a cada lenguaje para cruzar una `List` de tareas con el `Map` de XP.",
+      [
+        "Una lista vacia para comprobar que el resumen no rompe el programa.",
+        "Una clave de lenguaje que no exista en el mapa para decidir el valor por defecto.",
+      ],
     ),
     "java-exceptions": guide(
       "Crea un método `parsearNota(String texto)` que convierta texto a número y maneje errores.",
@@ -1313,6 +1341,10 @@ public class ProgressRegistry {
         "Verifica que el contrato `-1` se mantiene igual en todos los fallos.",
       ],
       "Extrae una segunda funcion que valide si la nota esta entre 0 y 10 para separar parseo y regla de negocio.",
+      [
+        "Texto con espacios alrededor, como ` 8 `, para decidir si haces trim antes del parseo.",
+        "Valores numericos fuera de rango, como 12 o -3, si anades validacion de dominio.",
+      ],
     ),
     "java-testing": guide(
       "Diseña una función `estaAprobado(int nota)` y plantea sus pruebas principales.",
@@ -1349,6 +1381,10 @@ public class ProgressRegistry {
         "Asegúrate de que el método devuelve boolean y no texto de consola.",
       ],
       "Escribe el esqueleto de una clase de test JUnit con tres metodos separados para borde, suspenso y caso claramente aprobado.",
+      [
+        "La nota 0 para confirmar un suspenso claro.",
+        "La nota 5 exacta para fijar el borde que mas suele romperse.",
+      ],
     ),
     "java-spring-intro": guide(
       "Diseña la estructura base de una API de tareas con Spring.",
@@ -1386,6 +1422,10 @@ class TaskController {
         "Verifica que los nombres de rutas y métodos HTTP se entienden sin comentarios extra.",
       ],
       "Anade una cuarta operacion para filtrar tareas pendientes y decide si encaja mejor como query param en GET o como endpoint aparte.",
+      [
+        "Crear una tarea con titulo vacio para decidir donde iria la validacion.",
+        "Completar una tarea inexistente para pensar la respuesta HTTP y el contrato del service.",
+      ],
     ),
   },
 

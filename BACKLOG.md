@@ -68,6 +68,7 @@ Alcance mínimo:
 - [x] plantilla inicial
 - [x] pruebas manuales
 - [x] variación sugerida de continuación
+- [x] casos borde recomendados
 
 Valor:
 sube mucho el valor formativo sin meter compilación remota.
