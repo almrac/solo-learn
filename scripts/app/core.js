@@ -475,6 +475,33 @@ function getHistorySnapshot(days = 7) {
     };
   });
 
+  const daySummaries = recentDays.map((day) => {
+    const queueItems = state.dailyQueueLog[day] ?? [];
+    const touchedTracks = [
+      (state.trackSessionLog.java ?? []).includes(day) ? "Java" : null,
+      (state.trackSessionLog.javascript ?? []).includes(day) ? "JavaScript" : null,
+    ].filter(Boolean);
+
+    const challengeCount = (state.challengeSuccessLog ?? [])
+      .filter((entry) => typeof entry === "string")
+      .filter((entry) => entry.split(":")[0] === day)
+      .length;
+
+    const exerciseCount = (state.exerciseSuccessLog ?? [])
+      .filter((entry) => typeof entry === "string")
+      .filter((entry) => entry.split(":")[0] === day)
+      .length;
+
+    return {
+      day,
+      queueCount: queueItems.length,
+      completedSession: state.completedDailySessions.includes(day),
+      challengeCount,
+      exerciseCount,
+      touchedTracks,
+    };
+  });
+
   return {
     recentDays,
     studiedDays,
@@ -482,6 +509,7 @@ function getHistorySnapshot(days = 7) {
     approxMinutes,
     topTopics,
     trackBreakdown,
+    daySummaries,
     solvedChallengesCount: getWeeklySolvedChallengesCount(),
     solvedExercisesCount: getWeeklySolvedExercisesCount(),
   };

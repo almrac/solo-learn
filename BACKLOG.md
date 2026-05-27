@@ -221,11 +221,12 @@ primer corte ya visible en contenido guiado. Falta mucha más profundidad, pero 
 ### 13. Historial y calendario
 
 Estado:
-primer corte funcional ya visible en sidebar. Falta decidir si más adelante compensa un calendario más rico.
+primer corte funcional ya visible en sidebar. Ya resume días concretos, actividad por lenguaje y cierres reales. Falta decidir si más adelante compensa un calendario más rico.
 
 - [x] días estudiados
 - [x] tiempo aproximado
 - [x] temas tocados
+- [x] resumen diario reciente
 
 ## Largo plazo
 

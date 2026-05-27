@@ -225,6 +225,11 @@
   gap: var(--space-2);
 }
 
+.history-panel__days {
+  display: grid;
+  gap: var(--space-2);
+}
+
 .history-panel__track {
   display: grid;
   gap: 0.15rem;
@@ -238,6 +243,34 @@
 .history-panel__track small {
   color: var(--muted);
   line-height: 1.35;
+}
+
+.history-panel__entry {
+  display: grid;
+  gap: 0.2rem;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.history-panel__entry-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.history-panel__entry-top strong {
+  color: var(--forest);
+  font-size: 0.86rem;
+}
+
+.history-panel__entry-top span,
+.history-panel__entry p {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
 }
 
 .history-panel__day {

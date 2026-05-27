@@ -305,6 +305,24 @@ function renderHistoryPanel() {
         `)
         .join("")}
     </div>
+    <div class="history-panel__days">
+      ${history.daySummaries
+        .map((day) => `
+          <article class="history-panel__entry">
+            <div class="history-panel__entry-top">
+              <strong>${escapeHtml(formatStudyDate(day.day))}</strong>
+              <span>${day.completedSession ? "Sesión cerrada" : "Sesión abierta"}</span>
+            </div>
+            <p>
+              ${day.touchedTracks.length ? escapeHtml(day.touchedTracks.join(" · ")) : "Sin actividad"} ·
+              ${day.queueCount} bloques ·
+              ${day.challengeCount} retos ·
+              ${day.exerciseCount} tests
+            </p>
+          </article>
+        `)
+        .join("")}
+    </div>
     <p>${history.topTopics.length ? `Temas tocados: ${escapeHtml(history.topTopics.join(", "))}.` : "Aún no hay temas suficientes para resumir."}</p>
   `;
 }
