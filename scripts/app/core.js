@@ -321,6 +321,24 @@ function getTrackProgressSnapshot(trackId) {
   return { total, read, practice, validated, completed };
 }
 
+function getTrackTopicProgress(trackId, limit = 3) {
+  return getPracticeFamilyStats(getPracticeBankEntries(trackId))
+    .map((item) => ({
+      family: item.family,
+      total: item.total,
+      done: item.done,
+      started: item.started,
+      touched: item.done + item.started,
+      percent: item.total ? Math.round(((item.done + item.started) / item.total) * 100) : 0,
+    }))
+    .sort((left, right) =>
+      right.touched - left.touched ||
+      right.done - left.done ||
+      left.family.localeCompare(right.family),
+    )
+    .slice(0, limit);
+}
+
 function formatStudyDate(dateKey) {
   if (typeof dateKey !== "string" || !dateKey) return "Sin sesión aún";
 

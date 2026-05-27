@@ -56,6 +56,7 @@ function renderTrackProgress() {
   elements.trackProgress.innerHTML = Object.entries(tracks)
     .map(([trackId, track]) => {
       const snapshot = getTrackProgressSnapshot(trackId);
+      const topics = getTrackTopicProgress(trackId);
       const lastSession = state.lastTrackActivity[trackId];
       const completed = snapshot.completed;
       const total = snapshot.total;
@@ -71,6 +72,20 @@ function renderTrackProgress() {
           <p class="track-progress-row__meta">
             Teoría ${snapshot.read} · Práctica ${snapshot.practice} · Tests ${snapshot.validated}
           </p>
+          <div class="track-progress-topics">
+            ${topics.length
+              ? topics
+                  .map(
+                    (topic) => `
+                      <span>
+                        <strong>${escapeHtml(topic.family)}</strong>
+                        ${topic.done}/${topic.total}
+                      </span>
+                    `,
+                  )
+                  .join("")
+              : "<span>Sin temas tocados aún</span>"}
+          </div>
           <p class="track-progress-row__meta">
             Última sesión: ${escapeHtml(formatStudyDate(lastSession))}
           </p>

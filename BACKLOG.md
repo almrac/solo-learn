@@ -86,7 +86,7 @@ medir mejor el aprendizaje real.
 Alcance mínimo:
 
 - [x] distinguir lección vista, práctica hecha y ejercicio evaluado
-- [~] mostrar avance por tema
+- [x] mostrar avance por tema
 - [x] registrar última sesión por track
 - [x] añadir contador de repasos pendientes
 

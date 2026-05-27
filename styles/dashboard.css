@@ -93,6 +93,28 @@
   line-height: 1.4;
 }
 
+.track-progress-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.track-progress-topics span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.track-progress-topics strong {
+  color: var(--ink);
+}
+
 .mini-progress {
   height: var(--space-2);
   overflow: hidden;
