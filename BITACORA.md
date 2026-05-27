@@ -13,6 +13,14 @@ o sesión futura.
 - Se añadió persistencia de progreso con `localStorage`
 - Se incorporaron niveles, XP, logros y progreso básico
 
+## Fase 0 — Refactor estructural del núcleo JS
+
+- `app.js` dejó de concentrar toda la lógica
+- El runner se extrajo a `scripts/app/runner.js`
+- La analítica de aprendizaje se extrajo a `scripts/app/learning.js`
+- La planificación adaptativa se extrajo a `scripts/app/planning.js`
+- `index.html` ahora carga varios scripts vanilla en orden, sin build step
+
 ## Fase 2 — Lección activa y estudio real
 
 - La app dejó de ser solo un panel de tarjetas
@@ -30,7 +38,7 @@ o sesión futura.
 
 ## Fase 3 — Ruta de verano y ampliación de contenido
 
-- Se separó el contenido de la lógica en `data.js`
+- Se separó el contenido de la lógica en `scripts/data/`
 - `app.js` quedó centrado en render, estado y persistencia
 - Se añadió la sección de roadmap de junio a agosto
 - Se amplió el temario hasta 20 lecciones entre Java y JavaScript
@@ -269,8 +277,25 @@ o sesión futura.
   - transferencia
 - Ese historial puede alimentarse de forma manual y también automática al
   fallar retos o tests
+- El registro ya distingue también el origen del atasco:
+  lección, reto, tests o tests DOM
 - Si una lección concentra más atasco real que el resto, puede emerger como
   tarea de `Rescate` en la recomendación principal y en el plan diario
+- Esa recomendación ya no es neutra: cambia según el origen del bloqueo y puede
+  mandar a repaso, tests, preview DOM o rescate general
+- El sistema ya pondera más los atascos recientes que los antiguos para evitar
+  que el plan diario arrastre indefinidamente problemas ya superados
+- La presión ya puede bajar también por resolución real cuando el usuario cierra
+  teoría, práctica, retos o tests
+- Si una lección mejora pero vuelve a caer varias veces, el sistema ya la marca
+  como patrón frágil para no tratarla como tropiezo aislado
+- Para esas lecciones frágiles, la app ya sugiere también cómo conviene cerrar:
+  resumen, práctica corta, repetir reto o rehacer preview DOM
+- Parte de ese cierre ya puede ejecutarse con acciones rápidas desde el propio
+  bloque de atascos
+- Esas acciones rápidas ya dejan rastro como intentos de cierre por lección
+- La app ya usa esos alivios observados para priorizar el cierre que parece
+  funcionar mejor en cada lección
 
 ## Fase 29 — Profundización en transformación de datos
 
@@ -590,6 +615,63 @@ o sesión futura.
   - arrastre de error tipico
   - transferencia pendiente
 - Esa señal ya ajusta `Siguiente sesión` y aparece también en el `Plan de hoy`
+
+## Fase 69 — Historial de atascos por origen
+
+- El atasco ya no se registra solo por tipo
+- También se guarda el origen principal:
+  - lección
+  - reto
+  - tests
+  - tests DOM
+- Esa señal ya ajusta mejor rescates y recomendaciones
+
+## Fase 70 — Presion reciente y alivio real
+
+- Los atascos recientes pesan más que los antiguos
+- La presión también baja cuando cierras teoría, práctica, reto o tests con éxito
+- La lección activa ya puede mostrar señales de mejora real
+
+## Fase 71 — Recaida y cierres recomendados
+
+- La app distingue entre atasco puntual y patrón frágil
+- Si una lección mejora pero vuelve a caer, pasa a tratarse como recaída
+- El sistema ya recomienda el mejor tipo de cierre según el patrón:
+  - resumen
+  - práctica
+  - reto
+  - preview DOM
+  - salto avanzado
+
+## Fase 72 — Acciones rápidas y eficacia observada
+
+- Los cierres sugeridos ya son accionables desde la propia lección
+- La app registra intentos de cierre por lección
+- Si una acción baja la presión después, cuenta como alivio observado
+- Las acciones rápidas ya se ordenan por eficacia conocida
+
+## Fase 73 — Refactor de lógica y datos
+
+- `app.js` dejó de ser el único contenedor de lógica
+- La lógica se organizó en `scripts/app/`
+- Los datos también dejaron el monolito original y pasaron a `scripts/data/`
+
+## Fase 74 — Refactor de CSS por responsabilidad
+
+- `styles.css` dejó de ser el único archivo de estilos
+- El CSS ahora se reparte en `styles/`
+- El objetivo fue cortar el coste de mantenimiento sin meter build step
+
+## Fase 75 — Comprobación de humo de modularización
+
+- Se añadió `scripts/smoke-check.py`
+- La comprobación revisa:
+  - archivos enlazados desde `index.html`
+  - orden mínimo de scripts
+  - selectores DOM usados por `scripts/app/core.js`
+  - funciones críticas repartidas entre módulos
+  - listeners principales de `scripts/app/main.js`
+- El objetivo es detectar rápido roturas de arranque tras partir o mover módulos
 
 ## Fase 28 — Reglas semanales visibles
 

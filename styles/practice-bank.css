@@ -1,0 +1,414 @@
+.practice-bank {
+  margin: 0 0 var(--space-10);
+  background: var(--keylime);
+}
+
+.practice-bank__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  align-items: end;
+}
+
+.practice-bank__reset {
+  min-height: var(--space-10);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  padding: 0 var(--space-4);
+  background: var(--panel);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.practice-bank__spotlight {
+  margin-bottom: var(--space-5);
+}
+
+.practice-bank__phases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.practice-phase-pill {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 12rem;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  background: var(--panel);
+}
+
+.practice-phase-pill.is-active {
+  border-color: var(--forest);
+  background: var(--study);
+}
+
+.practice-phase-pill.is-priority {
+  border-color: rgba(38, 58, 99, 0.24);
+  box-shadow: inset 0 0 0 0.125rem rgba(38, 58, 99, 0.08);
+}
+
+.practice-phase-pill strong {
+  color: var(--forest);
+  font-size: 0.9rem;
+}
+
+.practice-phase-pill span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.practice-phase-pill small {
+  color: var(--forest);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.practice-bank__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.practice-stat-card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  text-align: left;
+}
+
+.practice-stat-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.practice-stat-card strong {
+  color: var(--forest);
+}
+
+.practice-stat-card span,
+.practice-stat-card p {
+  color: var(--muted);
+}
+
+.practice-stat-card__bar {
+  height: var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+}
+
+.practice-stat-card__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--forest);
+}
+
+.practice-stat-card small {
+  color: var(--forest);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.practice-stat-card.is-priority {
+  border-color: var(--forest);
+  background: var(--panel);
+  box-shadow: inset 0 0 0 0.125rem rgba(38, 58, 99, 0.08);
+}
+
+.practice-spotlight {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.practice-spotlight__meta,
+.practice-spotlight__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.practice-spotlight h3 {
+  color: var(--forest);
+}
+
+.practice-spotlight p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.practice-spotlight button {
+  min-height: var(--space-10);
+  border: var(--border-width) solid var(--forest);
+  border-radius: var(--radius);
+  padding: 0 var(--space-4);
+  background: var(--forest);
+  color: var(--white);
+  font-weight: 600;
+}
+
+.practice-bank__filter {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.practice-bank__filter select {
+  min-height: var(--space-10);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  padding: 0 var(--space-3);
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+}
+
+.practice-bank__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.practice-card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.practice-card__meta,
+.practice-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.practice-card__status--done {
+  background: var(--java-bg);
+}
+
+.practice-card__status--started {
+  background: var(--mint-kiss);
+}
+
+.practice-card__status--new {
+  background: var(--panel);
+}
+
+.practice-card__badge {
+  background: var(--slate);
+  color: var(--white);
+}
+
+.practice-card__phase {
+  background: var(--panel);
+  color: var(--forest);
+  border: var(--border-width) solid var(--line);
+}
+
+.practice-card__evolution-state {
+  background: var(--study);
+  color: var(--forest);
+}
+
+.practice-card h3 {
+  color: var(--forest);
+}
+
+.practice-card p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.practice-card button {
+  min-height: var(--space-10);
+  border: var(--border-width) solid var(--forest);
+  border-radius: var(--radius);
+  padding: 0 var(--space-4);
+  background: var(--forest);
+  color: var(--white);
+  font-weight: 600;
+}
+
+.practice-card__secondary {
+  border-color: var(--line) !important;
+  background: var(--panel) !important;
+  color: var(--ink) !important;
+}
+
+.blueprint {
+  margin: 0 0 var(--space-10);
+  background: var(--mint);
+}
+
+.blueprint__intro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.blueprint__intro p {
+  color: var(--muted);
+}
+
+.blueprint__intro button {
+  min-height: var(--space-10);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  padding: 0 var(--space-4);
+  background: var(--panel);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.blueprint__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.blueprint__legend {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.blueprint-stat {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.blueprint-stat strong {
+  color: var(--forest);
+  font-size: 1.35rem;
+}
+
+.blueprint-stat span {
+  color: var(--muted);
+}
+
+.blueprint-card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.blueprint-card.is-completed {
+  border-color: rgba(38, 58, 99, 0.28);
+  background: var(--white);
+}
+
+.blueprint-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.blueprint-card__concept {
+  color: var(--forest);
+  font-weight: 600;
+}
+
+.blueprint-card__tags,
+.blueprint-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.blueprint-card__dependency {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.blueprint-card__dependency strong {
+  color: var(--forest);
+}
+
+.blueprint-card__dependency p {
+  color: var(--muted);
+}
+
+.blueprint-card__dependency.is-blocked {
+  border-color: rgba(232, 112, 79, 0.42);
+  background: var(--mint-kiss);
+}
+
+.blueprint-card__dependency.is-ready {
+  border-color: rgba(38, 58, 99, 0.24);
+  background: var(--java-bg);
+}
+
+.blueprint-card__button {
+  min-height: var(--space-10);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  padding: 0 var(--space-4);
+  background: var(--panel);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.achievement.is-locked {
+  opacity: 1;
+  background: var(--bg);
+}
+
+.achievement__icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius);
+  background: var(--keylime);
+  color: var(--forest);
+  font-weight: 700;
+}
+
+.focus-mode .hero,
+.focus-mode .roadmap,
+.focus-mode .dashboard,
+.focus-mode .achievements {
+  display: none;
+}
+
+.focus-mode .study {
+  margin-top: var(--space-10);
+}
+

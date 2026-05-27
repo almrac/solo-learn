@@ -17,7 +17,8 @@ añadir ejercicios con tests automáticos y feedback claro.
 
 Alcance mínimo:
 
-- definir estructura de ejercicio en `data.js`
+- definir estructura de ejercicio en `scripts/data/foundations.js`,
+  `scripts/data/practice.js` y `scripts/data/evolution.js`
 - cargar starter distinto por lección
 - ejecutar solución del usuario en sandbox simple
 - comparar con casos esperados
@@ -108,6 +109,25 @@ Alcance mínimo:
 - sistema visual más consistente para Java y JavaScript
 - sin depender solo del color
 - posible iconografía o badges más fuertes
+- separar por completo las "salas" Java y JavaScript en el rediseño
+- usar un modo de estudio global con tres estados: `all`, `java`, `javascript`
+- franja superior de 4px por modo:
+  - transparente en `all`
+  - navy en `java`
+  - terracota en `javascript`
+- tinte del papel por modo:
+  - Java -> gris azulado sutil
+  - JavaScript -> cream / melocotón sutil
+- selector segmentado prominente en la subbar con glifo del lenguaje
+- filtro duro por modo:
+  - en `java`, desaparece todo el contenido JS
+  - en `javascript`, desaparece todo el contenido Java
+  - afecta a plan, repaso, banco, grid y lateral
+- solo el lenguaje activo debe ser navegable
+- la lección activa debe cambiar según el modo
+- brand, nav activa y acentos del header también deben teñirse por modo
+- el lateral debe cambiar su contenido según el lenguaje activo
+- aplicar esto al integrar el rediseño, no antes, para no duplicar trabajo
 
 ## Medio plazo
 
@@ -184,16 +204,22 @@ Opciones candidatas:
 
 No hacerlo hasta que el modelo de progreso esté más maduro.
 
-### 15. Refactor modular del frontend
+### 15. Mantener la modularidad del frontend
 
-Separar claramente:
+El corte grande ya está iniciado:
 
-- datos
-- estado
-- render
-- runner
-- evaluación
-- persistencia
+- lógica separada en `scripts/app/`
+- datos separados en `scripts/data/`
+- CSS separado por responsabilidad en `styles/`
+
+Pendiente:
+
+- vigilar si alguno de esos módulos vuelve a crecer demasiado
+- seguir cortando por responsabilidad antes de recrear monolitos
+- posponer una taxonomía CSS más fina hasta cerrar el rediseño visual para no
+  reorganizar `styles/` dos veces
+- ejecutar `python3 scripts/smoke-check.py` tras tocar `index.html`,
+  `scripts/app/`, `scripts/data/` o CSS para detectar roturas de arranque
 
 ### 16. Modo examen
 

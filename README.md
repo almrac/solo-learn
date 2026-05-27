@@ -45,6 +45,16 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - Cada lección incluye también una capa de apoyo mental: idea clave, lógica, mnemotecnia y error típico.
 - La lección activa permite marcar explícitamente si el atasco es de concepto, lógica, error típico o transferencia.
 - La app registra también atascos automáticos al fallar retos o tests para tener historial real de bloqueo.
+- Ese historial ya distingue también el origen principal del atasco: lección, reto, tests o tests DOM.
+- `Siguiente sesión` y `Plan de hoy` ya cambian la intervención según ese origen:
+  repaso, tests, preview DOM o rescate de teoría/práctica.
+- Los atascos recientes pesan más que los antiguos, así que la recomendación no arrastra para siempre problemas ya superados.
+- Cuando cierras teoría, práctica, retos o tests, la presión de ese atasco baja también por resolución real.
+- Si una lección mejora pero vuelve a atascarse varias veces, la app la trata como patrón frágil y puede priorizar estabilizarla.
+- En esas lecciones frágiles, la app ya sugiere también un cierre concreto: resumen, práctica corta, repetir reto o rehacer preview DOM.
+- Ese cierre ya puede lanzarse con acciones rápidas desde la propia lección: notas, reto, ejercicio o preview DOM.
+- La app registra también qué acción de cierre intentaste usar por lección.
+- Cuando detecta alivios tras esas acciones, empieza a priorizar el cierre que mejor funciona en cada lección.
 - El plan diario ya sugiere también el tipo de foco mental de cada tarea: concepto, lógica, error típico o transferencia.
 - La app detecta además el patrón de dificultad predominante del momento y lo usa para ajustar `Siguiente sesión` y `Plan de hoy`.
 - Si una lección concentra más atasco real que las demás, la app puede subirla como tarea de `Rescate`.
@@ -57,7 +67,7 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - El banco muestra estadísticas por familia: total, hechas, empezadas y sin tocar.
 - Las estadísticas por familia son clicables y destacan la prioridad útil actual.
 - Las familias muestran porcentaje de avance y el banco permite restablecer filtros rápido.
-- Easter egg técnico con una radiografía de `app.js` y su relación con la ruta de aprendizaje.
+- Easter egg técnico con una radiografía del frontend y su relación con la ruta de aprendizaje.
 - La radiografía técnica puede abrir directamente la lección o la práctica relacionada.
 - La radiografía detecta base cubierta o pendiente para cada bloque técnico.
 - La recomendación de siguiente sesión prioriza lecciones que desbloquean más partes del proyecto.
@@ -87,15 +97,33 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
   espaciado amplio.
 - CSS refactorizado con nomenclatura BEM, estados `is-*`, tokens de espaciado
   en base 4px y container máximo de `90rem` / 1440px.
+- Hojas de estilo separadas por responsabilidad para no mantener otro monolito
+  además de la lógica y los datos.
 - Import/export con estado visible y notas guardadas automáticamente al cambiar
   de lección o salir del campo.
 
 ## Estructura
 
 - `index.html`: estructura de la app.
-- `styles.css`: estilos responsive.
-- `data.js`: temario, ejemplos, prácticas y roadmap de verano.
-- `app.js`: estado, renderizado, progreso, retos y persistencia.
+- `styles/`: hojas CSS separadas por responsabilidad.
+- `styles/base.css`: tokens, reset y estilos base.
+- `styles/dashboard.css`: header, hero, dashboard, roadmap y paneles generales.
+- `styles/study.css`: lección activa, apoyos y bloques pedagógicos.
+- `styles/practice-bank.css`: banco de práctica, spotlight y blueprint técnico.
+- `styles/runner.css`: laboratorio JS, preview DOM y reto.
+- `styles/responsive.css`: ajustes responsive.
+- `scripts/data/`: datos JavaScript de la app.
+- `scripts/data/foundations.js`: tracks, lecciones base, supports y roadmap.
+- `scripts/data/practice.js`: ejercicios, guias Java y mini proyectos.
+- `scripts/data/evolution.js`: evolucion, casos guiados y blueprint.
+- `scripts/app/`: lógica JavaScript de la app.
+- `scripts/app/core.js`: estado, referencias DOM, persistencia y utilidades base.
+- `scripts/app/render.js`: render principal de la interfaz.
+- `scripts/app/runner.js`: laboratorio JavaScript, preview DOM y evaluación.
+- `scripts/app/learning.js`: atascos, cierres, recurrencia y analítica de aprendizaje.
+- `scripts/app/planning.js`: recomendaciones, plan diario y perfil semanal.
+- `scripts/app/main.js`: arranque y wiring de eventos.
+- `scripts/smoke-check.py`: comprobación estática de arranque tras tocar módulos.
 - `AGENT_CONTEXT.md`: contexto operativo del proyecto para agentes.
 - `BACKLOG.md`: backlog futuro de mejoras priorizadas.
 - `BITACORA.md`: registro manual de cambios relevantes.
@@ -105,13 +133,27 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 Abre `index.html` directamente en el navegador. No necesita instalación,
 compilación ni servidor local.
 
+## Comprobación de humo
+
+Después de partir o mover archivos de `scripts/app/`, `scripts/data/`, CSS o
+`index.html`, ejecuta:
+
+```bash
+python3 scripts/smoke-check.py
+```
+
+La comprobación revisa archivos enlazados, orden de scripts, selectores del DOM,
+funciones críticas y wiring de eventos principales. No sustituye a probar la app
+en navegador, pero detecta rápido roturas de arranque como funciones globales
+olvidadas durante una separación de archivos.
+
 ## Desplegar en GitHub Pages
 
 1. Sube estos archivos a un repositorio de GitHub:
    - `index.html`
-   - `styles.css`
-   - `data.js`
-   - `app.js`
+   - `styles/`
+   - `scripts/`
+   - `data/`
    - `README.md`
 2. En GitHub, entra en `Settings > Pages`.
 3. En `Build and deployment`, selecciona `Deploy from a branch`.

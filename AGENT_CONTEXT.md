@@ -25,6 +25,8 @@ es que la app sirva para practicar de verdad, no solo para mostrar contenido.
 - HTML + CSS + JavaScript vanilla
 - Persistencia actual: `localStorage`
 - Datos de ejemplo: JSON local en `data/study-items.json`
+- Tras tocar `index.html`, `scripts/app/`, `scripts/data/` o CSS, ejecutar
+  `python3 scripts/smoke-check.py`
 
 Notas del entorno observadas:
 
@@ -36,9 +38,25 @@ Notas del entorno observadas:
 ## Estructura actual
 
 - `index.html`: estructura y secciones principales
-- `styles.css`: estilos globales y componentes
-- `data.js`: tracks, lecciones, detalles y roadmap
-- `app.js`: estado, renderizado, eventos, persistencia y runner JS
+- `styles/`: hojas CSS separadas por responsabilidad
+- `styles/base.css`: tokens, reset y estilos base
+- `styles/dashboard.css`: header, hero, dashboard y paneles generales
+- `styles/study.css`: lección activa, apoyos y bloques pedagógicos
+- `styles/practice-bank.css`: banco de práctica y blueprint
+- `styles/runner.css`: runner JS, preview DOM y reto
+- `styles/responsive.css`: ajustes responsive
+- `scripts/data/`: datos JavaScript de la app
+- `scripts/data/foundations.js`: tracks, lecciones base, supports y roadmap
+- `scripts/data/practice.js`: ejercicios, guias Java y proyectos
+- `scripts/data/evolution.js`: evolucion, casos y blueprint
+- `scripts/app/`: lógica JavaScript de la app
+- `scripts/app/core.js`: estado, referencias DOM, persistencia y utilidades base
+- `scripts/app/render.js`: render principal
+- `scripts/app/runner.js`: runner JS, preview DOM y evaluación
+- `scripts/app/learning.js`: analítica de atascos, cierres y recurrencia
+- `scripts/app/planning.js`: recomendaciones, plan diario y lógica semanal
+- `scripts/app/main.js`: arranque y wiring de eventos
+- `scripts/smoke-check.py`: comprobación estática de arranque tras tocar módulos
 - `data/study-items.json`: ejemplo local para prácticas con `fetch`
 - `DESIGN.md`: guía visual de referencia usada para el rediseño
 - `README.md`: documentación general
@@ -88,7 +106,7 @@ La app ya incluye:
 - las estadísticas por familia incluyen porcentaje y barra de avance; el banco tiene reset rápido de filtros
 - preview DOM con `iframe` aislado para ejercicios de interfaz
 - validación de listas renderizadas y contadores en ejercicios DOM
-- panel oculto tipo easter egg que documenta conceptos reales de `app.js`
+- panel oculto tipo easter egg que documenta conceptos reales del frontend
 - el panel técnico permite saltar a la lección o práctica relacionada
 - el panel técnico muestra prerequisitos ya cubiertos o aún pendientes
 - la recomendación de siguiente sesión ya usa dependencias técnicas, no solo orden lineal
@@ -137,7 +155,7 @@ La app ya incluye:
 
 ## Modelo de datos actual
 
-El estado vive en `app.js` bajo `state` y contiene, al menos:
+El estado vive en `scripts/app/core.js` bajo `state` y contiene, al menos:
 
 - `activeTrack`
 - `filter`
@@ -192,6 +210,19 @@ El estado vive en `app.js` bajo `state` y contiene, al menos:
 - La propia lección ya permite marcar atascos explícitos por tipo:
   concepto, lógica, error típico o transferencia
 - Además, fallar retos o tests deja también rastro automático en ese historial
+- Ese historial ya distingue también el origen del bloqueo:
+  lección activa, reto, tests o tests DOM
+- La intervención ya varía según ese origen:
+  repaso si viene de reto, práctica si viene de tests, preview DOM si viene de
+  tests DOM, rescate general si viene de teoría/práctica abierta
+- El historial de atascos ya pondera más lo reciente que lo antiguo
+- Además, la presión ya puede bajar por resolución real al cerrar teoría,
+  práctica, retos o tests
+- La app ya distingue entre atasco puntual y patrón frágil con recaídas
+- En esos patrones frágiles ya recomienda también un tipo de cierre concreto
+- Parte de ese cierre ya es accionable desde la propia lección activa
+- La app ya registra también intentos de cierre por lección
+- También empieza a aprender qué cierre alivia mejor cada lección
 - La cola diaria ya puede etiquetar el foco mental principal de cada tarea
 - También detecta un patrón de dificultad dominante y lo usa para modular
   recomendación principal y plan diario
@@ -214,7 +245,8 @@ evaluable”. En términos prácticos:
 1. extender los ejercicios de `JavaScript` a más temas de interfaz y datos
 2. enriquecer la ruta `Java` con más práctica estructurada y proyectos
 3. mejor analítica de errores para repaso
-4. modularizar `app.js` cuando el coste de mantenimiento ya lo pida
+4. vigilar el crecimiento de las hojas de estilo y volver a cortar por
+   responsabilidad antes de recrear otro monolito
 
 ## Reglas para futuros agentes
 

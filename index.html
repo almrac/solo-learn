@@ -8,7 +8,12 @@
       name="description"
       content="Ruta personal gamificada para aprender Java y JavaScript desde cero hasta avanzado."
     >
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="styles/study.css">
+    <link rel="stylesheet" href="styles/practice-bank.css">
+    <link rel="stylesheet" href="styles/runner.css">
+    <link rel="stylesheet" href="styles/responsive.css">
   </head>
   <body>
     <header class="header">
@@ -225,6 +230,14 @@ const progreso = retos.filter(r => r.done);</code></pre>
                   </div>
                 </div>
                 <ul id="studyGuidedChecklist"></ul>
+                <div id="studyGuidedStarterBlock" hidden>
+                  <strong>Plantilla inicial</strong>
+                  <pre><code id="studyGuidedStarter"></code></pre>
+                </div>
+                <div id="studyGuidedMistakesBlock" hidden>
+                  <strong>Errores comunes</strong>
+                  <ul id="studyGuidedMistakes"></ul>
+                </div>
               </div>
               <div class="study-exercise" id="studyProject" hidden>
                 <div class="study-exercise__header">
@@ -243,6 +256,10 @@ const progreso = retos.filter(r => r.done);</code></pre>
                   </div>
                 </div>
                 <ul id="studyProjectMilestones"></ul>
+                <div id="studyProjectStarterBlock" hidden>
+                  <strong>Plantilla inicial</strong>
+                  <pre><code id="studyProjectStarter"></code></pre>
+                </div>
               </div>
               <div class="study-exercise" id="studyEvolution" hidden>
                 <div class="study-exercise__header">
@@ -433,7 +450,7 @@ const progreso = retos.filter(r => r.done);</code></pre>
         <div class="section-heading">
           <div>
             <p class="eyebrow">Easter egg</p>
-            <h2>Radiografía de `app.js`</h2>
+            <h2>Radiografía del frontend</h2>
           </div>
           <p class="section-heading__text">
             Este panel conecta partes reales de la app con conceptos de JavaScript y con la fase donde aprenderías a construirlas.
@@ -450,7 +467,14 @@ const progreso = retos.filter(r => r.done);</code></pre>
       </section>
     </main>
 
-    <script src="data.js" defer></script>
-    <script src="app.js" defer></script>
+    <script src="scripts/data/foundations.js" defer></script>
+    <script src="scripts/data/practice.js" defer></script>
+    <script src="scripts/data/evolution.js" defer></script>
+    <script src="scripts/app/core.js" defer></script>
+    <script src="scripts/app/runner.js" defer></script>
+    <script src="scripts/app/learning.js" defer></script>
+    <script src="scripts/app/planning.js" defer></script>
+    <script src="scripts/app/render.js" defer></script>
+    <script src="scripts/app/main.js" defer></script>
   </body>
 </html>
