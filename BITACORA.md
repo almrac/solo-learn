@@ -1087,6 +1087,11 @@ o sesión futura.
 - `Siguiente sesión` y `Plan de hoy` ya pueden abrir directamente la superficie principal del frente activo (`banco`, `examen` o `catálogo`)
 - La navegación por `workMode` empieza así a ser realmente operativa y no solo textual
 
+## Fase 144 — Examen alineado con el frente activo
+
+- La superficie de examen ya adapta su CTA y su nota base cuando `workMode` está en `exam`
+- La idea es que la separación funcional también se note dentro del propio bloque de comprobación y no solo en navegación lateral o planes
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`

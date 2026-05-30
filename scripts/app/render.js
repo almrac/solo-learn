@@ -1459,11 +1459,17 @@ function renderChallenge() {
     elements.challengePrompt.textContent = lesson.challenge.prompt;
     const lessonCount = buildExamLessonIds().length;
     const examLeadHint = getExamLeadHint();
+    const examCtaLabel = state.workMode === "exam" ? "Entrar en examen" : "Iniciar modo examen";
+    const examSetupNote = lessonCount
+      ? state.workMode === "exam"
+        ? "Ahora mismo este frente está en modo comprobación: prioriza preguntas con recaída o práctica ya abierta dentro del filtro actual."
+        : "El examen usa retos, no otorga XP extra y prioriza primero las lecciones con recaída o práctica ya abierta dentro del filtro actual."
+      : "No hay preguntas que cumplan el filtro actual.";
     elements.challengeMeta.innerHTML = `
       <div class="challenge__meta-row">
         <span class="badge">${tracks[getTrackIdByLesson(lesson.id)].label}</span>
         <span class="badge">${lessonCount} preguntas candidatas</span>
-        <button class="button" type="button" data-exam-action="start" ${lessonCount ? "" : "disabled"}>Iniciar modo examen</button>
+        <button class="button" type="button" data-exam-action="start" ${lessonCount ? "" : "disabled"}>${examCtaLabel}</button>
       </div>
       <div class="challenge__exam-setup">
         <label class="challenge__config">
@@ -1496,7 +1502,7 @@ function renderChallenge() {
           </select>
         </label>
       </div>
-      <p class="challenge__exam-note">${lessonCount ? "El examen usa retos, no otorga XP extra y prioriza primero las lecciones con recaída o práctica ya abierta dentro del filtro actual." : "No hay preguntas que cumplan el filtro actual."}</p>
+      <p class="challenge__exam-note">${examSetupNote}</p>
       ${lessonCount && examLeadHint ? `<p class="challenge__exam-note"><strong>Entraría primero:</strong> ${escapeHtml(examLeadHint)}</p>` : ""}
     `;
     submitButton.textContent = "Comprobar";
