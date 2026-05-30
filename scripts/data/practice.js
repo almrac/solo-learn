@@ -305,6 +305,44 @@ Object.assign(learningRoot.LEARNING_DATA, {
             pendingTitles: [],
           },
         },
+        {
+          label: "Conserva el orden original de las tareas pendientes",
+          args: [async () => ({
+            items: [
+              { title: "Primera pendiente", done: false },
+              { title: "Completada", done: true },
+              { title: "Segunda pendiente", done: false },
+              { title: "Tercera pendiente", done: false },
+            ],
+          })],
+          expected: {
+            total: 4,
+            pendingCount: 3,
+            pendingTitles: ["Primera pendiente", "Segunda pendiente", "Tercera pendiente"],
+          },
+        },
+        {
+          label: "Devuelve resumen vacío si items viene vacío",
+          args: [async () => ({
+            items: [],
+          })],
+          expected: {
+            total: 0,
+            pendingCount: 0,
+            pendingTitles: [],
+          },
+        },
+        {
+          label: "Tolera respuestas sin items y devuelve un resumen vacío",
+          args: [async () => ({
+            meta: { source: "local" },
+          })],
+          expected: {
+            total: 0,
+            pendingCount: 0,
+            pendingTitles: [],
+          },
+        },
       ],
     }),
     "js-state": exercise({
@@ -1181,6 +1219,78 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "count", selector: "#courseList li", expected: 0 },
           ],
         },
+        {
+          label: "Trata respuestas sin items como estado vacío",
+          actions: [
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                meta: { source: "local" },
+              })],
+            },
+          ],
+          assertions: [
+            { type: "text", selector: "#status", expected: "No hay resultados." },
+            { type: "count", selector: "#courseList li", expected: 0 },
+          ],
+        },
+        {
+          label: "Se recupera tras vacío y vuelve a pintar en el orden recibido",
+          actions: [
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({ items: [] })],
+            },
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                items: [
+                  { title: "Async", level: "Intermedio" },
+                  { title: "Testing", level: "Avanzado" },
+                ],
+              })],
+            },
+          ],
+          assertions: [
+            { type: "text", selector: "#status", expected: "Resultados listos." },
+            { type: "count", selector: "#courseList li", expected: 2 },
+            { type: "text", selector: "#courseList li:first-child", expected: "Async | Intermedio" },
+            { type: "text", selector: "#courseList li:last-child", expected: "Testing | Avanzado" },
+          ],
+        },
+        {
+          label: "Limpia un error anterior aunque la siguiente carga también venga sin items",
+          actions: [
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                items: [
+                  { title: "map y filter", level: "Base" },
+                ],
+              })],
+            },
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => { throw new Error("fallo de red"); }],
+            },
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                meta: { retry: true },
+              })],
+            },
+          ],
+          assertions: [
+            { type: "text", selector: "#status", expected: "No hay resultados." },
+            { type: "count", selector: "#courseList li", expected: 0 },
+          ],
+        },
       ],
     }),
     "js-json-fetch": exercise({
@@ -1334,6 +1444,53 @@ Object.assign(learningRoot.LEARNING_DATA, {
             "<li>UI states | JavaScript | Intermedio |  | 0 XP</li>",
           compare: "html",
         },
+        {
+          label: "Tolera items sin tags pero con stats parciales y mantiene el formato",
+          args: [{
+            course: "Solo Learn",
+            items: [
+              {
+                title: "Arquitectura modular",
+                language: "JavaScript",
+                level: "Avanzado",
+                stats: {},
+              },
+            ],
+          }],
+          expected:
+            "<li>Arquitectura modular | JavaScript | Avanzado |  | 0 XP</li>",
+          compare: "html",
+        },
+        {
+          label: "Soporta mezclar xp 0, stats ausentes y tags largas sin reordenar items",
+          args: [{
+            course: "Solo Learn",
+            items: [
+              {
+                title: "Primer render",
+                language: "JavaScript",
+                level: "Base",
+                tags: ["dom", "listas"],
+                stats: { xp: 0 },
+              },
+              {
+                title: "DTOs",
+                language: "Java",
+                level: "Avanzado",
+              },
+              {
+                title: "Panel semanal",
+                language: "JavaScript",
+                level: "Avanzado",
+                tags: ["plan", "ritmo", "repaso"],
+                stats: { xp: 130 },
+              },
+            ],
+          }],
+          expected:
+            "<li>Primer render | JavaScript | Base | dom, listas | 0 XP</li><li>DTOs | Java | Avanzado |  | 0 XP</li><li>Panel semanal | JavaScript | Avanzado | plan, ritmo, repaso | 130 XP</li>",
+          compare: "html",
+        },
       ],
     }),
     "js-modules": exercise({
@@ -1389,6 +1546,86 @@ Object.assign(learningRoot.LEARNING_DATA, {
             misc: ["index.html"],
           },
         },
+        {
+          label: "Mantiene el orden interno de cada grupo aunque el array llegue mezclado",
+          args: [[
+            "styles/responsive.css",
+            "scripts/app/main.js",
+            "README.md",
+            "scripts/data/evolution.js",
+            "styles/base.css",
+            "scripts/app/core.js",
+            "data/study-items.json",
+          ]],
+          expected: {
+            app: ["scripts/app/main.js", "scripts/app/core.js"],
+            data: ["scripts/data/evolution.js", "data/study-items.json"],
+            styles: ["styles/responsive.css", "styles/base.css"],
+            misc: ["README.md"],
+          },
+        },
+        {
+          label: "Manda a misc las rutas parecidas que no pertenecen a los prefijos soportados",
+          args: [[
+            "script/app/core.js",
+            "stylesheets/base.css",
+            "dataset/study-items.json",
+            "scripts/data-notes.md",
+          ]],
+          expected: {
+            app: [],
+            data: [],
+            styles: [],
+            misc: [
+              "script/app/core.js",
+              "stylesheets/base.css",
+              "dataset/study-items.json",
+              "scripts/data-notes.md",
+            ],
+          },
+        },
+        {
+          label: "Exige prefijos exactos y no clasifica rutas con carpetas anidadas antes del prefijo",
+          args: [[
+            "src/scripts/app/core.js",
+            "./styles/base.css",
+            "backup/data/study-items.json",
+            "scripts/app/main.js",
+          ]],
+          expected: {
+            app: ["scripts/app/main.js"],
+            data: [],
+            styles: [],
+            misc: [
+              "src/scripts/app/core.js",
+              "./styles/base.css",
+              "backup/data/study-items.json",
+            ],
+          },
+        },
+        {
+          label: "Mezcla prefijos válidos e inválidos sin romper el orden interno de cada grupo",
+          args: [[
+            "notes/styles/guide.md",
+            "styles/base.css",
+            "scripts/data/practice.js",
+            "scripts/app/main.js",
+            "docs/data-model.md",
+            "data/study-items.json",
+            "scripts/application.js",
+            "styles/responsive.css",
+          ]],
+          expected: {
+            app: ["scripts/app/main.js"],
+            data: ["scripts/data/practice.js", "data/study-items.json"],
+            styles: ["styles/base.css", "styles/responsive.css"],
+            misc: [
+              "notes/styles/guide.md",
+              "docs/data-model.md",
+              "scripts/application.js",
+            ],
+          },
+        },
       ],
     }),
     "js-components": exercise({
@@ -1427,6 +1664,61 @@ Object.assign(learningRoot.LEARNING_DATA, {
           }],
           expected:
             "<article><h3>Colecciones</h3><p>Java | Intermedio</p></article>",
+          compare: "html",
+        },
+        {
+          label: "Soporta titulos largos y niveles avanzados sin alterar la estructura",
+          args: [{
+            title: "Estados de carga, vacio y error",
+            track: "JavaScript",
+            level: "Avanzado",
+          }],
+          expected:
+            "<article><h3>Estados de carga, vacio y error</h3><p>JavaScript | Avanzado</p></article>",
+          compare: "html",
+        },
+        {
+          label: "Mantiene espacios y simbolos literales del titulo recibido",
+          args: [{
+            title: "DTO + service + validacion",
+            track: "Java",
+            level: "Avanzado",
+          }],
+          expected:
+            "<article><h3>DTO + service + validacion</h3><p>Java | Avanzado</p></article>",
+          compare: "html",
+        },
+        {
+          label: "Respeta mayusculas, acentos y numeros en los datos recibidos",
+          args: [{
+            title: "API REST 101",
+            track: "JavaScript",
+            level: "Intermedio+",
+          }],
+          expected:
+            "<article><h3>API REST 101</h3><p>JavaScript | Intermedio+</p></article>",
+          compare: "html",
+        },
+        {
+          label: "No altera espacios internos del titulo al renderizar la tarjeta",
+          args: [{
+            title: "Estado local   y render",
+            track: "Java",
+            level: "Base",
+          }],
+          expected:
+            "<article><h3>Estado local   y render</h3><p>Java | Base</p></article>",
+          compare: "html",
+        },
+        {
+          label: "Mantiene el track literal aunque no sea uno de los dos habituales",
+          args: [{
+            title: "Diseño de pruebas",
+            track: "Backend",
+            level: "Avanzado",
+          }],
+          expected:
+            "<article><h3>Diseño de pruebas</h3><p>Backend | Avanzado</p></article>",
           compare: "html",
         },
       ],
@@ -1561,6 +1853,118 @@ Object.assign(learningRoot.LEARNING_DATA, {
             visibleTitles: ["Arrays", "DOM"],
           },
         },
+        {
+          label: "Filtra completadas dentro de un track concreto sin tocar los contadores globales",
+          args: [[
+            { title: "Arrays", done: false, track: "javascript" },
+            { title: "Spring", done: true, track: "java" },
+            { title: "Testing", done: true, track: "javascript" },
+            { title: "DTOs", done: false, track: "java" },
+          ], { status: "completed", track: "javascript" }],
+          expected: {
+            total: 4,
+            pending: 2,
+            completed: 2,
+            visibleTitles: ["Testing"],
+          },
+        },
+        {
+          label: "Devuelve lista visible vacia si el track pedido no aparece",
+          args: [[
+            { title: "Arrays", done: false, track: "javascript" },
+            { title: "Testing", done: true, track: "javascript" },
+          ], { status: "all", track: "java" }],
+          expected: {
+            total: 2,
+            pending: 1,
+            completed: 1,
+            visibleTitles: [],
+          },
+        },
+        {
+          label: "Tolera filters sin status y filtra solo por track si existe",
+          args: [[
+            { title: "Arrays", done: false, track: "javascript" },
+            { title: "Spring", done: true, track: "java" },
+            { title: "DOM", done: false, track: "javascript" },
+          ], { track: "javascript" }],
+          expected: {
+            total: 3,
+            pending: 2,
+            completed: 1,
+            visibleTitles: ["Arrays", "DOM"],
+          },
+        },
+        {
+          label: "Mantiene contadores globales aunque status desconocido y track dejen la vista vacía",
+          args: [[
+            { title: "Arrays", done: false, track: "javascript" },
+            { title: "Spring", done: true, track: "java" },
+            { title: "Testing", done: true, track: "javascript" },
+          ], { status: "archived", track: "javascript" }],
+          expected: {
+            total: 3,
+            pending: 1,
+            completed: 2,
+            visibleTitles: [],
+          },
+        },
+        {
+          label: "Tolera filters vacío y devuelve todos los títulos en orden",
+          args: [[
+            { title: "Arrays", done: false, track: "javascript" },
+            { title: "Spring", done: true, track: "java" },
+            { title: "DOM", done: false, track: "javascript" },
+          ], {}],
+          expected: {
+            total: 3,
+            pending: 2,
+            completed: 1,
+            visibleTitles: ["Arrays", "Spring", "DOM"],
+          },
+        },
+        {
+          label: "Mantiene contadores globales si el track es desconocido y deja la vista vacía",
+          args: [[
+            { title: "Arrays", done: false, track: "javascript" },
+            { title: "Spring", done: true, track: "java" },
+            { title: "DTOs", done: false, track: "java" },
+          ], { status: "all", track: "python" }],
+          expected: {
+            total: 3,
+            pending: 2,
+            completed: 1,
+            visibleTitles: [],
+          },
+        },
+        {
+          label: "Filtra pendientes sin track y conserva el orden global completo",
+          args: [[
+            { title: "Arrays", done: false, track: "javascript" },
+            { title: "Spring", done: true, track: "java" },
+            { title: "DTOs", done: false, track: "java" },
+            { title: "DOM", done: false, track: "javascript" },
+          ], { status: "pending" }],
+          expected: {
+            total: 4,
+            pending: 3,
+            completed: 1,
+            visibleTitles: ["Arrays", "DTOs", "DOM"],
+          },
+        },
+        {
+          label: "Tolera filters nulo y devuelve todos los títulos sin romper contadores",
+          args: [[
+            { title: "Arrays", done: false, track: "javascript" },
+            { title: "Spring", done: true, track: "java" },
+          ], null],
+          expected: {
+            total: 2,
+            pending: 1,
+            completed: 1,
+            visibleTitles: ["Arrays", "Spring"],
+          },
+        },
       ],
     }),
     "js-testing": exercise({
@@ -1627,6 +2031,31 @@ Object.assign(learningRoot.LEARNING_DATA, {
           label: "Rechaza numeros aunque parezcan texto util",
           args: [1234],
           expected: false,
+        },
+        {
+          label: "Rechaza arrays aunque contengan texto",
+          args: [["DOM"]],
+          expected: false,
+        },
+        {
+          label: "Rechaza objetos aunque tengan una propiedad title",
+          args: [{ title: "Practicar fetch" }],
+          expected: false,
+        },
+        {
+          label: "Acepta strings con exactamente tres caracteres utiles aunque incluyan salto de linea",
+          args: ["\nabc\n"],
+          expected: true,
+        },
+        {
+          label: "Rechaza strings con menos de tres caracteres utiles aunque tengan tabs y saltos",
+          args: [" \n\tab\t "],
+          expected: false,
+        },
+        {
+          label: "Acepta tres caracteres utiles aunque uno sea espacio interno",
+          args: [" a b "],
+          expected: true,
         },
       ],
     }),
@@ -2135,6 +2564,194 @@ class TaskService {
   },
 
   projectBriefs: {
+    "java-variables": projectBrief(
+      "Construye una ficha de estudiante usando variables bien tipadas y salida clara.",
+      "Fijar la base más temprana de Java con una pieza pequeña pero útil: declarar datos con tipos adecuados, mantener nombres legibles y producir una salida de consola fácil de leer.",
+      [
+        "Declara variables para nombre, edad, nota media, horas de estudio y si el módulo está aprobado.",
+        "Elige tipos coherentes para cada dato: `String`, `int`, `double` y `boolean`.",
+        "Compón una salida final que reúna toda la información sin mezclar tipos al azar.",
+        "Evita nombres genéricos como `x` o `dato` para que la intención se lea de un vistazo.",
+        "Añade al menos un pequeño cálculo o derivado, por ejemplo si supera una meta mínima de estudio.",
+        "Comprueba mentalmente un caso con nota baja o pocas horas para asegurar que la salida sigue siendo legible.",
+      ],
+      [
+        "Variables tipadas",
+        "Nombres con intención",
+        "Salida formateada",
+        "Dato derivado simple",
+        "Caso borde básico",
+      ],
+      `public class StudentProfileApp {
+  public static void main(String[] args) {
+    String studentName = "Ana";
+    int age = 21;
+    double averageGrade = 7.8;
+    int weeklyStudyHours = 9;
+    boolean passedModule = true;
+
+    // TODO: calcular un dato simple y mostrar una ficha legible.
+  }
+}`,
+      [
+        "Comprueba que cada variable representa una sola idea y no mezcla significados.",
+        "Verifica que la salida final se entiende sin tener que mirar el código varias veces.",
+        "Asegúrate de que el cálculo derivado no obliga a convertir tipos sin sentido.",
+        "Revisa que `boolean` y `double` aparezcan con intención real y no solo por meter más tipos.",
+        "Piensa un caso con pocas horas o nota suspensa para confirmar que el formato sigue siendo estable.",
+      ],
+      [
+        "La base de tipos y variables deja de ser teoría aislada y pasa a una ficha de datos con sentido.",
+        "Los nombres elegidos ayudan a leer intención y no solo sintaxis.",
+        "La salida final ya prepara el paso a decisiones, métodos y modelado posterior.",
+        "La pieza cierra mejor el arranque de Java antes de subir a control y arrays.",
+      ],
+    ),
+    "java-methods": projectBrief(
+      "Separa un resumen de estudio en métodos pequeños con parámetros claros.",
+      "Pasar de resolver todo dentro de `main` a dividir una tarea simple en métodos reutilizables con entrada, proceso y retorno bien definidos.",
+      [
+        "Parte de datos simples como nombre de alumno, minutos estudiados y retos completados.",
+        "Crea un método para calcular una métrica útil, por ejemplo puntos o nivel de sesión.",
+        "Crea otro método para construir una salida final legible a partir de esos datos.",
+        "Haz que `main` quede como coordinador y no como sitio donde vive toda la lógica.",
+        "Evita duplicar fórmulas o concatenaciones en varios sitios.",
+        "Prueba mentalmente qué ocurre con minutos a cero o con una sesión muy corta para comprobar el contrato.",
+      ],
+      [
+        "Método de cálculo",
+        "Método de formato o resumen",
+        "main coordinador",
+        "Parámetros claros",
+        "Return coherente",
+      ],
+      `class SessionSummaryApp {
+  static int calculateXp(int minutes, int completedChallenges) {
+    // TODO
+    return 0;
+  }
+
+  static String buildSummary(String name, int minutes, int completedChallenges, int xp) {
+    // TODO
+    return "";
+  }
+
+  public static void main(String[] args) {
+    String name = "Ana";
+    int minutes = 40;
+    int completedChallenges = 2;
+
+    // TODO: coordinar llamadas y mostrar el resumen final.
+  }
+}`,
+      [
+        "Comprueba que cada método tenga una sola responsabilidad visible.",
+        "Verifica que `main` llama a métodos y no rehace por su cuenta la lógica que ya extrajiste.",
+        "Asegúrate de que nombres de parámetros y métodos expliquen intención, no solo tipo.",
+        "Revisa que el valor devuelto por un método se use realmente y no se pierda por el camino.",
+        "Piensa un caso con cero minutos o cero retos para confirmar que el contrato sigue siendo razonable.",
+      ],
+      [
+        "La estructura ya enseña a repartir trabajo fuera de `main`.",
+        "Los métodos reciben datos claros y devuelven resultados reutilizables.",
+        "La pieza prepara bien el paso a validación, control de flujo y colecciones.",
+        "La lectura del código mejora porque cada bloque tiene una intención concreta.",
+      ],
+    ),
+    "java-control": projectBrief(
+      "Construye un evaluador simple de progreso con decisiones y repetición controlada.",
+      "Practicar `if`, `else`, bucles y acumulación básica con una pieza que clasifique sesiones y recorra varios datos sin quedarse en ejemplos artificiales.",
+      [
+        "Parte de una colección pequeña de sesiones o notas de práctica.",
+        "Usa condicionales para clasificar cada entrada, por ejemplo `completa`, `en progreso` o `pendiente`.",
+        "Usa un bucle para recorrer todas las entradas y acumular contadores útiles.",
+        "Calcula al final un pequeño resumen con número de pendientes, completadas o sesiones largas.",
+        "Evita condiciones duplicadas o mal ordenadas que hagan imposible entender por qué cae en cada rama.",
+        "Prueba mentalmente qué ocurre con una lista vacía o con entradas que caen justo en el límite de una condición.",
+      ],
+      [
+        "Condicional principal",
+        "Bucle de recorrido",
+        "Contadores acumulados",
+        "Resumen final",
+        "Casos borde de control",
+      ],
+      `class StudyProgressControl {
+  static String classifySession(int minutes, boolean completed) {
+    // TODO
+    return "";
+  }
+
+  public static void main(String[] args) {
+    int[] sessionMinutes = { 15, 45, 0, 70 };
+    boolean[] completedFlags = { false, true, false, true };
+
+    // TODO: recorrer, clasificar y resumir.
+  }
+}`,
+      [
+        "Comprueba que el orden de las condiciones no tapa ramas que deberían poder ejecutarse.",
+        "Verifica que el bucle recorre exactamente el rango válido y no se sale por índice.",
+        "Asegúrate de que cada contador se actualiza en la rama correcta y no en varias a la vez.",
+        "Piensa el caso de cero sesiones para confirmar que el resumen sigue siendo coherente.",
+        "Revisa que la clasificación de una sesión corta o incompleta tenga una regla visible y defendible.",
+      ],
+      [
+        "La lógica de control deja de ser sintaxis suelta y pasa a resolver un flujo reconocible.",
+        "Las ramas y contadores se leen con intención clara.",
+        "La pieza prepara bien el salto a arrays, recorridos y validación más rica.",
+        "El código obliga a pensar en casos límite antes de crecer en complejidad.",
+      ],
+    ),
+    "java-arrays": projectBrief(
+      "Construye un analizador básico de sesiones usando arrays y recorrido por índice.",
+      "Practicar acceso por posición, recorrido completo y acumulación sobre arrays simples antes de pasar a colecciones más ricas.",
+      [
+        "Parte de arrays paralelos o de un array con valores homogéneos como minutos, notas o XP por sesión.",
+        "Recorre todas las posiciones válidas sin salirte del índice.",
+        "Calcula un resumen útil, por ejemplo total, máximo, promedio o número de sesiones por encima de un umbral.",
+        "Muestra o devuelve también qué posición o valor destaca más si eso ayuda a entender el recorrido.",
+        "Evita lógica duplicada dentro del bucle si el mismo cálculo se puede centralizar.",
+        "Piensa qué ocurre con arrays vacíos, con un solo elemento o con todos los valores iguales.",
+      ],
+      [
+        "Array de entrada",
+        "Recorrido por índice",
+        "Acumulación de métricas",
+        "Detección de máximo o promedio",
+        "Casos borde básicos",
+      ],
+      `class StudyArrayStats {
+  static int findLongestSession(int[] minutes) {
+    // TODO
+    return 0;
+  }
+
+  static double calculateAverage(int[] minutes) {
+    // TODO
+    return 0;
+  }
+
+  public static void main(String[] args) {
+    int[] sessions = { 20, 45, 30, 60 };
+
+    // TODO: recorrer o reutilizar metodos para mostrar un resumen.
+  }
+}`,
+      [
+        "Comprueba que el recorrido usa límites correctos y no intenta leer fuera del array.",
+        "Verifica que el total y el promedio usan el mismo conjunto de datos y no ramas distintas.",
+        "Asegúrate de que el valor máximo o la sesión más larga se inicializa de forma razonable.",
+        "Piensa el caso de array vacío antes de decidir qué devolver o cómo proteger la operación.",
+        "Revisa que el índice solo se usa cuando aporta algo y que la lógica principal sigue siendo legible.",
+      ],
+      [
+        "El array deja de ser solo teoría y pasa a una herramienta para resumir datos reales.",
+        "El recorrido por índice se entiende con intención clara.",
+        "La pieza prepara bien el salto a `ArrayList` y colecciones más expresivas.",
+        "Los casos borde básicos quedan visibles antes de crecer en estructura.",
+      ],
+    ),
     "java-oop": projectBrief(
       "Modela una biblioteca pequeña con objetos reales, catálogo y operaciones básicas de préstamo.",
       "Definir clases con atributos privados y comportamientos claros para dejar atrás soluciones planas con variables sueltas y empezar a pensar en reglas de dominio y coordinación entre objetos.",
@@ -2453,6 +3070,386 @@ class TaskController {
         "El filtrado simple entra por query params y no deforma el diseño de rutas.",
       ],
     ),
+    "js-values": projectBrief(
+      "Construye un resumen básico de sesión a partir de variables y una función pequeña.",
+      "Fijar la base más temprana de JavaScript con una pieza útil: recibir datos simples, guardarlos con nombres claros y devolver una salida legible sin efectos secundarios.",
+      [
+        "Parte de valores simples como nombre, nivel, minutos y XP.",
+        "Declara variables con intención clara y evita nombres genéricos.",
+        "Crea una función que reciba esos datos y devuelva una frase o pequeño resumen legible.",
+        "Haz que la salida sea estable aunque cambien nombre, nivel o minutos.",
+        "Comprueba que la función devuelve un string y no depende de `console.log`.",
+        "Prueba un caso con cero minutos o cero XP para dejar claro el contrato básico.",
+      ],
+      [
+        "Valores de entrada",
+        "Variables con intención",
+        "Función simple",
+        "Salida legible",
+        "Caso borde básico",
+      ],
+      `const studentName = "Ana";
+const currentLevel = "Base";
+const sessionMinutes = 30;
+const earnedXp = 20;
+
+function buildSessionSummary(name, level, minutes, xp) {
+  // TODO: devolver una frase clara con los datos recibidos.
+}
+`,
+      [
+        "Comprueba que cada variable representa una sola idea y que el nombre ayuda a leer la función.",
+        "Verifica que la función devuelve siempre un string y no deja el trabajo a un `console.log` externo.",
+        "Asegúrate de que cambiar un valor de entrada modifica la salida esperada sin romper el formato.",
+        "Prueba un caso con valores cero para confirmar que el contrato sigue siendo legible.",
+        "Revisa que la lógica siga siendo mínima: aquí el objetivo es claridad, no meter todavía estructuras complejas.",
+      ],
+      [
+        "La base de variables y funciones deja de ser abstracta y pasa a una pieza pequeña con sentido.",
+        "Los nombres elegidos ayudan a leer intención y no solo sintaxis.",
+        "La función devuelve un contrato estable y fácil de probar.",
+        "La ruta base queda más cerrada antes de subir a objetos y colecciones.",
+      ],
+    ),
+    "js-state": projectBrief(
+      "Construye un tablero simple de tareas con estado local y render completo.",
+      "Pasar de pintar una lista aislada a mantener una pequeña fuente de verdad en memoria, actualizarla con acciones concretas y repintar toda la vista desde ese estado.",
+      [
+        "Define un objeto `state` con tareas y filtro activo.",
+        "Crea funciones puras o casi puras para añadir tarea, alternar completada y calcular pendientes.",
+        "Haz un `render()` que pinte lista, contador y filtro visible a partir del estado actual.",
+        "Conecta acciones de interfaz para modificar `state` y volver a renderizar.",
+        "Guarda y recupera el estado desde `localStorage` sin dispersar esa lógica por toda la app.",
+        "Comprueba que una recarga mantiene tareas y filtro, y que cada cambio vuelve a pintar toda la vista sin residuos.",
+      ],
+      [
+        "Objeto de estado",
+        "Funciones de actualización",
+        "Render completo de lista y contador",
+        "Persistencia local",
+        "Acciones de interfaz",
+        "Pequeño flujo de recarga",
+      ],
+      `const state = {
+  filter: "all",
+  tasks: [
+    { id: 1, title: "Repasar arrays", done: false },
+    { id: 2, title: "Practicar fetch", done: true },
+  ],
+};
+
+function getVisibleTasks() {
+  // TODO: aplicar filtro sobre state.tasks.
+}
+
+function toggleTask(taskId) {
+  // TODO: actualizar state.tasks sin perder el resto del estado.
+}
+
+function render() {
+  // TODO: pintar lista, contador y filtro activo.
+}
+
+function persistState() {
+  // TODO: guardar en localStorage.
+}`,
+      [
+        "Comprueba que añadir o cambiar una tarea modifica la vista completa y no solo una parte suelta.",
+        "Verifica que el contador de pendientes y la lista visible salen siempre del mismo estado.",
+        "Asegúrate de que el filtro `all / pending / done` no duplica lógica en varios sitios.",
+        "Recarga la app y confirma que `localStorage` devuelve la misma vista que dejaste.",
+        "Comprueba que renderizar dos veces seguidas no deja nodos viejos ni contadores desfasados.",
+      ],
+      [
+        "Toda la interfaz sale de una única fuente de verdad fácil de localizar.",
+        "Actualizar una tarea obliga a tocar estado y render, no a parchear varios nodos manualmente.",
+        "La persistencia queda acotada y no contamina la lógica de filtrado o pintado.",
+        "La pieza ya se parece a una mini app y no solo a una práctica DOM aislada.",
+      ],
+    ),
+    "js-objects": projectBrief(
+      "Construye un selector de tareas pendientes a partir de objetos simples.",
+      "Practicar lectura de propiedades, recorrido de colecciones de objetos y construcción de una salida útil sin mezclar todavía DOM ni asincronía.",
+      [
+        "Parte de un array de tareas con `title`, `completed`, `language` y, si quieres, una prioridad.",
+        "Recorre la colección y quédate solo con las tareas pendientes.",
+        "Extrae de cada tarea la información mínima que te interesa devolver.",
+        "Devuelve una estructura clara, por ejemplo una lista de títulos o un objeto con títulos y contador.",
+        "Mantén nombres de propiedades coherentes y no asumas que todos los objetos tienen exactamente el mismo valor en cada campo.",
+        "Comprueba qué ocurre si el array llega vacío o si todas las tareas están ya completadas.",
+      ],
+      [
+        "Colección de objetos",
+        "Lectura de propiedades",
+        "Selección de pendientes",
+        "Salida final clara",
+        "Casos borde básicos",
+      ],
+      `const tasks = [
+  { title: "Repasar objetos", completed: false, language: "JavaScript" },
+  { title: "Practicar clases", completed: true, language: "Java" },
+  { title: "Preparar fetch", completed: false, language: "JavaScript" },
+];
+
+function buildPendingTasks(items) {
+  // TODO: leer propiedades y devolver solo la informacion util de las tareas pendientes.
+}
+`,
+      [
+        "Comprueba que la salida usa solo las tareas pendientes y no mezcla completadas por error.",
+        "Verifica que leer `item.title` o `item.completed` sea consistente en todos los pasos y no cambies nombres a mitad de función.",
+        "Asegúrate de que la salida final sea fácil de consumir después desde otra función o desde una vista.",
+        "Prueba el caso de array vacío para confirmar que el contrato sigue siendo estable.",
+        "Revisa que no metas todavía render o efectos secundarios: aquí el foco es entender y transformar objetos.",
+      ],
+      [
+        "La lectura de objetos deja de ser teoría y pasa a una pieza de trabajo con intención clara.",
+        "La función final devuelve un contrato pequeño, legible y reutilizable.",
+        "Los casos borde básicos quedan cubiertos antes de subir a filtros más ricos.",
+        "La base queda mejor preparada para arrays, DOM y JSON.",
+      ],
+    ),
+    "js-array-methods": projectBrief(
+      "Construye un resumen de progreso a partir de colecciones y métodos de array.",
+      "Consolidar `map`, `filter` y `reduce` sobre datos cercanos a una app real para que la transformación deje de sentirse como un ejercicio aislado de sintaxis.",
+      [
+        "Parte de un array de sesiones o tareas con campos como `title`, `language`, `minutes` y `done`.",
+        "Usa `filter` para quedarte solo con el subconjunto que vas a analizar.",
+        "Usa `map` si necesitas transformar títulos o preparar una salida más legible.",
+        "Usa `reduce` para obtener un resumen útil como minutos totales, pendientes o sesiones por lenguaje.",
+        "Devuelve un objeto final o una estructura clara que luego pueda consumirse desde una vista.",
+        "Comprueba que los cálculos siguen siendo correctos con arrays vacíos, una sola entrada y datos mezclados.",
+      ],
+      [
+        "Colección de entrada",
+        "Filtro del subconjunto útil",
+        "Transformación intermedia",
+        "Resumen agregado",
+        "Resultado final legible",
+      ],
+      `const sessions = [
+  { title: "Repasar map", language: "JavaScript", minutes: 30, done: true },
+  { title: "Practicar colecciones", language: "Java", minutes: 45, done: false },
+  { title: "Filtrar JSON", language: "JavaScript", minutes: 25, done: false },
+];
+
+function buildStudySummary(items) {
+  // TODO: filtrar, transformar y resumir con metodos de array.
+}
+`,
+      [
+        "Comprueba que el resumen no mezcla el total bruto con el subconjunto filtrado.",
+        "Verifica que `reduce` tenga un acumulador estable incluso si el array llega vacío.",
+        "Asegúrate de que la salida final tiene nombres y forma fáciles de consumir desde otra función.",
+        "Revisa que no estés usando un `for` manual donde el objetivo era practicar `map`, `filter` o `reduce` con intención clara.",
+        "Prueba un caso donde solo haya items de un lenguaje para confirmar que el resumen no asume datos mixtos.",
+      ],
+      [
+        "La transformación de datos ya se parece a una necesidad real de producto y no a un kata suelto.",
+        "Cada método de array tiene una responsabilidad visible y no está usado por inercia.",
+        "La salida final queda lista para render o test sin rehacer cálculos fuera.",
+        "La pieza refuerza bien la base antes de entrar en render, JSON y fetch.",
+      ],
+    ),
+    "js-data-to-dom": projectBrief(
+      "Construye un panel de estudio que transforme datos en tarjetas visibles con filtros claros.",
+      "Practicar la tubería completa `datos -> decisión -> salida` sobre una colección en memoria, separando filtrado, transformación y render para que la interfaz siga siendo legible y re-renderizable.",
+      [
+        "Parte de un array de items con `title`, `language`, `level` y `completed`.",
+        "Crea una función que filtre según un criterio activo como lenguaje o estado.",
+        "Crea una segunda función que transforme cada item visible en una tarjeta HTML consistente.",
+        "Renderiza el conjunto final dentro de un contenedor único y añade un resumen con total visible y pendientes.",
+        "Haz que cambiar el criterio vuelva a pintar toda la vista sin dejar restos del render anterior.",
+        "Evita mezclar el filtro dentro del template para que la lógica y la salida queden separadas.",
+      ],
+      [
+        "Colección de datos",
+        "Filtro activo",
+        "Transformación a tarjeta HTML",
+        "Resumen visible",
+        "Render completo",
+        "Cambio de criterio",
+      ],
+      `const state = {
+  filter: "all",
+  items: [
+    { title: "Repasar reduce", language: "JavaScript", level: "Base", completed: false },
+    { title: "Practicar colecciones", language: "Java", level: "Intermedio", completed: true },
+  ],
+};
+
+function getVisibleItems(items, filter) {
+  // TODO: devolver solo los items visibles segun el filtro activo.
+}
+
+function renderStudyCard(item) {
+  // TODO: devolver HTML consistente para una tarjeta.
+}
+
+function renderStudyPanel() {
+  const summary = document.querySelector("#studySummary");
+  const grid = document.querySelector("#studyGrid");
+
+  // TODO: filtrar, resumir y renderizar.
+}
+`,
+      [
+        "Comprueba que el resumen de pendientes coincide con el subconjunto visible y no con el total bruto.",
+        "Verifica que cambiar de filtro sustituya por completo las tarjetas anteriores.",
+        "Asegúrate de que el orden visible siga el orden del array filtrado y no se reordene sin motivo.",
+        "Comprueba que `renderStudyCard` no tenga dentro decisiones de filtrado que deberían vivir fuera.",
+        "Prueba un filtro sin resultados para confirmar que la vista queda limpia y el resumen sigue siendo coherente.",
+      ],
+      [
+        "La lógica de decisión y la salida HTML quedan separadas con una frontera clara.",
+        "La vista se puede re-renderizar varias veces sin residuos ni contadores desfasados.",
+        "El usuario puede leer tarjetas y resumen como una sola vista coherente.",
+        "La pieza consolida bien el salto desde arrays y filtros hacia interfaces más completas.",
+      ],
+    ),
+    "js-render-lists": projectBrief(
+      "Construye un listado de prácticas visible a partir de datos reales en memoria.",
+      "Pasar de arrays de objetos a una interfaz legible que pinte varias filas, mantenga el orden y sustituya siempre el contenido anterior completo.",
+      [
+        "Define un array de items con `title`, `language`, `level` y, si quieres, una marca de prioridad.",
+        "Crea una función `renderPracticeList(items)` que convierta cada objeto en un `<li>` legible.",
+        "Pinta la lista completa dentro de un contenedor único como `#practiceList`.",
+        "Añade un pequeño resumen superior con cuántos items se están mostrando.",
+        "Prueba una segunda tanda de datos y comprueba que el render sustituye la vista anterior en vez de hacer append.",
+        "Mantén el formato de cada fila estable para que el usuario pueda escanear rápido lenguaje, nivel y título.",
+      ],
+      [
+        "Array de datos",
+        "Función de render por item o por lista",
+        "Contenedor de lista visible",
+        "Resumen de items mostrados",
+        "Segunda tanda de render",
+      ],
+      `const items = [
+  { title: "map y filter", language: "JavaScript", level: "Base" },
+  { title: "Clases y objetos", language: "Java", level: "Intermedio" },
+  { title: "Estado local", language: "JavaScript", level: "Intermedio" },
+];
+
+function renderPracticeList(items) {
+  const list = document.querySelector("#practiceList");
+  const summary = document.querySelector("#practiceSummary");
+
+  // TODO: pintar filas y actualizar resumen.
+}
+`,
+      [
+        "Comprueba que se pinta exactamente un `<li>` por cada item recibido.",
+        "Verifica que el resumen y la lista salgan de la misma tanda de datos.",
+        "Asegúrate de que una segunda llamada no deja elementos anteriores colgados.",
+        "Comprueba que el orden visible coincide con el orden del array de entrada.",
+        "Revisa que el formato de cada fila siga siendo legible aunque cambie el lenguaje o el nivel.",
+      ],
+      [
+        "El render convierte datos en interfaz sin mezclar fetch, estado global ni listeners innecesarios.",
+        "La lista se puede volver a pintar varias veces sin arrastrar residuos.",
+        "El usuario puede escanear título, lenguaje y nivel de un vistazo.",
+        "La pieza ya prepara bien el salto posterior hacia filtros y estado local.",
+      ],
+    ),
+    "js-dom": projectBrief(
+      "Construye un contador de estudio con acciones visibles y DOM controlado.",
+      "Practicar selección de nodos, eventos y actualización coherente de interfaz con una pieza pequeña que cambie estado visible en pantalla.",
+      [
+        "Crea un bloque con contador, botón de sumar, botón de reset y una etiqueta de estado.",
+        "Selecciona todos los nodos necesarios con `querySelector`.",
+        "Conecta listeners para incrementar el contador y reiniciarlo.",
+        "Actualiza también un mensaje visible como `Sin empezar`, `En progreso` o `Reiniciado` según la acción.",
+        "Evita duplicar listeners si vuelves a inicializar la pieza o recargas la práctica.",
+        "Comprueba que la interfaz cambia siempre desde una única función de actualización y no con parches dispersos.",
+      ],
+      [
+        "Estructura HTML simple",
+        "Selección de nodos",
+        "Eventos click",
+        "Actualización de contador",
+        "Mensaje de estado",
+        "Función de actualización visible",
+      ],
+      `const state = {
+  xp: 0,
+  status: "Sin empezar",
+};
+
+function updateView() {
+  const counter = document.querySelector("#xpCounter");
+  const status = document.querySelector("#xpStatus");
+
+  // TODO: pintar state.xp y state.status.
+}
+
+function connectCounter() {
+  const addButton = document.querySelector("#addXp");
+  const resetButton = document.querySelector("#resetXp");
+
+  // TODO: conectar listeners y llamar a updateView().
+}
+`,
+      [
+        "Comprueba que el contador cambia al pulsar y vuelve a cero al reiniciar.",
+        "Verifica que el mensaje de estado también cambia junto al contador.",
+        "Asegúrate de que la vista se puede repintar varias veces sin incoherencias.",
+        "Comprueba que no se dispara el incremento dos veces por un listener duplicado.",
+        "Revisa que todos los cambios visibles salgan de una misma función de actualización.",
+      ],
+      [
+        "La interacción responde al clic con cambios visibles inmediatos y predecibles.",
+        "Los nodos se seleccionan una vez con intención clara y no de forma caótica.",
+        "Contador y mensaje se mantienen sincronizados en cada acción.",
+        "La pieza ya sirve como base para formularios, toggles y paneles más ricos.",
+      ],
+    ),
+    "js-forms": projectBrief(
+      "Construye un formulario de tareas con validación y feedback visible.",
+      "Practicar `submit`, lectura de inputs, validación básica y mensajes de error o confirmación sin recargar la página.",
+      [
+        "Crea un formulario con título, prioridad y botón de guardar.",
+        "Escucha el evento `submit` y usa `preventDefault()`.",
+        "Valida que el título no esté vacío y tenga una longitud mínima razonable.",
+        "Muestra un mensaje visible de error o éxito en pantalla.",
+        "Limpia el formulario solo cuando la validación sea correcta.",
+        "Haz que varios envíos seguidos mantengan un comportamiento estable y no dupliquen listeners.",
+      ],
+      [
+        "Estructura del formulario",
+        "Lectura de campos",
+        "Validación básica",
+        "Feedback visible",
+        "Limpieza del formulario",
+        "Flujo de varios envíos",
+      ],
+      `function connectTaskForm() {
+  const form = document.querySelector("#taskForm");
+  const titleInput = document.querySelector("#taskTitle");
+  const priorityInput = document.querySelector("#taskPriority");
+  const feedback = document.querySelector("#taskFeedback");
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    // TODO: validar, mostrar feedback y limpiar si todo va bien.
+  });
+}
+`,
+      [
+        "Comprueba que un título vacío no limpia el formulario y muestra error.",
+        "Verifica que un título válido sí muestra confirmación y limpia los campos esperados.",
+        "Asegúrate de que el mensaje cambia entre error y éxito sin quedarse congelado.",
+        "Prueba varios submits seguidos para confirmar que no duplicas eventos.",
+        "Revisa que la lógica de validación no dependa de texto hardcodeado repartido por varios sitios.",
+      ],
+      [
+        "El formulario responde al submit sin recargar la página.",
+        "Error y éxito tienen contratos visibles distintos y fáciles de reconocer.",
+        "La limpieza de campos ocurre solo cuando toca.",
+        "La pieza ya sirve como base para entradas más ricas y validaciones posteriores.",
+      ],
+    ),
     "js-components": projectBrief(
       "Extrae una tarjeta de práctica reutilizable a partir de datos.",
       "Tomar un bloque repetido de UI, convertirlo en una función que recibe datos y devuelve HTML consistente.",
@@ -2532,6 +3529,106 @@ function renderJsonViewer() {
         "Resumen y lista visible salen de la misma fuente de datos, no de cálculos duplicados.",
         "Cambiar filtros sustituye la vista anterior completa y no solo hace append.",
         "La recarga actualiza resumen y lista como una sola operación visible.",
+      ],
+    ),
+    "js-json-to-dom": projectBrief(
+      "Construye una vista de destacados a partir de un objeto JSON ya cargado.",
+      "Practicar el paso intermedio entre datos ya disponibles en memoria y una interfaz que filtra, resume y pinta solo la parte útil.",
+      [
+        "Parte de un objeto `data` con una propiedad `items` ya disponible.",
+        "Filtra solo los elementos destacados o los que cumplen una condición clara.",
+        "Genera una lista visible en el DOM con título, lenguaje y nivel.",
+        "Añade un resumen corto con cuántos items destacados se están mostrando.",
+        "Haz que una segunda llamada con otro objeto sustituya completamente la lista anterior.",
+        "Separa en una función el filtrado y en otra el render para no mezclar responsabilidades.",
+      ],
+      [
+        "Objeto JSON ya parseado",
+        "Filtro de items destacados",
+        "Resumen visible",
+        "Lista renderizada",
+        "Segundo render sin residuos",
+      ],
+      `function getFeaturedItems(data) {
+  // TODO: devolver solo los items destacados.
+}
+
+function renderFeaturedItems(data) {
+  const summary = document.querySelector("#featuredSummary");
+  const list = document.querySelector("#featuredList");
+
+  // TODO: filtrar, resumir y pintar en DOM.
+}
+`,
+      [
+        "Comprueba que el número del resumen coincide con los `<li>` pintados.",
+        "Verifica que una segunda carga con menos destacados vacía lo anterior que ya no aplica.",
+        "Asegúrate de que el filtro sale del propio objeto `data` y no de variables sueltas externas.",
+        "Comprueba que el orden visible respeta el orden original de `data.items`.",
+        "Revisa que el render siga siendo legible aunque mezcle Java y JavaScript.",
+      ],
+      [
+        "El filtro de destacados y el render están separados con intención clara.",
+        "La vista se puede volver a pintar con otro objeto sin arrastrar restos.",
+        "Resumen y lista salen del mismo subconjunto de datos.",
+        "La pieza ya prepara bien el salto posterior hacia `fetch` y cargas asíncronas.",
+      ],
+    ),
+    "js-modules": projectBrief(
+      "Separa un visor de prácticas en módulos pequeños y con intención clara.",
+      "Pasar de una sola pieza de código a una estructura mínima con responsabilidades separadas: estado, carga de datos, filtrado y render.",
+      [
+        "Define un módulo de estado con filtros activos y colección cargada.",
+        "Extrae un módulo `catalog-service.js` o similar para cargar y normalizar datos.",
+        "Extrae un módulo de render que reciba datos ya preparados y pinte resumen y lista.",
+        "Crea un punto de entrada pequeño que conecte listeners, carga inicial y re-render.",
+        "Evita que el módulo de render haga `fetch` o que el de datos toque directamente el DOM.",
+        "Comprueba que una recarga o cambio de filtro siga actualizando toda la vista desde una sola fuente de verdad.",
+      ],
+      [
+        "Módulo de estado",
+        "Módulo de carga de datos",
+        "Módulo de filtrado o transformación",
+        "Módulo de render",
+        "Archivo de arranque",
+        "Notas sobre responsabilidades de cada pieza",
+      ],
+      `// state.js
+export const state = {
+  items: [],
+  language: "all",
+  level: "all",
+};
+
+// catalog-service.js
+export async function loadCatalog(fetchItems) {
+  // TODO: cargar y normalizar.
+}
+
+// catalog-render.js
+export function renderCatalog(state) {
+  // TODO: pintar resumen y lista visible.
+}
+
+// main.js
+import { state } from "./state.js";
+import { loadCatalog } from "./catalog-service.js";
+import { renderCatalog } from "./catalog-render.js";
+
+// TODO: conectar carga inicial, filtros y render.
+`,
+      [
+        "Comprueba que cada módulo tenga una sola responsabilidad visible.",
+        "Verifica que cambiar un filtro no obligue a duplicar lógica de transformación en varios archivos.",
+        "Asegúrate de que `main.js` coordina, pero no concentra la lógica real.",
+        "Revisa que el render salga siempre del estado actual y no de variables sueltas dispersas.",
+        "Comprueba que podrías sustituir la fuente de datos sin rehacer el módulo de render.",
+      ],
+      [
+        "Los nombres de archivos explican su responsabilidad sin leer toda la implementación.",
+        "El flujo `cargar -> guardar en estado -> renderizar` se sigue de un vistazo.",
+        "Cambiar el filtro o recargar datos no obliga a tocar varias ramas duplicadas.",
+        "La separación ya prepara el terreno para crecer sin volver al monolito inicial.",
       ],
     ),
     "js-fetch-to-dom": projectBrief(

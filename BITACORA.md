@@ -682,6 +682,269 @@ o sesión futura.
   - si esta semana conviene evitar contenido avanzado
 - Estas reglas también ajustan ligeramente la priorización de lecciones
 
+## Fase 76 — Sidebar orientada por sala
+
+- El lateral ya no depende solo del color para distinguir `Todo`, `Java` y `JavaScript`
+- Se añadió un bloque `Mapa lateral` que cambia según la sala activa
+- En `Todo` orienta sobre cuándo entrar en cada sala
+- En `Java` resume un flujo de backend y diseño con acceso directo a la lección y al banco
+- En `JavaScript` resume un flujo de frontend ejecutable con acceso directo al runner y al banco
+- `README.md` documenta además las superficies principales de uso para que el flujo no quede implícito
+
+## Fase 77 — Cobertura fina en ejercicios avanzados de JavaScript
+
+- Se reforzaron los tests evaluables de `js-modules`
+- Ahora comprueban mejor orden interno por grupo y rutas parecidas que no deben clasificarse por error
+- Se reforzaron también los tests de `js-components`
+- Ahora validan títulos largos y metadatos más variados sin cambiar la estructura HTML esperada
+- Se amplió además `js-project` con más combinaciones de filtros por `status` y `track`
+- El objetivo fue apretar la capa evaluable en tramos intermedios y avanzados sin tocar diseño
+
+## Fase 78 — Casos borde y repaso con fallo específico
+
+- Se ampliaron los tests evaluables de `js-json-fetch` con más combinaciones de `tags`, `stats` y `xp`
+- Se amplió también `js-testing` con casos borde adicionales sobre `trim`, saltos de línea y longitud útil real
+- La app registra ahora fallos de ejercicios por nombre de test, no solo por lección
+- Ese rastro se usa ya en el repaso para indicar qué comprobación se repite más
+- La prioridad de repaso entre lecciones con tests abiertos puede apoyarse ahora también en ese fallo específico recurrente
+
+## Fase 79 — Prioridad diaria con fallo concreto
+
+- `Siguiente sesión` puede usar ya el fallo específico más repetido cuando la deuda dominante es de lógica
+- `Plan de hoy` incorpora también esa pista en tareas de tests y repaso
+- Esto hace que la recomendación no diga solo "cierra tests", sino también qué comprobación conviene atacar primero
+
+## Fase 80 — Señal semanal de calidad de cierre
+
+- La lectura semanal ya distingue también si se está repitiendo un mismo fallo de tests
+- Puede aparecer una `Semana de ajuste` aunque exista continuidad, si el atasco real sigue concentrado en la misma comprobación
+- Las misiones semanales de práctica y repaso muestran ahora también ese fallo recurrente cuando existe
+
+## Fase 81 — Foco recurrente dentro de la lección activa
+
+- El bloque de ejercicio evaluable puede mostrar ya cuál es el test que más se repite en esa lección
+- Esa pista aparece dentro de la lección activa antes de bajar al runner
+- Desde ahí se puede cargar directamente el ejercicio para atacar primero ese caso concreto
+
+## Fase 82 — Feedback del runner con memoria de fallo
+
+- El resumen de resultados del runner puede señalar ya cuál es el atasco dominante cuando vuelven a caer varios tests
+- Los tests fallidos muestran además una pista breve cuando ese mismo caso ya se ha repetido varias veces
+- El objetivo es que el feedback no se limite a esperado/recibido, sino que también oriente por recurrencia real
+
+## Fase 83 — Pistas de corrección según el tipo de fallo
+
+- El mismatch del runner añade ahora una pista breve según el tipo de test que falla
+- Puede orientar hacia filtrado, orden, limpieza de render, estructura devuelta o formato HTML
+- En fallos DOM también puede distinguir entre conteo de nodos y texto/render final
+
+## Fase 84 — Mini proyecto guiado para módulos
+
+- `js-modules` ya tiene mini proyecto guiado propio
+- El foco está en separar estado, carga de datos, transformación, render y archivo de arranque
+- La idea es convertir la lección en un puente real entre utilidades sueltas y arquitectura frontend mantenible
+
+## Fase 85 — Mini proyecto guiado para estado local
+
+- `js-state` ya tiene mini proyecto guiado propio
+- El foco está en mantener una fuente de verdad local, re-renderizar desde estado y persistir con `localStorage`
+- La idea es reforzar el puente entre ejercicios DOM sueltos y una mini app con ciclo completo de estado
+
+## Fase 86 — Mini proyecto guiado para renderizado de listas
+
+- `js-render-lists` ya tiene mini proyecto guiado propio
+- El foco está en convertir arrays de objetos en una lista visible, con resumen y rerender limpio
+- La idea es reforzar el paso entre transformación de datos y primeras interfaces renderizadas
+
+## Fase 87 — Mini proyecto guiado para DOM y eventos
+
+- `js-dom` ya tiene mini proyecto guiado propio
+- El foco está en selección de nodos, listeners y actualización visible coherente
+- La idea es reforzar el paso entre DOM básico y componentes interactivos más ricos
+
+## Fase 88 — Mini proyecto guiado para formularios
+
+- `js-forms` ya tiene mini proyecto guiado propio
+- El foco está en `submit`, validación, feedback visible y limpieza controlada del formulario
+- La idea es reforzar el paso entre interacción básica y captura fiable de datos desde UI
+
+## Fase 89 — Mini proyecto guiado para JSON a interfaz
+
+- `js-json-to-dom` ya tiene mini proyecto guiado propio
+- El foco está en filtrar un objeto JSON ya cargado, resumirlo y pintarlo en DOM
+- La idea es reforzar el puente entre datos en memoria y vistas antes de entrar en `fetch`
+
+## Fase 90 — Mini proyecto guiado para datos a interfaz
+
+- `js-data-to-dom` ya tiene mini proyecto guiado propio
+- El foco está en separar filtro, transformación a tarjeta, resumen y render completo
+- La idea es reforzar la tubería `datos -> decisión -> salida` antes de cerrar el tramo de interfaz
+
+## Fase 91 — Mini proyecto guiado para métodos de array
+
+- `js-array-methods` ya tiene mini proyecto guiado propio
+- El foco está en usar `filter`, `map` y `reduce` sobre datos de progreso con una salida final consumible
+- La idea es reforzar la base de transformación antes de subir a render, JSON y `fetch`
+
+## Fase 92 — Mini proyecto guiado para objetos
+
+- `js-objects` ya tiene mini proyecto guiado propio
+- El foco está en leer propiedades, seleccionar pendientes y devolver una salida pequeña y reutilizable
+- La idea es reforzar la base de estructuras de datos antes de seguir subiendo a filtros y render
+
+## Fase 93 — Mini proyecto guiado para valores y funciones
+
+- `js-values` ya tiene mini proyecto guiado propio
+- El foco está en variables con intención, función simple y salida legible sin efectos secundarios
+- La idea es cerrar la base mínima de JavaScript antes de subir a objetos y transformaciones
+
+## Fase 94 — Mini proyecto guiado para métodos en Java
+
+- `java-methods` ya tiene mini proyecto guiado propio
+- El foco está en separar cálculo, formato y coordinación en métodos con parámetros y retorno claros
+- La idea es reforzar el paso fuera de `main` antes de seguir subiendo a control, arrays y POO
+
+## Fase 95 — Mini proyecto guiado para control de flujo en Java
+
+- `java-control` ya tiene mini proyecto guiado propio
+- El foco está en condicionales, bucles y contadores con un resumen final legible
+- La idea es reforzar decisiones y repetición antes de subir a arrays, colecciones y modelado más rico
+
+## Fase 96 — Mini proyecto guiado para arrays en Java
+
+- `java-arrays` ya tiene mini proyecto guiado propio
+- El foco está en recorrido por índice, acumulación, máximo y promedio sobre datos simples
+- La idea es cerrar el bloque base de Java antes de seguir con colecciones y modelado orientado a objetos
+
+## Fase 97 — Cobertura fina para asincronía evaluable
+
+- Reforzada `js-async` en `scripts/data/practice.js`
+- Añadidos casos para orden de pendientes, `items` vacío y respuestas sin `items`
+- La idea es endurecer una lección intermedia que todavía admitía soluciones superficiales
+
+## Fase 98 — Cobertura fina para estados de interfaz
+
+- Reforzada `js-ui-states` en `scripts/data/practice.js`
+- Añadidos casos para respuestas sin `items`, recuperación tras vacío y limpieza de error antes de un vacío posterior
+- La idea es endurecer la gestión visual de carga, vacío y error más allá del caso feliz
+
+## Fase 99 — Cobertura fina para módulos y prefijos
+
+- Reforzada `js-modules` en `scripts/data/practice.js`
+- Añadidos casos para prefijos exactos, falsos positivos con carpetas previas y mezclas de rutas válidas e inválidas
+- La idea es castigar soluciones frágiles basadas en `includes` o clasificaciones demasiado laxas
+
+## Fase 100 — Cobertura fina para dashboard final
+
+- Reforzada `js-project` en `scripts/data/practice.js`
+- Añadidos casos para `filters` parcial o vacío y para combinaciones donde `status` desconocido deja la vista vacía sin tocar contadores globales
+- La idea es endurecer el contrato del resumen final en escenarios de filtro menos felices
+
+## Fase 101 — Cierre de examen con memoria de fallos
+
+- En `scripts/app/core.js` el resumen del examen ya agrega también patrones recurrentes detectados en tests previos
+- En `scripts/app/render.js` el resultado del examen muestra esos patrones y anota el fallo recurrente principal dentro de cada pregunta fallada cuando existe
+- La idea es que el modo examen no cierre solo con nota, sino también con una pista concreta de qué conviene repasar después
+
+## Fase 102 — Spotlight del banco guiado por fallo recurrente
+
+- En `scripts/app/core.js` el spotlight del banco ya puede priorizar prácticas JavaScript con fallo repetido dominante
+- En `scripts/app/render.js` ese spotlight muestra también el bloqueo principal cuando existe, en vez de recomendar solo por progreso genérico
+- La idea es convertir la señal fina de tests en una recomendación visible y accionable dentro del banco
+
+## Fase 103 — Orden del banco alineado con la señal de fallos
+
+- En `scripts/app/core.js` el banco ya calcula una prioridad reutilizable por práctica con peso de fallo recurrente, impacto y estado
+- En `scripts/app/render.js` el grid usa esa prioridad para ordenar mejor pendientes y también marca con badge las prácticas con fallo repetido
+- La idea es que spotlight y listado principal empujen en la misma dirección, no con criterios distintos
+
+## Fase 104 — Cola de examen priorizada por recaída real
+
+- En `scripts/app/core.js` la selección inicial del modo examen ya ordena primero lecciones con fallo recurrente, luego práctica ya abierta y después impacto técnico
+- En `scripts/app/render.js` la nota de configuración del examen explica que esa priorización ocurre dentro del filtro actual
+- La idea es que el examen no solo respete alcance y nivel, sino también dónde conviene apretar más según la memoria real de fallos
+
+## Fase 105 — Pista visible de arranque para el examen
+
+- En `scripts/app/core.js` el examen ya puede resumir qué lección entraría primero y por qué
+- En `scripts/app/render.js` esa pista aparece en la configuración antes de iniciar el examen
+- La idea es que la priorización del examen deje de ser solo interna y pase a ser visible y auditable
+
+## Fase 106 — Siguiente sesión con pista de entrada
+
+- En `scripts/app/planning.js` la recomendación principal ya devuelve una pista corta de entrada para la lección sugerida
+- En `scripts/app/render.js` la tarjeta `Siguiente sesión` muestra esa pista cuando existe
+- La idea es alinear la explicación de la tarjeta principal con el nivel de detalle que ya tienen banco y examen
+
+## Fase 107 — Plan de hoy con entrada útil por bloque
+
+- En `scripts/app/planning.js` cada paso del `Plan de hoy` ya puede llevar una pista corta de entrada
+- En `scripts/app/render.js` esa pista aparece dentro de cada bloque diario cuando existe
+- La idea es que la cola diaria no solo diga qué hacer, sino también por dónde conviene empezar cada tarea
+
+## Fase 108 — Repaso con pista de reentrada
+
+- En `scripts/app/render.js` cada frente del bloque `Repaso` ya puede mostrar una pista corta de reentrada
+- La prioridad sale primero del fallo dominante cuando existe y, si no, del tipo de frente o del trabajo ya abierto
+- La idea es que el repaso no solo enumere deudas, sino también por dónde conviene volver a entrar en cada una
+
+## Fase 109 — Misiones semanales con entrada útil
+
+- En `scripts/app/planning.js` varias misiones semanales ya incluyen una pista corta de entrada cuando hay una pieza concreta que atacar primero
+- En `scripts/app/render.js` esa pista aparece dentro de la misión como `Entrada útil`
+- La idea es que el resumen semanal no sea solo cuantitativo, sino también accionable cuando una misión está floja
+
+## Fase 110 — Historial con punto de reentrada
+
+- En `scripts/app/render.js` el historial reciente ya muestra una `Reentrada útil ahora` usando la recomendación principal vigente
+- La idea es que, después de leer la semana, el panel también sugiera por dónde conviene volver a entrar sin tener que mirar otro bloque
+
+## Fase 111 — Consolidación interna de la lógica de entrada útil
+
+- En `scripts/app/core.js` la app ya centraliza la detección de trabajo abierto y la pista base de reentrada por lección
+- `planning.js` y `render.js` reutilizan ahora ese helper común en vez de repetir la lógica en varios sitios
+- La idea es reducir duplicación antes de seguir creciendo con más superficies de recomendación
+
+## Fase 112 — Señal común de prioridad para sesión, banco y examen
+
+- En `scripts/app/core.js` la app ya expone una señal común por lección con peso de recaída, estado empezado e impacto técnico
+- `planning.js` la usa ahora para ordenar mejor `Siguiente sesión`, pendientes de tests y lecciones falladas
+- Banco y examen también consumen ya esa misma prioridad, para que las tres superficies empujen con el mismo criterio base
+
+## Fase 113 — Consolidación de textos de priorización diaria
+
+- En `scripts/app/planning.js` varias razones repetidas de tests, base previa, escalada y repaso pasan ahora por helpers comunes
+- La idea es que el “por qué” de la sesión y del plan diario no diverja por tener frases duplicadas repartidas por el módulo
+
+## Fase 114 — Consolidación de textos semanales
+
+- En `scripts/app/planning.js` varias descripciones de misiones semanales pasan ahora por helpers comunes
+- Se han normalizado especialmente retos, práctica abierta y roadmap para que la lectura semanal no mezcle estilos distintos sin necesidad
+
+## Fase 115 — Cobertura fina para componentes evaluables
+
+- Reforzada `js-components` en `scripts/data/practice.js`
+- Añadidos casos para respetar mayúsculas, acentos, números, espacios internos y tracks literales no habituales
+- La idea es castigar soluciones que solo aciertan la estructura HTML feliz pero deforman el contrato textual de entrada
+
+## Fase 116 — Cobertura fina para testing evaluable
+
+- Reforzada `js-testing` en `scripts/data/practice.js`
+- Añadidos casos para arrays, objetos y títulos válidos con espacio interno útil
+- La idea es endurecer el contrato de validación y evitar soluciones que solo cubren strings felices o tipos triviales
+
+## Fase 117 — Mini proyecto guiado para variables en Java
+
+- `java-variables` ya tiene mini proyecto guiado propio
+- El foco está en tipos básicos, nombres con intención, salida legible y un dato derivado simple
+- La idea es cerrar mejor la base de Java antes de seguir subiendo a métodos, control y arrays
+
+## Fase 118 — Cobertura extra para dashboard final
+
+- Reforzada otra vez `js-project` en `scripts/data/practice.js`
+- Añadidos casos para track desconocido, `status` pendiente sin track y `filters` nulo
+- La idea es cerrar mejor el contrato del dashboard ante filtros incompletos o inesperados
+
 ## Estado actual resumido
 
 Hoy la app tiene:
