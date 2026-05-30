@@ -2525,6 +2525,7 @@ class SmsNotifier implements Notificable {
         "Usa HashMap para asociar lenguaje con XP.",
         "Recorre ambas estructuras y muestra un resumen legible.",
         "Decide una convención estable para las claves del mapa antes de insertar y leer.",
+        "Separa claramente qué dato vive en la lista y cuál en el mapa para no terminar duplicando información sin criterio.",
       ],
       "Colecciones",
       "Intermedio",
@@ -2553,18 +2554,21 @@ public class ProgressRegistry {
         "Verifica que cada clave del mapa devuelve el XP correcto.",
         "Cambia el orden de inserción y comprueba que el programa sigue teniendo sentido.",
         "Prueba a pedir XP de un lenguaje ausente y decide si devuelves 0, mensaje o valor por defecto.",
+        "Comprueba que varias tareas del mismo lenguaje no te obligan a duplicar entradas del mapa si ese mapa solo guarda XP acumulado.",
       ],
       "Calcula tambien cuantas tareas pertenecen a cada lenguaje para cruzar una `List` de tareas con el `Map` de XP.",
       [
         "Una lista vacia para comprobar que el resumen no rompe el programa.",
         "Una clave de lenguaje que no exista en el mapa para decidir el valor por defecto.",
         "Dos tareas del mismo lenguaje con nombres parecidos para decidir si el conteo se basa en estructura o en texto libre.",
+        "Una tarea prioritaria sin XP todavía para decidir si el resumen muestra ausencia, 0 o un estado pendiente claro.",
       ],
       [
         "Decide primero que guarda la lista y que guarda el mapa para no mezclar responsabilidades.",
         "Rellena unas pocas tareas y un par de claves de XP antes de imprimir nada.",
         "Recorre cada estructura por separado y solo al final compone el resumen.",
         "Mantén la misma convención de claves (`java`, `javascript`) en escritura y lectura para no fabricar bugs invisibles.",
+        "Si decides priorizar tareas, procura que esa prioridad viva en la tarea o en una vista derivada, no escondida dentro del mapa de XP.",
       ],
     ),
     "java-exceptions": guide(
@@ -3034,7 +3038,7 @@ class Library {
     ),
     "java-collections": projectBrief(
       "Construye una agenda de estudio por consola con mini CRUD en memoria.",
-      "Pasar de variables sueltas a una agenda que permita crear, listar, completar y priorizar tareas de estudio sin rehacer el programa cada vez que crece.",
+      "Pasar de variables sueltas a una agenda que permita crear, listar, completar y priorizar tareas de estudio sin rehacer el programa cada vez que crece, fijando además contratos claros entre la lista principal, el mapa de apoyo y el resumen final.",
       [
         "Usa `ArrayList` para guardar tareas en memoria.",
         "Usa `HashMap` para asociar lenguaje con XP acumulado o con otro dato útil del dominio.",
@@ -3042,6 +3046,7 @@ class Library {
         "Separa pendientes y completadas en el resumen final.",
         "Muestra un resumen final recorriendo las estructuras.",
         "Decide qué valor por defecto devuelve el mapa cuando un lenguaje aún no tiene XP registrado.",
+        "Evita que la prioridad o el estado real de una tarea dependan de texto libre si ya puedes modelarlo como dato explícito.",
       ],
       [
         "Lista principal de tareas",
@@ -3049,6 +3054,7 @@ class Library {
         "Operaciones CRUD básicas",
         "Resumen por consola",
         "Vista de pendientes priorizadas",
+        "Contrato de datos estable",
       ],
       `import java.util.ArrayList;
 import java.util.HashMap;
@@ -3082,6 +3088,7 @@ xpByTrack.put("javascript", 160);
         "Añade un tercer dato y confirma que el resumen sigue saliendo legible.",
         "Verifica que las tareas más urgentes aparecen antes en la vista principal si decides priorizarlas.",
         "Prueba una tarea de un lenguaje sin XP cargado todavía y decide cómo aparece en el resumen.",
+        "Prueba dos tareas del mismo lenguaje con estados distintos para confirmar que el resumen no mezcla pendiente, prioridad y XP como si fueran el mismo dato.",
       ],
       [
         "La salida final resume pendientes, completadas y XP sin depender de variables sueltas repetidas.",
@@ -3089,6 +3096,7 @@ xpByTrack.put("javascript", 160);
         "Lista y mapa tienen responsabilidades distintas y eso se nota en el código.",
         "La agenda ya parece una herramienta de estudio y no solo una demo de colecciones.",
         "La ausencia de una clave en el mapa ya no rompe el flujo: también forma parte del contrato del programa.",
+        "La pieza ya obliga a pensar en modelo de datos y no solo en usar `ArrayList` y `HashMap` porque toca.",
       ],
     ),
     "java-inheritance": projectBrief(

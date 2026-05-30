@@ -1029,6 +1029,12 @@ o sesión futura.
 - Se añadió un panel lateral para cambiar de frente y saltar directamente a la superficie principal de cada uno
 - `Continuar ruta` ya no empuja siempre al mismo sitio: ahora respeta el frente activo para preparar mejor el rediseño posterior sin tocar aún la estructura visual grande
 
+## Fase 134 — Más densidad para colecciones en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-collections` en `scripts/data/practice.js`
+- Añadido más foco en responsabilidades separadas entre `List` y `Map`, claves consistentes, prioridad explícita y resumen estable al crecer
+- La idea es que colecciones deje de sentirse como demo de estructuras y pase a empujar ya decisiones básicas de modelado
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`
