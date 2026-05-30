@@ -2277,16 +2277,19 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Crea un libro corto y otro largo y compara el resultado de `esLargo()`.",
         "Comprueba que el constructor deja el objeto listo sin pasos extra.",
         "Verifica que la lógica depende del estado del libro y no de datos externos.",
+        "Prueba el borde exacto de 400 páginas para fijar la regla con precisión.",
       ],
       "Anade un metodo `resumen()` que devuelva una cadena legible con los datos del libro sin imprimir directamente en la clase.",
       [
         "Un libro de exactamente 400 paginas para fijar bien el borde de la regla.",
         "Titulos o autores con espacios para comprobar que el constructor conserva bien el texto.",
+        "Un valor 0 o negativo en paginas para decidir si ese caso forma parte del contrato o queda fuera por ahora.",
       ],
       [
         "Decide primero que estado minimo debe guardar un libro para ser util.",
         "Haz que el constructor deje esos datos listos en los atributos privados.",
         "El metodo `esLargo()` solo necesita mirar `pages` y devolver un boolean.",
+        "Si detectas un caso raro como paginas negativas, decide si lo modelas ya o si lo dejas explícitamente fuera del alcance.",
       ],
     ),
     "java-inheritance": guide(
@@ -2774,6 +2777,7 @@ class TaskService {
         "Crea una clase `Library` o un bloque coordinador mínimo para guardar varios libros.",
         "Añade una búsqueda simple por título o autor antes de prestar.",
         "Instancia varios libros y muestra una secuencia de préstamo y devolución desde `main`.",
+        "Decide qué devuelve la biblioteca cuando no encuentra un libro y cómo comunicas ese caso sin romper el flujo.",
       ],
       [
         "Clase `Book`",
@@ -2826,6 +2830,7 @@ class Library {
         "Busca un libro por título antes de prestar para no depender de variables sueltas en `main`.",
         "Verifica que el catálogo se siga entendiendo al añadir dos o tres libros.",
         "Desde `main`, imprime el estado antes y después de cada operación.",
+        "Prueba una búsqueda de título inexistente para fijar el contrato de no encontrado.",
       ],
       [
         "El libro cambia de disponible a prestado y vuelve a disponible sin estados ambiguos.",
@@ -2833,6 +2838,7 @@ class Library {
         "La biblioteca coordina búsqueda y catálogo sin que `main` tenga que conocer cada detalle.",
         "La biblioteca puede listar varios libros sin duplicar lógica de impresión por cada uno.",
         "La demo final enseña una secuencia completa, no solo una impresión aislada.",
+        "El caso de libro no encontrado ya forma parte del contrato del coordinador, no queda implícito.",
       ],
     ),
     "java-collections": projectBrief(

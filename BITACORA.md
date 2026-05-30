@@ -963,6 +963,12 @@ o sesión futura.
 - Añadido más foco en normalización de títulos, duplicados, conflicto y contrato de query params
 - La idea es que Spring no se quede en estructura de capas y empiece a tocar decisiones de contrato HTTP y reglas de dominio
 
+## Fase 123 — Más densidad para POO en Java
+
+- Reforzada la guía y el mini proyecto de `java-oop` en `scripts/data/practice.js`
+- Añadido más foco en borde exacto de reglas, páginas inválidas y contrato de libro no encontrado en la biblioteca
+- La idea es que POO no se quede en ejemplo de clase mínima y empiece a fijar mejor invariantes y coordinación entre objetos
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`
