@@ -548,9 +548,14 @@ function renderReviewBox() {
 
 function renderWeeklyMissions() {
   const missions = buildWeeklyMissions();
+  const missionsEyebrow = state.workMode === "practice"
+    ? "Misiones de práctica"
+    : state.workMode === "exam"
+      ? "Misiones de comprobación"
+      : "Misiones semanales";
 
   elements.weeklyMissions.innerHTML = `
-    <p class="eyebrow">Misiones semanales</p>
+    <p class="eyebrow">${escapeHtml(missionsEyebrow)}</p>
     <h3>${missions.filter((mission) => mission.tone === "done").length}/${missions.length} en buen estado</h3>
     ${missions
       .map(
