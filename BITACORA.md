@@ -1097,6 +1097,16 @@ o sesión futura.
 - El spotlight del banco ya adapta su rotulación y su lectura base cuando `workMode` está en `practice`
 - La idea es que el frente de práctica se note también dentro del propio banco y no solo en navegación y llamadas a la acción
 
+## Fase 146 — Estudio alineado con el frente activo
+
+- La lección activa ya adapta su eyebrow cuando `workMode` está en `study`
+- La idea es cerrar la coherencia básica entre estudio, práctica y examen sin esperar todavía al rediseño visual completo
+
+## Fase 147 — Repaso alineado con el frente activo
+
+- El bloque de `Repaso` ya adapta su eyebrow y su mensaje vacío según `study`, `practice` o `exam`
+- La idea es que también la lectura de deuda pendiente hable el mismo idioma que el frente activo y no quede como bloque neutro
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`

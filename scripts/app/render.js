@@ -442,6 +442,8 @@ function getWorkModeCopy() {
       nextEmpty: "Hoy conviene cerrar práctica o repasar runner, no abrir teoría nueva porque sí.",
       dailyEyebrow: "Plan de práctica",
       dailyEmpty: "Hoy no hay bloqueos críticos. Puedes cerrar práctica abierta o repetir una pieza corta.",
+      reviewEyebrow: "Repaso de práctica",
+      reviewEmpty: "No hay bloqueos abiertos en práctica. Puedes cerrar una pieza nueva o repetir una ya validada.",
       jumpLabel: "Ir al banco",
       jumpTarget: "practice-bank",
     };
@@ -453,6 +455,8 @@ function getWorkModeCopy() {
       nextEmpty: "Ahora mismo puedes repetir examen corto o revisar fallos recientes para medir cierre real.",
       dailyEyebrow: "Plan de examen",
       dailyEmpty: "Hoy no hay bloqueos críticos. Puedes montar un examen corto o repasar recaídas.",
+      reviewEyebrow: "Repaso de examen",
+      reviewEmpty: "No hay recaídas abiertas ahora mismo. Puedes lanzar un examen corto o revisar una superficie fuerte.",
       jumpLabel: "Abrir examen",
       jumpTarget: "challenge",
     };
@@ -463,6 +467,8 @@ function getWorkModeCopy() {
     nextEmpty: "Repite retos fallados o empieza un proyecto propio.",
     dailyEyebrow: "Plan de hoy",
     dailyEmpty: "Hoy no hay bloqueos críticos. Puedes avanzar por la ruta o repetir práctica.",
+    reviewEyebrow: "Repaso",
+    reviewEmpty: "No hay retos fallados, tests abiertos ni atascos fuertes ahora mismo.",
     jumpLabel: "Ver catálogo",
     jumpTarget: "dashboard",
   };
@@ -503,11 +509,12 @@ function renderNextSession() {
 
 function renderReviewBox() {
   const pending = getPendingReviewEntries(state.activeTrack);
+  const workModeCopy = getWorkModeCopy();
   if (!pending.length) {
     elements.reviewBox.innerHTML = `
-      <p class="eyebrow">Repaso</p>
+      <p class="eyebrow">${escapeHtml(workModeCopy.reviewEyebrow)}</p>
       <h3>Sin errores pendientes</h3>
-      <p>No hay retos fallados, tests abiertos ni atascos fuertes en ${tracks[state.activeTrack].label}.</p>
+      <p>${escapeHtml(workModeCopy.reviewEmpty)}</p>
     `;
     return;
   }
@@ -517,7 +524,7 @@ function renderReviewBox() {
   const struggleCount = pending.filter((entry) => entry.reasons.includes("Atasco")).length;
 
   elements.reviewBox.innerHTML = `
-    <p class="eyebrow">Repaso pendiente</p>
+    <p class="eyebrow">${escapeHtml(workModeCopy.reviewEyebrow)}</p>
     <h3>${pending.length} ${pending.length === 1 ? "frente" : "frentes"} por revisar</h3>
     <p>Retos ${challengeCount} · Tests ${testCount} · Atascos ${struggleCount}</p>
     ${pending
@@ -861,6 +868,11 @@ function renderStudyPanel() {
   const isCompleted = state.completed.includes(lesson.id);
   const isExerciseSolved = state.solvedExercises.includes(lesson.id);
   const hasDomExercise = exercise?.mode === "dom";
+  if (elements.studyEyebrow) {
+    elements.studyEyebrow.textContent = state.workMode === "study"
+      ? "Frente principal de estudio"
+      : "Estás aprendiendo ahora";
+  }
 
   elements.studyLevel.textContent = `${tracks[getTrackIdByLesson(lesson.id)].label} · ${lesson.level}`;
   elements.studyLevel.className = `eyebrow language-mark language-mark--${getTrackIdByLesson(lesson.id)}`;

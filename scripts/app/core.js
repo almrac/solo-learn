@@ -173,6 +173,7 @@ const elements = {
   lessonGrid: document.querySelector("#lessonGrid"),
   planGrid: document.querySelector("#planGrid"),
   studyLevel: document.querySelector("#studyLevel"),
+  studyEyebrow: document.querySelector("#studyEyebrow"),
   studyTitle: document.querySelector("#studyTitle"),
   studyTheory: document.querySelector("#studyTheory"),
   studySupport: document.querySelector("#studySupport"),
