@@ -113,6 +113,7 @@ const defaultState = {
   },
   challengeSuccessLog: [],
   exerciseSuccessLog: [],
+  exerciseFailureLog: {},
   streak: 0,
   xp: 0,
   examMode: {
@@ -154,6 +155,7 @@ const elements = {
   historyPanel: document.querySelector("#historyPanel"),
   reviewBox: document.querySelector("#reviewBox"),
   activeTrack: document.querySelector("#activeTrack"),
+  roomGuide: document.querySelector("#roomGuide"),
   studyModeSummary: document.querySelector("#studyModeSummary"),
   focusModeButton: document.querySelector("#focusModeButton"),
   tabs: document.querySelectorAll(".language-tabs__button"),
@@ -180,6 +182,7 @@ const elements = {
   studyPractice: document.querySelector("#studyPractice"),
   studyExercise: document.querySelector("#studyExercise"),
   studyExercisePrompt: document.querySelector("#studyExercisePrompt"),
+  studyExerciseFocus: document.querySelector("#studyExerciseFocus"),
   studyExerciseChecklist: document.querySelector("#studyExerciseChecklist"),
   studyExerciseStatus: document.querySelector("#studyExerciseStatus"),
   studyGuidedProblem: document.querySelector("#studyGuidedProblem"),
@@ -331,12 +334,97 @@ function buildExamLessonIds() {
   const selectedArea = examAreaScope === "current" ? state.learningAreaFilter : examAreaScope;
   const selectedLevel = examLevelScope === "current" ? state.filter : examLevelScope;
 
-  return sortVisibleLessons(allLessons().filter((lesson) => {
-    const trackMatch = selectedTrack === "all" || getTrackIdByLesson(lesson.id) === selectedTrack;
-    const areaMatch = matchesLearningAreaFilter(lesson.id, selectedArea);
-    const levelMatch = selectedLevel === "all" || lesson.level === selectedLevel;
-    return trackMatch && areaMatch && levelMatch;
-  })).map((lesson) => lesson.id);
+  return allLessons()
+    .filter((lesson) => {
+      const trackMatch = selectedTrack === "all" || getTrackIdByLesson(lesson.id) === selectedTrack;
+      const areaMatch = matchesLearningAreaFilter(lesson.id, selectedArea);
+      const levelMatch = selectedLevel === "all" || lesson.level === selectedLevel;
+      return trackMatch && areaMatch && levelMatch;
+    })
+    .sort((left, right) => {
+      const leftSignal = getLessonPrioritySignal(left);
+      const rightSignal = getLessonPrioritySignal(right);
+      return rightSignal.failureWeight - leftSignal.failureWeight ||
+        rightSignal.isStarted - leftSignal.isStarted ||
+        rightSignal.impactScore - leftSignal.impactScore ||
+        left.xp - right.xp;
+    })
+    .map((lesson) => lesson.id);
+}
+
+function isLessonStarted(lessonId) {
+  return state.readLessons.includes(lessonId) ||
+    state.practiceDone.includes(lessonId) ||
+    state.solvedExercises.includes(lessonId);
+}
+
+function getLessonPrioritySignal(lessonId, options = {}) {
+  const lesson = typeof lessonId === "string" ? findLesson(lessonId) : lessonId;
+  if (!lesson?.id) {
+    return {
+      lesson: null,
+      failureWeight: 0,
+      isStarted: 0,
+      impactScore: 0,
+      leadHint: "",
+      primaryReason: "",
+    };
+  }
+
+  const failureSummary = getExerciseFailureSummary(lesson.id);
+  const recommendation = scoreLessonRecommendation(lesson);
+  const failureWeight = failureSummary?.topWeightedCount ?? 0;
+  const started = Number(isLessonStarted(lesson.id));
+
+  return {
+    lesson,
+    failureWeight,
+    isStarted: started,
+    impactScore: recommendation?.score ?? 0,
+    leadHint: getLessonLeadHint(lesson, options.hintOptions ?? {}),
+    primaryReason: failureSummary?.topLabel
+      ? `recaida:${failureSummary.topLabel}`
+      : started
+        ? "started"
+        : "impact",
+  };
+}
+
+function getLessonLeadHint(lessonId, options = {}) {
+  const lesson = typeof lessonId === "string" ? findLesson(lessonId) : lessonId;
+  if (!lesson?.id) return "";
+
+  const failureSummary = getExerciseFailureSummary(lesson.id);
+  if (failureSummary?.topLabel) {
+    return options.failurePrefix
+      ? `${options.failurePrefix} "${failureSummary.topLabel}".`
+      : `Entra por "${failureSummary.topLabel}".`;
+  }
+
+  if (typeof options.fallbackWhenNoFailure === "function") {
+    const fallback = options.fallbackWhenNoFailure(lesson);
+    if (fallback) return fallback;
+  }
+
+  if (isLessonStarted(lesson.id)) {
+    return options.startedText ?? "Ya tiene trabajo abierto.";
+  }
+
+  return options.defaultText ?? "Empuja una pieza con impacto técnico real.";
+}
+
+function getExamLeadHint() {
+  const firstLessonId = buildExamLessonIds()[0];
+  if (!firstLessonId) return "";
+
+  const lesson = findLesson(firstLessonId);
+  if (!lesson) return "";
+
+  return getLessonLeadHint(lesson, {
+    failurePrefix: `Entraría primero ${lesson.title} por recaída en`,
+    startedText: `Entraría primero ${lesson.title} porque ya tiene trabajo abierto dentro del alcance actual.`,
+    defaultText: `Entraría primero ${lesson.title} por impacto técnico dentro del filtro actual.`,
+  });
 }
 
 function allLessons() {
@@ -439,6 +527,7 @@ function getExamReviewSummary() {
 
   const byTrack = new Map();
   const byLevel = new Map();
+  const byRecurringFailure = new Map();
 
   wrongLessonIds.forEach((lessonId) => {
     const lesson = findLesson(lessonId);
@@ -447,6 +536,14 @@ function getExamReviewSummary() {
 
     byTrack.set(trackId, (byTrack.get(trackId) ?? 0) + 1);
     byLevel.set(lesson.level, (byLevel.get(lesson.level) ?? 0) + 1);
+
+    const failureSummary = getExerciseFailureSummary(lessonId);
+    if (failureSummary?.topLabel) {
+      byRecurringFailure.set(
+        failureSummary.topLabel,
+        (byRecurringFailure.get(failureSummary.topLabel) ?? 0) + Math.max(1, failureSummary.topWeightedCount ?? 1),
+      );
+    }
   });
 
   return {
@@ -459,6 +556,13 @@ function getExamReviewSummary() {
       label: level,
       count,
     })),
+    recurringFailures: [...byRecurringFailure.entries()]
+      .map(([label, count]) => ({
+        label,
+        count,
+      }))
+      .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label))
+      .slice(0, 3),
   };
 }
 
@@ -728,7 +832,7 @@ function getLessonStruggleWeight(lessonId) {
 function getPendingReviewEntries(trackId) {
   const grouped = new Map();
 
-  const register = (lessonId, reason, priority) => {
+  const register = (lessonId, reason, priority, detail = "", detailWeight = 0) => {
     const lesson = findLesson(lessonId);
     if (!lesson || getTrackIdByLesson(lessonId) !== trackId) return;
 
@@ -736,10 +840,16 @@ function getPendingReviewEntries(trackId) {
       lesson,
       reasons: [],
       priority: 0,
+      detail: "",
+      detailWeight: 0,
     };
 
     current.reasons.push(reason);
     current.priority = Math.max(current.priority, priority);
+    if (detail && detailWeight >= current.detailWeight) {
+      current.detail = detail;
+      current.detailWeight = detailWeight;
+    }
     grouped.set(lessonId, current);
   };
 
@@ -750,7 +860,13 @@ function getPendingReviewEntries(trackId) {
   tracks[trackId].lessons
     .filter((lesson) => exercises[lesson.id] && !state.solvedExercises.includes(lesson.id))
     .filter((lesson) => state.readLessons.includes(lesson.id) || state.practiceDone.includes(lesson.id))
-    .forEach((lesson) => register(lesson.id, "Tests", 2));
+    .forEach((lesson) => {
+      const failureSummary = getExerciseFailureSummary(lesson.id);
+      const detail = failureSummary?.topLabel
+        ? `Fallo repetido: ${failureSummary.topLabel}`
+        : "";
+      register(lesson.id, "Tests", 2, detail, failureSummary?.topWeightedCount ?? 0);
+    });
 
   tracks[trackId].lessons
     .filter((lesson) => !state.completed.includes(lesson.id))
@@ -764,6 +880,7 @@ function getPendingReviewEntries(trackId) {
     }))
     .sort((left, right) =>
       right.priority - left.priority ||
+      right.detailWeight - left.detailWeight ||
       getLessonStruggleWeight(right.lesson.id) - getLessonStruggleWeight(left.lesson.id) ||
       scoreLessonRecommendation(right.lesson).score - scoreLessonRecommendation(left.lesson).score,
     );
@@ -838,10 +955,16 @@ function persist() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-function renderExerciseResults(results, solved) {
+function renderExerciseResults(results, solved, lessonId = "", source = "tests") {
   elements.exerciseResultsPanel.hidden = false;
+  const failureSummary = lessonId && !solved
+    ? getExerciseFailureSummary(lessonId, source)
+    : null;
+
   elements.exerciseSummary.textContent = solved
     ? "Todos los tests superados"
+    : failureSummary?.topLabel
+      ? `${results.filter((result) => result.passed).length}/${results.length} tests correctos · atasco dominante: ${failureSummary.topLabel}`
     : results.length
       ? `${results.filter((result) => result.passed).length}/${results.length} tests correctos`
       : "Sin evaluar";
@@ -852,12 +975,33 @@ function renderExerciseResults(results, solved) {
             <li class="runner__exercise-item ${result.passed ? "is-passed" : "is-failed"}">
               <strong>${escapeHtml(result.label)}</strong>
               <span>${result.passed ? "Correcto" : "Revisar"}</span>
-              ${result.passed ? "" : formatExerciseMismatch(result.expected, result.received)}
+              ${result.passed ? "" : `${formatExerciseMismatch(result.expected, result.received, result.label, source)}${formatExerciseFailureHint(lessonId, source, result.label)}`}
             </li>
           `,
         )
         .join("")
     : `<li class="runner__exercise-item is-failed"><strong>Sin resultado</strong><span>No se pudo validar.</span></li>`;
+}
+
+function formatExerciseFailureHint(lessonId, source, label) {
+  if (!lessonId || !label) return "";
+
+  const failureSummary = getExerciseFailureSummary(lessonId, source);
+  const failureEntry = state.exerciseFailureLog?.[lessonId]?.tests?.[label];
+  const count = sanitizeStruggleCount(failureEntry?.count);
+  const isDominant = failureSummary?.topLabel === label;
+
+  if (!count) return "";
+
+  if (isDominant && count >= 2) {
+    return `<p>Este es el fallo que más se repite ahora mismo en esta lección.</p>`;
+  }
+
+  if (count >= 2) {
+    return `<p>Este caso ya ha fallado varias veces; conviene cerrarlo antes de pasar al siguiente.</p>`;
+  }
+
+  return "";
 }
 
 function setStorageStatus(message) {
@@ -1027,6 +1171,7 @@ function normalizeState(value) {
     trackSessionLog: cleanTrackSessionLog(value?.trackSessionLog),
     challengeSuccessLog: cleanChallengeSuccessLog(value?.challengeSuccessLog, lessonIds),
     exerciseSuccessLog: cleanChallengeSuccessLog(value?.exerciseSuccessLog, lessonIds),
+    exerciseFailureLog: cleanExerciseFailureLog(value?.exerciseFailureLog, lessonIds),
     streak: Number.isFinite(value?.streak) ? Math.max(0, value.streak) : 0,
     xp: Number.isFinite(value?.xp) ? Math.max(0, value.xp) : 0,
     examMode: {
@@ -1116,6 +1261,51 @@ function cleanChallengeSuccessLog(value, validIds) {
       return validIds.includes(lessonId);
     })
     .slice(0, 30);
+}
+
+function cleanExerciseFailureLog(value, validIds) {
+  if (!value || typeof value !== "object") return {};
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([lessonId, entry]) => validIds.includes(lessonId) && entry && typeof entry === "object")
+      .map(([lessonId, entry]) => {
+        const tests = Object.fromEntries(
+          Object.entries(entry.tests ?? {})
+            .filter(([label, item]) => typeof label === "string" && item && typeof item === "object")
+            .map(([label, item]) => [
+              label,
+              {
+                count: sanitizeStruggleCount(item.count),
+                source: typeof item.source === "string" ? item.source : "tests",
+                lastAt: typeof item.lastAt === "string" ? item.lastAt : "",
+              },
+            ])
+            .filter(([, item]) => item.count > 0),
+        );
+
+        const events = Array.isArray(entry.events)
+          ? entry.events
+              .filter((event) =>
+                event &&
+                typeof event === "object" &&
+                typeof event.label === "string" &&
+                typeof event.source === "string" &&
+                typeof event.at === "string" &&
+                Number.isFinite(Date.parse(event.at)),
+              )
+              .map((event) => ({
+                label: event.label,
+                source: event.source,
+                at: event.at,
+              }))
+              .slice(-40)
+          : [];
+
+        return [lessonId, { tests, events }];
+      })
+      .filter(([, entry]) => Object.keys(entry.tests).length || entry.events.length),
+  );
 }
 
 function sanitizeStruggleCount(value) {
@@ -1239,8 +1429,53 @@ function createDefaultState() {
     },
     challengeSuccessLog: [],
     exerciseSuccessLog: [],
+    exerciseFailureLog: {},
     streak: 0,
+    xp: 0,
   };
+}
+
+function recordExerciseFailures(lessonId, failedResults, source = "tests") {
+  if (!lessonId || !Array.isArray(failedResults) || !failedResults.length) return;
+
+  const current = state.exerciseFailureLog[lessonId] ?? {
+    tests: {},
+    events: [],
+  };
+  const now = new Date().toISOString();
+  const nextTests = { ...(current.tests ?? {}) };
+  const nextEvents = [...(current.events ?? [])];
+
+  failedResults.forEach((result) => {
+    if (!result?.label) return;
+
+    const currentEntry = nextTests[result.label] ?? {
+      count: 0,
+      source,
+      lastAt: "",
+    };
+
+    nextTests[result.label] = {
+      count: sanitizeStruggleCount(currentEntry.count) + 1,
+      source,
+      lastAt: now,
+    };
+    nextEvents.push({
+      label: result.label,
+      source,
+      at: now,
+    });
+  });
+
+  state.exerciseFailureLog[lessonId] = {
+    tests: nextTests,
+    events: nextEvents.slice(-40),
+  };
+}
+
+function clearExerciseFailureLog(lessonId) {
+  if (!lessonId || !state.exerciseFailureLog[lessonId]) return;
+  delete state.exerciseFailureLog[lessonId];
 }
 
 function getPracticeBankEntries(trackId) {
@@ -1371,6 +1606,42 @@ function getPriorityPracticeTopic(entries) {
   return getPracticeTopicStats(entries).find((item) => item.isPriority) ?? null;
 }
 
+function getPracticeFailureSignal(entry) {
+  if (!entry || entry.trackId !== "javascript" || entry.isDone) return null;
+
+  const failureSummary = getExerciseFailureSummary(entry.lessonId);
+  if (!failureSummary?.topLabel) return null;
+
+  return {
+    label: failureSummary.topLabel,
+    weight: failureSummary.topWeightedCount ?? 0,
+  };
+}
+
+function getPracticeSpotlightEntry(entries) {
+  const actionableEntries = entries.filter((entry) => !entry.isDone);
+  if (!actionableEntries.length) return entries[0] ?? null;
+
+  return [...actionableEntries].sort((left, right) => {
+    const leftPriority = getPracticeEntryPriority(left);
+    const rightPriority = getPracticeEntryPriority(right);
+    return rightPriority.failureWeight - leftPriority.failureWeight ||
+      rightPriority.isStarted - leftPriority.isStarted ||
+      rightPriority.impactScore - leftPriority.impactScore ||
+      left.title.localeCompare(right.title);
+  })[0] ?? null;
+}
+
+function getPracticeEntryPriority(entry) {
+  const signal = getLessonPrioritySignal(entry?.lessonId);
+  return {
+    failureWeight: signal.failureWeight,
+    impactScore: signal.impactScore,
+    isStarted: signal.isStarted,
+    isDone: Number(Boolean(entry?.isDone)),
+  };
+}
+
 function getPracticeProgressState(lessonId, trackId) {
   if (trackId === "javascript") {
     if (state.solvedExercises.includes(lessonId)) {
@@ -1403,6 +1674,11 @@ function isLessonCovered(lessonId) {
 }
 
 function getPracticeSpotlightReason(entry) {
+  const failureSignal = getPracticeFailureSignal(entry);
+  if (failureSignal) {
+    return `Ahora mismo esta práctica concentra un fallo repetido: "${failureSignal.label}". Cerrarla tiene más retorno que abrir una pieza nueva.`;
+  }
+
   if (entry.hasEvolution && !entry.evolutionBaseCovered) {
     return `Escala un ejercicio anterior, pero todavía te conviene cubrir antes la base: ${entry.evolutionSourceTitle}.`;
   }

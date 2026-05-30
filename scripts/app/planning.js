@@ -7,10 +7,45 @@ function recommendNextLesson() {
   if (!pendingLessons.length) return null;
 
   const ranked = pendingLessons
-    .map((lesson) => scoreLessonRecommendation(lesson))
-    .sort((left, right) => right.score - left.score || left.lesson.xp - right.lesson.xp);
+    .map((lesson) => ({
+      recommendation: scoreLessonRecommendation(lesson),
+      signal: getLessonPrioritySignal(lesson),
+    }))
+    .sort((left, right) =>
+      right.signal.failureWeight - left.signal.failureWeight ||
+      right.signal.isStarted - left.signal.isStarted ||
+      right.signal.impactScore - left.signal.impactScore ||
+      left.recommendation.lesson.xp - right.recommendation.lesson.xp,
+    );
 
-  return ranked[0];
+  return ranked[0]?.recommendation ?? null;
+}
+
+function getExerciseFailureCue(lessonId, source = null, prefix = "Falla sobre todo en") {
+  const summary = getExerciseFailureSummary(lessonId, source);
+  return summary?.topLabel ? `${prefix} "${summary.topLabel}".` : "";
+}
+
+function getSessionLeadHint(lesson) {
+  return getLessonLeadHint(lesson);
+}
+
+function buildPendingExerciseReason(lesson, baseText) {
+  const failureCue = getExerciseFailureCue(lesson.id, null, "Falla sobre todo en");
+  return `${baseText}${failureCue ? ` ${failureCue}` : ""}`;
+}
+
+function buildEvolutionReadyReason(entry) {
+  return `La base ${entry.baseTitle} ya está cubierta. Ahora conviene subir al siguiente replanteamiento.`;
+}
+
+function buildEvolutionBaseReason(entry) {
+  return `Te conviene cubrir esta base antes de escalar hacia ${entry.sourceLesson.title}.`;
+}
+
+function buildReviewDebtReason(entry, prefix = "Deuda prioritaria de repaso:", suffix = "Conviene cerrarla antes de abrir teoría nueva.") {
+  const detail = entry.detail ? ` ${entry.detail}.` : "";
+  return `${prefix} ${entry.reasons.join(", ").toLowerCase()}.${detail} ${suffix}`;
 }
 
 function recommendNextSession() {
@@ -20,11 +55,23 @@ function recommendNextSession() {
     .filter((lessonId) => !state.solvedChallenges.includes(lessonId))
     .map((lessonId) => findLesson(lessonId))
     .filter(Boolean)
-    .sort((left, right) => scoreLessonRecommendation(right).score - scoreLessonRecommendation(left).score);
+    .sort((left, right) => {
+      const leftSignal = getLessonPrioritySignal(left);
+      const rightSignal = getLessonPrioritySignal(right);
+      return rightSignal.failureWeight - leftSignal.failureWeight ||
+        rightSignal.isStarted - leftSignal.isStarted ||
+        rightSignal.impactScore - leftSignal.impactScore;
+    });
   const pendingExercises = allLessons()
     .filter((lesson) => exercises[lesson.id] && !state.solvedExercises.includes(lesson.id))
     .filter((lesson) => state.readLessons.includes(lesson.id) || state.practiceDone.includes(lesson.id))
-    .sort((left, right) => scoreLessonRecommendation(right).score - scoreLessonRecommendation(left).score);
+    .sort((left, right) => {
+      const leftSignal = getLessonPrioritySignal(left);
+      const rightSignal = getLessonPrioritySignal(right);
+      return rightSignal.failureWeight - leftSignal.failureWeight ||
+        rightSignal.isStarted - leftSignal.isStarted ||
+        rightSignal.impactScore - leftSignal.impactScore;
+    });
 
   if (struggleLeader && struggleLeader.summary.weightedTotal >= 3 && !state.completed.includes(struggleLeader.lesson.id)) {
     const intervention = getStruggleIntervention(struggleLeader);
@@ -33,6 +80,7 @@ function recommendNextSession() {
       kind: intervention.kind,
       target: intervention.target,
       reason: `${intervention.reason}${struggleLeader.summary.recurrenceScore >= 2 ? " Ademas, no parece un tropiezo aislado: esta leccion ya ha recaido varias veces." : ""}`,
+      hint: getSessionLeadHint(struggleLeader.lesson),
     };
   }
 
@@ -42,6 +90,7 @@ function recommendNextSession() {
       kind: "Repaso",
       target: "study",
       reason: "Ahora mismo el atasco dominante es de error típico. Corregir ese arrastre te dará más retorno que abrir una pieza nueva.",
+      hint: getSessionLeadHint(failedLessons[0]),
     };
   }
 
@@ -50,7 +99,11 @@ function recommendNextSession() {
       lesson: pendingExercises[0],
       kind: "Tests",
       target: "practice",
-      reason: "Ahora mismo predomina deuda de lógica. Conviene cerrar una práctica ya empezada y validar comportamiento.",
+      reason: buildPendingExerciseReason(
+        pendingExercises[0],
+        "Ahora mismo predomina deuda de lógica. Conviene cerrar una práctica ya empezada y validar comportamiento.",
+      ),
+      hint: getSessionLeadHint(pendingExercises[0]),
     };
   }
 
@@ -76,7 +129,8 @@ function recommendNextSession() {
       lesson: entry.lesson,
       kind: "Escalada",
       target: entry.target,
-      reason: `La base ${entry.baseTitle} ya está cubierta. Ahora conviene subir al siguiente replanteamiento.`,
+      reason: buildEvolutionReadyReason(entry),
+      hint: getSessionLeadHint(entry.lesson),
     };
   }
 
@@ -95,7 +149,8 @@ function recommendNextSession() {
       lesson: entry.lesson,
       kind: "Base previa",
       target: "study",
-      reason: `Te conviene cubrir esta base antes de escalar hacia ${entry.sourceLesson.title}.`,
+      reason: buildEvolutionBaseReason(entry),
+      hint: getSessionLeadHint(entry.lesson),
     };
   }
 
@@ -107,6 +162,7 @@ function recommendNextSession() {
     kind: "Desbloqueo",
     target: "study",
     reason: lessonRecommendation.reason,
+    hint: getSessionLeadHint(lessonRecommendation.lesson),
   };
 }
 
@@ -195,7 +251,7 @@ function buildDailyQueue() {
   const struggleLeader = getTrackStruggleLeaders(state.activeTrack)[0];
   const reviewEntries = getPendingReviewEntries(state.activeTrack);
 
-  const addItem = (lesson, kind, reason, target = "study", priority = 0, focusKey = null) => {
+  const addItem = (lesson, kind, reason, target = "study", priority = 0, focusKey = null, hint = "") => {
     if (!lesson || seen.has(lesson.id)) return;
     seen.add(lesson.id);
     items.push({
@@ -205,6 +261,7 @@ function buildDailyQueue() {
       target,
       priority,
       focus: getLearningFocus(lesson, kind, focusKey),
+      hint: hint || getSessionLeadHint(lesson),
     });
   };
 
@@ -278,18 +335,22 @@ function buildDailyQueue() {
       addItem(
         entry.lesson,
         route.target === "practice" ? "Tests" : route.target === "evolution" ? "Escalada" : "Repaso",
-        `Deuda prioritaria de repaso: ${entry.reasons.join(", ").toLowerCase()}. Conviene cerrarla antes de abrir teoría nueva.`,
+        buildReviewDebtReason(entry),
         route.target,
         route.target === "practice" ? 31 : 30,
+        null,
+        getSessionLeadHint(entry.lesson),
       );
     });
     pendingExercises.slice(0, 1).forEach((lesson) => {
       addItem(
         lesson,
         "Tests",
-        "Después del repaso, conviene cerrar una práctica que ya está arrancada.",
+        buildPendingExerciseReason(lesson, "Después del repaso, conviene cerrar una práctica que ya está arrancada."),
         "practice",
         20,
+        null,
+        getSessionLeadHint(lesson),
       );
     });
   } else if (sessionMode === "evolution") {
@@ -297,18 +358,22 @@ function buildDailyQueue() {
       addItem(
         entry.lesson,
         "Base previa",
-        `Te conviene cubrir esta base antes de escalar hacia ${entry.sourceLesson.title}.`,
+        buildEvolutionBaseReason(entry),
         "study",
         35,
+        null,
+        getSessionLeadHint(entry.lesson),
       );
     });
     pendingExercises.slice(0, 1).forEach((lesson) => {
       addItem(
         lesson,
         "Tests",
-        "Después de cubrir la base, cierra una práctica empezada para fijar la progresión.",
+        buildPendingExerciseReason(lesson, "Después de cubrir la base, cierra una práctica empezada para fijar la progresión."),
         "practice",
         18,
+        null,
+        getSessionLeadHint(lesson),
       );
     });
   } else if (sessionMode === "consolidation") {
@@ -316,9 +381,11 @@ function buildDailyQueue() {
       addItem(
         lesson,
         "Tests",
-        "Ya empezaste esta lección. Cerrar el ejercicio consolida mejor el concepto.",
+        buildPendingExerciseReason(lesson, "Ya empezaste esta lección. Cerrar el ejercicio consolida mejor el concepto."),
         "practice",
         30,
+        null,
+        getSessionLeadHint(lesson),
       );
     });
   } else if (sessionMode === "evolution-ready") {
@@ -326,31 +393,37 @@ function buildDailyQueue() {
       addItem(
         entry.lesson,
         "Escalada",
-        `La base ${entry.baseTitle} ya está cubierta. Ahora conviene subir al siguiente replanteamiento.`,
+        buildEvolutionReadyReason(entry),
         entry.target,
         34,
+        null,
+        getSessionLeadHint(entry.lesson),
       );
     });
     pendingExercises.slice(0, 1).forEach((lesson) => {
       addItem(
         lesson,
         "Tests",
-        "Después de la subida, cerrar una práctica abierta ayuda a consolidar la progresión.",
+        buildPendingExerciseReason(lesson, "Después de la subida, cerrar una práctica abierta ayuda a consolidar la progresión."),
         "practice",
         16,
+        null,
+        getSessionLeadHint(lesson),
       );
     });
   } else if (sessionMode === "unlock" && !saturation.blockNewTheory) {
     if (recommendation) {
-      addItem(recommendation.lesson, "Desbloqueo", recommendation.reason, "study", 30);
+      addItem(recommendation.lesson, "Desbloqueo", recommendation.reason, "study", 30, null, recommendation.hint);
     }
     pendingExercises.slice(0, 1).forEach((lesson) => {
       addItem(
         lesson,
         "Tests",
-        "Añadir una validación práctica evita que el desbloqueo se quede solo en teoría.",
+        buildPendingExerciseReason(lesson, "Añadir una validación práctica evita que el desbloqueo se quede solo en teoría."),
         "practice",
         15,
+        null,
+        getSessionLeadHint(lesson),
       );
     });
   } else {
@@ -361,6 +434,8 @@ function buildDailyQueue() {
         `Ya puedes pasar del fundamento a ${entry.lesson.title}.`,
         entry.target,
         26,
+        null,
+        getSessionLeadHint(entry.lesson),
       );
     });
     evolutionBaseLessons.slice(0, 1).forEach((entry) => {
@@ -370,16 +445,18 @@ function buildDailyQueue() {
         `Antes de subir hacia ${entry.sourceLesson.title}, conviene cubrir esta pieza base.`,
         "study",
         24,
+        null,
+        getSessionLeadHint(entry.lesson),
       );
     });
     if (recommendation && !saturation.blockNewTheory) {
-      addItem(recommendation.lesson, "Desbloqueo", recommendation.reason, "study", 30);
+      addItem(recommendation.lesson, "Desbloqueo", recommendation.reason, "study", 30, null, recommendation.hint);
     }
     pendingExercises.slice(0, 1).forEach((lesson) => {
       addItem(
         lesson,
         "Tests",
-        "Ya empezaste esta lección. Cerrar el ejercicio consolida mejor el concepto.",
+        buildPendingExerciseReason(lesson, "Ya empezaste esta lección. Cerrar el ejercicio consolida mejor el concepto."),
         "practice",
         20,
       );
@@ -389,7 +466,7 @@ function buildDailyQueue() {
       addItem(
         entry.lesson,
         route.target === "practice" ? "Tests" : route.target === "evolution" ? "Escalada" : "Repaso",
-        `Revisar ${entry.reasons.join(", ").toLowerCase()} evita arrastrar ese bloqueo a la siguiente fase.`,
+        buildReviewDebtReason(entry, "Revisar", "Evita arrastrar ese bloqueo a la siguiente fase."),
         route.target,
         route.target === "practice" ? 12 : 10,
       );
@@ -413,9 +490,11 @@ function buildDailyQueue() {
     addItem(
       lesson,
       "Tests",
-      "Cerrar una práctica abierta mantiene la sesión productiva.",
+      buildPendingExerciseReason(lesson, "Cerrar una práctica abierta mantiene la sesión productiva."),
       "practice",
       11,
+      null,
+      getSessionLeadHint(lesson),
     );
   });
   reviewEntries.slice(0, 2).forEach((entry) => {
@@ -423,9 +502,11 @@ function buildDailyQueue() {
     addItem(
       entry.lesson,
       route.target === "practice" ? "Tests" : route.target === "evolution" ? "Escalada" : "Repaso",
-      `Un repaso corto de ${entry.reasons.join(", ").toLowerCase()} evita que el bloqueo se convierta en hábito.`,
+      buildReviewDebtReason(entry, "Un repaso corto de", "Evita que el bloqueo se convierta en hábito."),
       route.target,
       route.target === "practice" ? 12 : 10,
+      null,
+      getSessionLeadHint(entry.lesson),
     );
   });
 
@@ -635,14 +716,41 @@ function renderDailySessionFooter(totalSteps, doneSteps, sessionCompletedToday) 
   `;
 }
 
+function getWeeklyExerciseFailureFocus(trackId) {
+  return tracks[trackId].lessons
+    .map((lesson) => {
+      const summary = getExerciseFailureSummary(lesson.id);
+      return summary
+        ? {
+            lesson,
+            summary,
+          }
+        : null;
+    })
+    .filter(Boolean)
+    .sort((left, right) =>
+      right.summary.topWeightedCount - left.summary.topWeightedCount ||
+      right.summary.total - left.summary.total ||
+      scoreLessonRecommendation(right.lesson).score - scoreLessonRecommendation(left.lesson).score,
+    )[0] ?? null;
+}
+
 function getWeeklyStudyProfile() {
-  const { closedCount, saturation } = getWeeklyContext();
+  const { closedCount, saturation, recurringFailureFocus } = getWeeklyContext();
 
   if (saturation.blockNewTheory && closedCount <= 2) {
     return {
       label: "Semana de contencion",
       description: "Conviene reducir frentes abiertos, cerrar práctica pendiente y recuperar ritmo antes de ampliar temario.",
       tip: "No abras lecciones nuevas avanzadas. Prioriza una práctica y un repaso por sesión.",
+    };
+  }
+
+  if (recurringFailureFocus && recurringFailureFocus.summary.topWeightedCount >= 4) {
+    return {
+      label: "Semana de ajuste",
+      description: `Hay continuidad, pero sigues chocando con el mismo test en ${recurringFailureFocus.lesson.title}.`,
+      tip: `No midas la semana solo por volumen: intenta cerrar primero "${recurringFailureFocus.summary.topLabel}".`,
     };
   }
 
@@ -742,6 +850,7 @@ function getWeeklyContext() {
   const reviewEntries = getPendingReviewEntries(state.activeTrack);
   const saturation = getDailySaturationState(pendingExercises, failedLessons, reviewEntries);
   const solvedChallengesCount = getWeeklySolvedChallengesCount();
+  const recurringFailureFocus = getWeeklyExerciseFailureFocus(state.activeTrack);
 
   return {
     closedCount,
@@ -751,6 +860,7 @@ function getWeeklyContext() {
     reviewEntries,
     saturation,
     solvedChallengesCount,
+    recurringFailureFocus,
   };
 }
 
@@ -787,6 +897,28 @@ function getClosestOpenPhase() {
     .sort((left, right) => left.pendingCount - right.pendingCount || left.lessonIds.length - right.lessonIds.length)[0] ?? null;
 }
 
+function buildWeeklyChallengeDetail(activeTrack, solvedChallengesCount, solvedChallengesTarget) {
+  if (solvedChallengesCount >= solvedChallengesTarget) {
+    return "Ya no dependes solo del histórico total: esta meta se mide por semana real.";
+  }
+
+  return `El reto activo de ${findLesson(state.activeLessonId)?.title ?? tracks[activeTrack].label} cuenta para esta misión.`;
+}
+
+function buildWeeklyPracticeDetail(recurringFailureFocus) {
+  if (!recurringFailureFocus) return "";
+  return `El atasco repetido de tests está sobre todo en "${recurringFailureFocus.summary.topLabel}" dentro de ${recurringFailureFocus.lesson.title}.`;
+}
+
+function buildWeeklyRoadmapDetail(closestPhase, closestPhaseLesson) {
+  if (!closestPhase) {
+    return "No queda ninguna fase abierta en el plan.";
+  }
+
+  if (!closestPhaseLesson) return "";
+  return `Siguiente cierre útil: ${closestPhaseLesson.title} en ${closestPhase.title}.`;
+}
+
 function buildWeeklyMissions() {
   const context = getWeeklyContext();
   const activeTrack = state.activeTrack;
@@ -806,9 +938,12 @@ function buildWeeklyMissions() {
   const crossTrackLesson = missingTrackId ? findNextTrackLesson(missingTrackId) : null;
   const closestPhase = getClosestOpenPhase();
   const closestPhaseLesson = closestPhase?.pendingLessonId ? findLesson(closestPhase.pendingLessonId) : null;
-  const roadmapDetail = !closestPhaseLesson
-    ? ""
-    : `Siguiente cierre útil: ${closestPhaseLesson.title} en ${closestPhase.title}.`;
+  const roadmapDetail = buildWeeklyRoadmapDetail(closestPhase, closestPhaseLesson);
+  const recurringFailureFocus = context.recurringFailureFocus;
+  const firstPendingExerciseHint = firstPendingExercise ? getSessionLeadHint(firstPendingExercise) : "";
+  const firstReviewHint = firstReviewEntry?.lesson ? getSessionLeadHint(firstReviewEntry.lesson) : "";
+  const crossTrackHint = crossTrackLesson ? getSessionLeadHint(crossTrackLesson) : "";
+  const roadmapHint = closestPhaseLesson ? getSessionLeadHint(closestPhaseLesson) : "";
 
   return [
     {
@@ -827,9 +962,7 @@ function buildWeeklyMissions() {
       title: "Resolver 2 retos",
       status: context.solvedChallengesCount >= solvedChallengesTarget ? "Hecha" : "En curso",
       metric: `${context.solvedChallengesCount}/${solvedChallengesTarget} retos resueltos esta semana`,
-      detail: context.solvedChallengesCount >= solvedChallengesTarget
-        ? "Ya no dependes solo del histórico total: esta meta se mide por semana real."
-        : `El reto activo de ${findLesson(state.activeLessonId)?.title ?? tracks[activeTrack].label} cuenta para esta misión.`,
+      detail: buildWeeklyChallengeDetail(activeTrack, context.solvedChallengesCount, solvedChallengesTarget),
       tone: context.solvedChallengesCount >= solvedChallengesTarget ? "done" : "progress",
       cta: context.solvedChallengesCount >= solvedChallengesTarget
         ? null
@@ -843,11 +976,13 @@ function buildWeeklyMissions() {
       title: `Bajar práctica abierta en ${tracks[activeTrack].label}`,
       status: context.pendingExercises.length <= 2 ? "Controlada" : "Pendiente",
       metric: `${context.pendingExercises.length} prácticas abiertas`,
+      detail: buildWeeklyPracticeDetail(recurringFailureFocus),
+      entryHint: firstPendingExerciseHint,
       tone: context.pendingExercises.length <= 2 ? "done" : "warning",
       cta: firstPendingExercise
         ? {
-            label: "Cerrar tests",
-            lessonId: firstPendingExercise.id,
+          label: "Cerrar tests",
+          lessonId: firstPendingExercise.id,
             target: "practice",
           }
         : null,
@@ -856,6 +991,8 @@ function buildWeeklyMissions() {
       title: `Limpiar repaso en ${tracks[activeTrack].label}`,
       status: context.reviewEntries.length <= 1 ? "Controlado" : "Pendiente",
       metric: `${context.reviewEntries.length} frentes de repaso`,
+      detail: firstReviewEntry?.detail || "",
+      entryHint: firstReviewHint,
       tone: context.reviewEntries.length <= 1 ? "done" : "warning",
       cta: firstReviewEntry && firstReviewRoute
         ? {
@@ -875,6 +1012,7 @@ function buildWeeklyMissions() {
       title: "Tocar ambos lenguajes",
       status: bothTracksTouched ? "Hecha" : "En curso",
       metric: `${Number(hasTrackActivityInWindow("java", context.lastSevenDays)) + Number(hasTrackActivityInWindow("javascript", context.lastSevenDays))}/2 lenguajes esta semana`,
+      entryHint: crossTrackHint,
       tone: bothTracksTouched ? "done" : "progress",
       cta: !bothTracksTouched && crossTrackLesson
         ? {
@@ -891,7 +1029,8 @@ function buildWeeklyMissions() {
       metric: !closestPhase
         ? "Todas las fases ya están cerradas"
         : `${closestPhase.title}: ${closestPhase.completedCount}/${closestPhase.lessonIds.length} lecciones · ${closestPhase.pendingCount} pendientes`,
-      detail: !closestPhase ? "No queda ninguna fase abierta en el plan." : roadmapDetail,
+      detail: roadmapDetail,
+      entryHint: roadmapHint,
       tone: !closestPhase ? "done" : closestPhase.pendingCount <= 2 ? "progress" : "warning",
       cta: closestPhaseLesson
         ? {

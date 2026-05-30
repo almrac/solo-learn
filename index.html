@@ -97,6 +97,8 @@ const progreso = retos.filter(r => r.done);</code></pre>
         <aside class="dashboard__sidebar">
           <div class="active-track" id="activeTrack"></div>
 
+          <div class="room-guide" id="roomGuide"></div>
+
           <section class="study-mode-panel" aria-label="Modo de estudio">
             <div class="study-mode-panel__header">
               <span class="eyebrow">Sala activa</span>
@@ -231,6 +233,7 @@ const progreso = retos.filter(r => r.done);</code></pre>
                   <span id="studyExerciseStatus">Pendiente</span>
                 </div>
                 <p id="studyExercisePrompt"></p>
+                <div class="study-exercise__focus" id="studyExerciseFocus" hidden></div>
                 <ul id="studyExerciseChecklist"></ul>
               </div>
               <div class="study-exercise" id="studyGuidedProblem" hidden>

@@ -186,7 +186,8 @@
 .daily-queue,
 .weekly-missions,
 .history-panel,
-.review-box {
+.review-box,
+.room-guide {
   display: grid;
   gap: var(--space-2);
   padding: var(--space-5);
@@ -211,6 +212,11 @@
 .quickstart {
   background: var(--panel);
   border: var(--border-width) solid var(--line);
+}
+
+.room-guide {
+  background: rgba(255, 255, 255, 0.7);
+  border: var(--border-width) solid rgba(38, 58, 99, 0.12);
 }
 
 .review-box {
@@ -249,17 +255,20 @@ body[data-study-mode="javascript"] .achievements {
 
 body[data-study-mode="java"] .study-mode-panel,
 body[data-study-mode="java"] .active-track,
-body[data-study-mode="java"] .daily-queue {
+body[data-study-mode="java"] .daily-queue,
+body[data-study-mode="java"] .room-guide {
   background: #eef3ff;
 }
 
 body[data-study-mode="javascript"] .study-mode-panel,
 body[data-study-mode="javascript"] .active-track,
-body[data-study-mode="javascript"] .daily-queue {
+body[data-study-mode="javascript"] .daily-queue,
+body[data-study-mode="javascript"] .room-guide {
   background: #fff1e8;
 }
 
 .quickstart h3,
+.room-guide h3,
 .next-session h3,
 .daily-queue h3,
 .weekly-missions h3,
@@ -272,6 +281,7 @@ body[data-study-mode="javascript"] .daily-queue {
 }
 
 .next-session p:not(.eyebrow),
+.room-guide p:not(.eyebrow),
 .quickstart p:not(.eyebrow),
 .daily-queue p:not(.eyebrow),
 .weekly-missions p:not(.eyebrow),
@@ -413,6 +423,35 @@ body[data-study-mode="javascript"] .daily-queue {
   color: var(--terracotta);
 }
 
+.room-guide__signals {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.room-guide__signal {
+  display: grid;
+  gap: 0.15rem;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid rgba(38, 58, 99, 0.1);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.room-guide__signal strong {
+  color: var(--forest);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.room-guide__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
 .quickstart__list {
   display: grid;
   gap: var(--space-2);
@@ -423,6 +462,7 @@ body[data-study-mode="javascript"] .daily-queue {
 }
 
 .quickstart button,
+.room-guide button,
 .next-session button,
 .daily-queue button,
 .review-box button {

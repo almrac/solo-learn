@@ -19,6 +19,37 @@ window.setInterval(() => {
 
 render();
 
+elements.roomGuide.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-room-action]");
+  if (!button) return;
+
+  if (button.dataset.roomAction === "study-mode" && button.dataset.studyMode) {
+    applyStudyMode(button.dataset.studyMode);
+    persist();
+    render();
+    document.querySelector(".dashboard").scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (button.dataset.roomAction === "runner") {
+    saveCurrentNotes();
+    openLesson(state.activeLessonId);
+    persist();
+    render();
+    document.querySelector(".runner").scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (button.dataset.roomAction === "practice-bank") {
+    document.querySelector(".practice-bank").scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (button.dataset.roomAction === "study") {
+    document.querySelector(".study").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+});
+
 elements.quickstart.addEventListener("click", (event) => {
   const button = event.target.closest("[data-dismiss-quickstart]");
   if (!button) return;
@@ -148,6 +179,13 @@ elements.studyStruggles.addEventListener("click", (event) => {
     return;
   }
 
+  const actionButton = event.target.closest("[data-study-action]");
+  if (!actionButton) return;
+
+  runStudyCloseoutAction(actionButton.dataset.studyAction);
+});
+
+elements.studyExercise.addEventListener("click", (event) => {
   const actionButton = event.target.closest("[data-study-action]");
   if (!actionButton) return;
 

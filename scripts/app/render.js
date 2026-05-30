@@ -47,6 +47,7 @@ function render() {
     elements.studyModeSummary.textContent = trackHeading.modeSummary;
   }
   renderActiveTrack(track);
+  renderRoomGuide();
 
   renderPlan();
   renderLessons();
@@ -143,6 +144,95 @@ function renderTrackProgress() {
     .join("");
 }
 
+function renderRoomGuide() {
+  const roomGuide = getRoomGuide();
+
+  elements.roomGuide.innerHTML = `
+    <p class="eyebrow">${escapeHtml(roomGuide.eyebrow)}</p>
+    <h3>${escapeHtml(roomGuide.title)}</h3>
+    <p>${escapeHtml(roomGuide.summary)}</p>
+    <div class="room-guide__signals">
+      ${roomGuide.signals
+        .map(
+          (signal) => `
+            <span class="room-guide__signal">
+              <strong>${escapeHtml(signal.label)}</strong>
+              ${escapeHtml(signal.value)}
+            </span>
+          `,
+        )
+        .join("")}
+    </div>
+    <div class="room-guide__actions">
+      ${roomGuide.actions
+        .map(
+          (action) => `
+            <button
+              type="button"
+              data-room-action="${escapeHtml(action.type)}"
+              ${action.studyMode ? `data-study-mode="${action.studyMode}"` : ""}
+              ${action.target ? `data-target="${action.target}"` : ""}
+            >
+              ${escapeHtml(action.label)}
+            </button>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function getRoomGuide() {
+  if (state.studyMode === "all") {
+    return {
+      eyebrow: "Mapa lateral",
+      title: "Vista global",
+      summary: "Usa esta sala para comparar rutas, revisar catálogo y decidir en qué frente conviene entrar antes de estudiar a fondo.",
+      signals: [
+        { label: "Java", value: "backend, modelado y problemas guiados" },
+        { label: "JavaScript", value: "runner, DOM, fetch y tests" },
+        { label: "Todo", value: "planificación y visión de conjunto" },
+      ],
+      actions: [
+        { type: "study-mode", studyMode: "java", label: "Entrar en Java" },
+        { type: "study-mode", studyMode: "javascript", label: "Entrar en JavaScript" },
+      ],
+    };
+  }
+
+  if (state.activeTrack === "javascript") {
+    return {
+      eyebrow: "Mapa lateral",
+      title: "Sala JavaScript",
+      summary: "Aquí conviene trabajar con ciclos cortos de teoría, runner, tests y preview DOM para cerrar comportamiento real.",
+      signals: [
+        { label: "Sala", value: "Frontend ejecutable" },
+        { label: "Superficie fuerte", value: "Runner + tests DOM" },
+        { label: "Ritmo útil", value: "leer, ejecutar, validar y ajustar" },
+      ],
+      actions: [
+        { type: "runner", target: "practice", label: "Abrir runner" },
+        { type: "practice-bank", target: "practice-bank", label: "Ir al banco JS" },
+      ],
+    };
+  }
+
+  return {
+    eyebrow: "Mapa lateral",
+    title: "Sala Java",
+    summary: "Aquí conviene trabajar con teoría, problema guiado, modelado y mini proyecto antes de saltar a piezas más arquitectónicas.",
+    signals: [
+      { label: "Sala", value: "Backend y diseño" },
+      { label: "Superficie fuerte", value: "Problemas guiados" },
+      { label: "Ritmo útil", value: "leer, plantear, contrastar y refinar" },
+    ],
+    actions: [
+      { type: "study", target: "study", label: "Seguir lección Java" },
+      { type: "practice-bank", target: "practice-bank", label: "Ir al banco Java" },
+    ],
+  };
+}
+
 function renderQuickstart() {
   if (state.quickstartDismissed) {
     elements.quickstart.innerHTML = "";
@@ -233,6 +323,7 @@ function renderNextSession() {
     <p><strong>Última sesión ${tracks[state.activeTrack].label}:</strong> ${escapeHtml(formatStudyDate(lastSession))}.</p>
     ${pattern ? `<p><strong>Foco actual:</strong> ${escapeHtml(pattern.label)}.</p>` : ""}
     <p><strong>${recommendation.kind}:</strong> ${escapeHtml(recommendation.reason)}</p>
+    ${recommendation.hint ? `<p><strong>Entrada útil:</strong> ${escapeHtml(recommendation.hint)}</p>` : ""}
     <button type="button" data-lesson-id="${nextLesson.id}" data-target="${recommendation.target}">${recommendation.target === "practice" ? "Abrir práctica" : "Abrir lección"}</button>
   `;
 }
@@ -261,10 +352,13 @@ function renderReviewBox() {
       .map((entry) => {
         const reasonLabel = entry.reasons.join(" · ");
         const route = getReviewEntryRoute(entry);
+        const leadHint = getReviewEntryLeadHint(entry);
+        const detail = entry.detail ? ` · ${entry.detail}` : "";
         return `
           <button type="button" data-lesson-id="${entry.lesson.id}" data-target="${route.target}">
             ${escapeHtml(entry.lesson.title)}
-            <small>${escapeHtml(reasonLabel)} · ${escapeHtml(route.hint)}</small>
+            <small>${escapeHtml(reasonLabel)} · ${escapeHtml(route.hint)}${escapeHtml(detail)}</small>
+            ${leadHint ? `<small><strong>Entrada útil:</strong> ${escapeHtml(leadHint)}</small>` : ""}
           </button>
         `;
       })
@@ -288,6 +382,7 @@ function renderWeeklyMissions() {
             </div>
             <p>${escapeHtml(mission.metric)}</p>
             ${mission.detail ? `<p>${escapeHtml(mission.detail)}</p>` : ""}
+            ${mission.entryHint ? `<p><strong>Entrada útil:</strong> ${escapeHtml(mission.entryHint)}</p>` : ""}
             ${mission.cta
               ? `
                 <button
@@ -309,6 +404,12 @@ function renderWeeklyMissions() {
 
 function renderHistoryPanel() {
   const history = getHistorySnapshot(7);
+  const recommendation = recommendNextSession();
+  const reentryText = !recommendation
+    ? ""
+    : recommendation.hint
+      ? `${recommendation.lesson.title} · ${recommendation.hint}`
+      : `${recommendation.lesson.title} · ${recommendation.kind.toLowerCase()}`;
 
   elements.historyPanel.innerHTML = `
     <p class="eyebrow">Historial reciente</p>
@@ -358,6 +459,7 @@ function renderHistoryPanel() {
         .join("")}
     </div>
     <p>${history.topTopics.length ? `Temas tocados: ${escapeHtml(history.topTopics.join(", "))}.` : "Aún no hay temas suficientes para resumir."}</p>
+    ${reentryText ? `<p><strong>Reentrada útil ahora:</strong> ${escapeHtml(reentryText)}</p>` : ""}
   `;
 }
 
@@ -407,6 +509,18 @@ function getReviewEntryRoute(entry) {
   };
 }
 
+function getReviewEntryLeadHint(entry) {
+  if (!entry?.lesson) return "";
+
+  if (entry.reasons.includes("Reto")) {
+    return "Empieza por la opción correcta y el error que te hizo caer.";
+  }
+
+  return getLessonLeadHint(entry.lesson, {
+    defaultText: "Conviene reentrar por la parte más fragil antes de seguir avanzando.",
+  });
+}
+
 function renderDailyQueue() {
   const queue = buildDailyQueue();
   const todayKey = getTodayKey();
@@ -452,6 +566,7 @@ function renderDailyQueue() {
               <span class="daily-queue__focus">${item.focus}</span>
               ${item.lesson.title}
               <small>${item.reason}</small>
+              ${item.hint ? `<small><strong>Entrada útil:</strong> ${escapeHtml(item.hint)}</small>` : ""}
             </button>
             <div class="daily-queue__actions">
               <span class="daily-queue__state">${isDone ? "Hecho hoy" : "Pendiente hoy"}</span>
@@ -792,6 +907,8 @@ function renderStudyExercise(lesson, exercise, isSolved) {
   if (!exercise) {
     elements.studyExercise.hidden = true;
     elements.studyExercisePrompt.textContent = "";
+    elements.studyExerciseFocus.innerHTML = "";
+    elements.studyExerciseFocus.hidden = true;
     elements.studyExerciseChecklist.innerHTML = "";
     elements.studyExerciseStatus.textContent = "";
     return;
@@ -799,10 +916,36 @@ function renderStudyExercise(lesson, exercise, isSolved) {
 
   elements.studyExercise.hidden = false;
   elements.studyExercisePrompt.textContent = exercise.prompt;
+  renderStudyExerciseFocus(lesson, exercise, isSolved);
   elements.studyExerciseChecklist.innerHTML = exercise.checklist
     .map((item) => `<li>${escapeHtml(item)}</li>`)
     .join("");
   elements.studyExerciseStatus.textContent = isSolved ? "Superado" : "Pendiente";
+}
+
+function renderStudyExerciseFocus(lesson, exercise, isSolved) {
+  if (isSolved) {
+    elements.studyExerciseFocus.innerHTML = "";
+    elements.studyExerciseFocus.hidden = true;
+    return;
+  }
+
+  const source = exercise.mode === "dom" ? "dom-tests" : "tests";
+  const failureSummary = getExerciseFailureSummary(lesson.id, source);
+
+  if (!failureSummary?.topLabel) {
+    elements.studyExerciseFocus.innerHTML = "";
+    elements.studyExerciseFocus.hidden = true;
+    return;
+  }
+
+  const sourceLabel = source === "dom-tests" ? "preview DOM" : "tests";
+  elements.studyExerciseFocus.hidden = false;
+  elements.studyExerciseFocus.innerHTML = `
+    <strong>Empieza por aquí</strong>
+    <p>El bloqueo más repetido en ${sourceLabel} ahora mismo es <strong>${escapeHtml(failureSummary.topLabel)}</strong>.</p>
+    <button type="button" data-study-action="load-exercise">Cargar ejercicio y atacar ese caso</button>
+  `;
 }
 
 function renderGuidedProblem(problem) {
@@ -1074,12 +1217,16 @@ function renderChallenge() {
         ${review.byLevel.length
           ? `<p>Fallos por nivel: ${escapeHtml(review.byLevel.map((item) => `${item.label} ${item.count}`).join(" · "))}</p>`
           : "<p>Sin fallos por nivel.</p>"}
+        ${review.recurringFailures.length
+          ? `<p>Patrones recurrentes ya vistos: ${escapeHtml(review.recurringFailures.map((item) => `${item.label} ${item.count}`).join(" · "))}</p>`
+          : "<p>Sin patrón recurrente detectado en tests previos.</p>"}
       </div>
     `;
     elements.challengeOptions.innerHTML = state.examMode.lessonIds
       .map((lessonId) => {
         const lesson = findLesson(lessonId);
         const entry = state.examMode.answers.find((item) => item.lessonId === lessonId);
+        const failureSummary = getExerciseFailureSummary(lessonId);
         return `
           <article class="challenge__review ${entry?.isCorrect ? "is-correct" : "is-wrong"}">
             <strong>${escapeHtml(lesson?.title ?? lessonId)}</strong>
@@ -1088,6 +1235,9 @@ function renderChallenge() {
               Tu respuesta: ${escapeHtml(entry?.selected ?? "Sin responder")} ·
               Correcta: ${escapeHtml(entry?.correctAnswer ?? lesson?.challenge.answer ?? "")}
             </small>
+            ${!entry?.isCorrect && failureSummary?.topLabel
+              ? `<p><small>Fallo recurrente asociado: ${escapeHtml(failureSummary.topLabel)}</small></p>`
+              : ""}
           </article>
         `;
       })
@@ -1130,6 +1280,7 @@ function renderChallenge() {
     elements.challengeTitle.textContent = lesson.title;
     elements.challengePrompt.textContent = lesson.challenge.prompt;
     const lessonCount = buildExamLessonIds().length;
+    const examLeadHint = getExamLeadHint();
     elements.challengeMeta.innerHTML = `
       <div class="challenge__meta-row">
         <span class="badge">${tracks[getTrackIdByLesson(lesson.id)].label}</span>
@@ -1167,7 +1318,8 @@ function renderChallenge() {
           </select>
         </label>
       </div>
-      <p class="challenge__exam-note">${lessonCount ? "El examen usa retos y no otorga XP extra." : "No hay preguntas que cumplan el filtro actual."}</p>
+      <p class="challenge__exam-note">${lessonCount ? "El examen usa retos, no otorga XP extra y prioriza primero las lecciones con recaída o práctica ya abierta dentro del filtro actual." : "No hay preguntas que cumplan el filtro actual."}</p>
+      ${lessonCount && examLeadHint ? `<p class="challenge__exam-note"><strong>Entraría primero:</strong> ${escapeHtml(examLeadHint)}</p>` : ""}
     `;
     submitButton.textContent = "Comprobar";
   }
@@ -1232,6 +1384,7 @@ function renderPracticeBank() {
           ${entry.hasEvolution ? '<span class="badge practice-card__badge">Escala después</span>' : ""}
           ${entry.evolutionPhase ? `<span class="badge practice-card__phase">${escapeHtml(entry.evolutionPhase)}</span>` : ""}
           ${entry.hasEvolution ? `<span class="badge practice-card__evolution-state">${entry.evolutionBaseCovered ? "Base cubierta" : "Base pendiente"}</span>` : ""}
+          ${getPracticeFailureSignal(entry) ? '<span class="badge practice-card__status practice-card__status--started">Fallo repetido</span>' : ""}
           <span class="badge practice-card__status practice-card__status--${entry.progressState.key}">${escapeHtml(entry.progressState.label)}</span>
         </div>
         <h3>${escapeHtml(entry.title)}</h3>
@@ -1340,13 +1493,14 @@ function renderPracticeBankPhases(entries) {
 }
 
 function renderPracticeBankSpotlight(entries) {
-  const recommended = entries.find((entry) => !entry.isDone) ?? entries[0];
+  const recommended = getPracticeSpotlightEntry(entries);
   const priorityTopic = getPriorityPracticeTopic(entries);
   if (!recommended) {
     elements.practiceBankSpotlight.innerHTML = "";
     return;
   }
 
+  const failureSignal = getPracticeFailureSignal(recommended);
   const spotlightTopic = priorityTopic && recommended.topics.includes(priorityTopic.topic)
     ? priorityTopic.topic
     : recommended.topics[0] ?? "";
@@ -1361,10 +1515,14 @@ function renderPracticeBankSpotlight(entries) {
         ${recommended.hasEvolution ? '<span class="badge practice-card__badge">Escala después</span>' : ""}
         ${recommended.evolutionPhase ? `<span class="badge practice-card__phase">${escapeHtml(recommended.evolutionPhase)}</span>` : ""}
         ${recommended.hasEvolution ? `<span class="badge practice-card__evolution-state">${recommended.evolutionBaseCovered ? "Base cubierta" : "Base pendiente"}</span>` : ""}
+        ${failureSignal ? `<span class="badge practice-card__status practice-card__status--started">Fallo repetido</span>` : ""}
         <span class="badge">${escapeHtml(recommended.progressState.label)}</span>
       </div>
       <h3>${escapeHtml(recommended.title)}</h3>
       <p>${escapeHtml(getPracticeSpotlightReason(recommended))}</p>
+      ${failureSignal
+        ? `<p><strong>Bloqueo principal:</strong> ${escapeHtml(failureSignal.label)}.</p>`
+        : ""}
       ${spotlightTopic
         ? `<p><strong>Tema empujado ahora:</strong> ${escapeHtml(spotlightTopic)}.</p>`
         : ""}
@@ -1455,6 +1613,9 @@ function sortPracticeBankEntries(entries) {
   };
 
   return [...entries].sort((left, right) => {
+    const leftPriority = getPracticeEntryPriority(left);
+    const rightPriority = getPracticeEntryPriority(right);
+
     if (state.practiceEvolutionFilter === "evolves" && left.evolutionBaseCovered !== right.evolutionBaseCovered) {
       return Number(right.evolutionBaseCovered) - Number(left.evolutionBaseCovered);
     }
@@ -1469,18 +1630,19 @@ function sortPracticeBankEntries(entries) {
     }
 
     if (state.practiceSort === "impact") {
-      const leftImpact = scoreLessonRecommendation(findLesson(left.lessonId)).score;
-      const rightImpact = scoreLessonRecommendation(findLesson(right.lessonId)).score;
-      return rightImpact - leftImpact || left.title.localeCompare(right.title);
+      return rightPriority.failureWeight - leftPriority.failureWeight ||
+        rightPriority.impactScore - leftPriority.impactScore ||
+        left.title.localeCompare(right.title);
     }
 
     if (left.isDone !== right.isDone) {
-      return Number(left.isDone) - Number(right.isDone);
+      return leftPriority.isDone - rightPriority.isDone;
     }
 
-    const leftImpact = scoreLessonRecommendation(findLesson(left.lessonId)).score;
-    const rightImpact = scoreLessonRecommendation(findLesson(right.lessonId)).score;
-    return rightImpact - leftImpact || left.title.localeCompare(right.title);
+    return rightPriority.failureWeight - leftPriority.failureWeight ||
+      rightPriority.isStarted - leftPriority.isStarted ||
+      rightPriority.impactScore - leftPriority.impactScore ||
+      left.title.localeCompare(right.title);
   });
 }
 

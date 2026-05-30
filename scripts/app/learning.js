@@ -41,22 +41,24 @@ function getStruggleIntervention(entry) {
   }
 
   if (source === "tests") {
+    const failureSummary = getExerciseFailureSummary(entry.lesson.id, "tests");
     return {
       kind: "Tests",
       target: "practice",
       focusKey: "logic",
-      reason: `${baseReason} Conviene abrir práctica y validar la solución en tests normales.${closeout ? ` ${closeout}.` : ""}`,
-      shortReason: `${shortBaseReason} Conviene cerrar los tests abiertos.`,
+      reason: `${baseReason}${failureSummary?.topLabel ? ` El test que más se repite ahora es "${failureSummary.topLabel}".` : ""} Conviene abrir práctica y validar la solución en tests normales.${closeout ? ` ${closeout}.` : ""}`,
+      shortReason: `${shortBaseReason}${failureSummary?.topLabel ? ` Falla sobre todo en "${failureSummary.topLabel}".` : ""} Conviene cerrar los tests abiertos.`,
     };
   }
 
   if (source === "dom-tests") {
+    const failureSummary = getExerciseFailureSummary(entry.lesson.id, "dom-tests");
     return {
       kind: "Preview DOM",
       target: "practice",
       focusKey: "logic",
-      reason: `${baseReason} Conviene abrir el preview y corregir renderizado, eventos o estructura DOM.${closeout ? ` ${closeout}.` : ""}`,
-      shortReason: `${shortBaseReason} Conviene volver al preview DOM.`,
+      reason: `${baseReason}${failureSummary?.topLabel ? ` La comprobación que más se repite ahora es "${failureSummary.topLabel}".` : ""} Conviene abrir el preview y corregir renderizado, eventos o estructura DOM.${closeout ? ` ${closeout}.` : ""}`,
+      shortReason: `${shortBaseReason}${failureSummary?.topLabel ? ` El fallo más repetido está en "${failureSummary.topLabel}".` : ""} Conviene volver al preview DOM.`,
     };
   }
 
@@ -222,21 +224,102 @@ function compareExerciseResult(received, expected, compareMode) {
   return JSON.stringify(received) === JSON.stringify(expected);
 }
 
+function getExerciseFailureSummary(lessonId, source = null) {
+  const entry = state.exerciseFailureLog?.[lessonId];
+  if (!entry) return null;
+
+  const weightedByLabel = new Map();
+  const totalsByLabel = new Map();
+
+  for (const event of entry.events ?? []) {
+    if (source && event.source !== source) continue;
+    const weight = getStruggleEventWeight(event.at);
+    weightedByLabel.set(event.label, (weightedByLabel.get(event.label) ?? 0) + weight);
+    totalsByLabel.set(event.label, (totalsByLabel.get(event.label) ?? 0) + 1);
+  }
+
+  const labels = Array.from(weightedByLabel.entries())
+    .map(([label, weightedCount]) => ({
+      label,
+      weightedCount,
+      count: totalsByLabel.get(label) ?? 0,
+    }))
+    .sort((left, right) => right.weightedCount - left.weightedCount || right.count - left.count || left.label.localeCompare(right.label));
+
+  if (!labels.length) return null;
+
+  return {
+    total: labels.reduce((sum, entry) => sum + entry.count, 0),
+    topLabel: labels[0].label,
+    topWeightedCount: labels[0].weightedCount,
+    topCount: labels[0].count,
+    labels,
+  };
+}
+
 function normalizeHtml(value) {
   return String(value).replace(/\s+/g, " ").trim();
 }
 
-function formatExerciseMismatch(expected, received) {
+function formatExerciseMismatch(expected, received, label = "", source = "tests") {
+  const hint = inferExerciseFixHint(expected, received, label, source);
+
   if (Array.isArray(expected) && Array.isArray(received)) {
-    return expected
+    const lines = expected
       .map((item, index) => {
         const current = received[index];
         return `<p>${escapeHtml(item.selector)} · esperado: ${escapeHtml(formatConsoleValue(item.value))} · recibido: ${escapeHtml(formatConsoleValue(current?.value))}</p>`;
       })
       .join("");
+
+    return `${lines}${hint ? `<p><strong>Pista:</strong> ${escapeHtml(hint)}</p>` : ""}`;
   }
 
-  return `<p>Esperado: ${escapeHtml(formatConsoleValue(expected))}</p><p>Recibido: ${escapeHtml(formatConsoleValue(received))}</p>`;
+  return `<p>Esperado: ${escapeHtml(formatConsoleValue(expected))}</p><p>Recibido: ${escapeHtml(formatConsoleValue(received))}</p>${hint ? `<p><strong>Pista:</strong> ${escapeHtml(hint)}</p>` : ""}`;
+}
+
+function inferExerciseFixHint(expected, received, label = "", source = "tests") {
+  const normalizedLabel = String(label).toLowerCase();
+  const receivedText = typeof received === "string" ? received : formatConsoleValue(received);
+  const expectedText = typeof expected === "string" ? expected : formatConsoleValue(expected);
+
+  if (typeof receivedText === "string" && receivedText.includes("Error:")) {
+    return "La solución está lanzando un error. Revisa primero el nombre de la función, accesos a propiedades y datos que recorres.";
+  }
+
+  if (source === "dom-tests" && Array.isArray(expected) && expected.some((item) => typeof item?.value === "number")) {
+    return "Revisa cuántos nodos estás pintando y si limpias el contenedor antes de volver a renderizar.";
+  }
+
+  if (source === "dom-tests" && Array.isArray(expected)) {
+    return "Revisa el texto final del DOM, el orden de los elementos visibles y si sustituyes por completo el render anterior.";
+  }
+
+  if (normalizedLabel.includes("orden") || normalizedLabel.includes("mantiene") || normalizedLabel.includes("conserva")) {
+    return "Revisa el orden del filtrado o del map final. El dato puede ser correcto, pero salir en una secuencia distinta.";
+  }
+
+  if (normalizedLabel.includes("vacia") || normalizedLabel.includes("vacía") || normalizedLabel.includes("limpia") || normalizedLabel.includes("sustituye")) {
+    return "Revisa si reinicias el resultado anterior antes de pintar la nueva tanda.";
+  }
+
+  if (normalizedLabel.includes("filtra") || normalizedLabel.includes("solo") || normalizedLabel.includes("featured") || normalizedLabel.includes("pendientes")) {
+    return "Revisa la condición de filtrado antes de transformar o pintar los datos.";
+  }
+
+  if (typeof expected === "string" && expected.includes("<li>")) {
+    return "Revisa el formato exacto del HTML devuelto: etiquetas, separadores, espacios útiles y orden de campos.";
+  }
+
+  if (expected && typeof expected === "object") {
+    return "Revisa la estructura final que devuelves: nombres de propiedades, contadores y arrays calculados.";
+  }
+
+  if (typeof expectedText === "string" && typeof receivedText === "string") {
+    return "Revisa el valor final que devuelves y compáralo con el esperado carácter por carácter si hace falta.";
+  }
+
+  return "";
 }
 
 function recordLessonStruggle(lessonId, type, source = "study") {

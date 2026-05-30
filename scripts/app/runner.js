@@ -122,7 +122,7 @@ function evaluateActiveExercise() {
       .then(async (candidate) => {
         if (typeof candidate !== "function") {
           elements.jsRunnerOutput.textContent = `No se encontró una función llamada ${exercise.functionName}.`;
-          renderExerciseResults([], false);
+          renderExerciseResults([], false, lesson.id, "tests");
           return;
         }
 
@@ -149,9 +149,14 @@ function evaluateActiveExercise() {
 
         const solved = results.length > 0 && results.every((result) => result.passed);
         if (!solved) {
+          recordExerciseFailures(
+            lesson.id,
+            results.filter((result) => !result.passed),
+            "tests",
+          );
           recordLessonStruggle(lesson.id, "logic", "tests");
         }
-        renderExerciseResults(results, solved);
+        renderExerciseResults(results, solved, lesson.id, "tests");
         elements.jsRunnerOutput.textContent = output.length
           ? output.join("\n")
           : solved
@@ -162,6 +167,7 @@ function evaluateActiveExercise() {
         if (solved) {
           addProgressOnce("practiceDone", lesson.id, 20);
           addProgressOnce("solvedExercises", lesson.id, 35);
+          clearExerciseFailureLog(lesson.id);
           recordExerciseSuccess(lesson.id);
         }
         persist();
@@ -170,12 +176,12 @@ function evaluateActiveExercise() {
       .catch((error) => {
         recordLessonStruggle(lesson.id, "logic", "tests");
         elements.jsRunnerOutput.textContent = `${error.name}: ${error.message}`;
-        renderExerciseResults([], false);
+        renderExerciseResults([], false, lesson.id, "tests");
       });
   } catch (error) {
     recordLessonStruggle(lesson.id, "logic", "tests");
     elements.jsRunnerOutput.textContent = `${error.name}: ${error.message}`;
-    renderExerciseResults([], false);
+    renderExerciseResults([], false, lesson.id, "tests");
   }
 }
 
@@ -295,9 +301,14 @@ function evaluateDomExercise(lesson, exercise, code) {
     .then((results) => {
       const solved = results.length > 0 && results.every((result) => result.passed);
       if (!solved) {
+        recordExerciseFailures(
+          lesson.id,
+          results.filter((result) => !result.passed),
+          "dom-tests",
+        );
         recordLessonStruggle(lesson.id, "logic", "dom-tests");
       }
-      renderExerciseResults(results, solved);
+      renderExerciseResults(results, solved, lesson.id, "dom-tests");
       elements.jsRunnerOutput.textContent = solved
         ? "Preview y validación DOM correctos."
         : "El ejercicio se ejecutó, pero el DOM no cumple todos los tests.";
@@ -306,6 +317,7 @@ function evaluateDomExercise(lesson, exercise, code) {
       if (solved) {
         addProgressOnce("practiceDone", lesson.id, 20);
         addProgressOnce("solvedExercises", lesson.id, 35);
+        clearExerciseFailureLog(lesson.id);
         recordExerciseSuccess(lesson.id);
       }
       persist();
@@ -314,7 +326,7 @@ function evaluateDomExercise(lesson, exercise, code) {
     .catch((error) => {
       recordLessonStruggle(lesson.id, "logic", "dom-tests");
       elements.jsRunnerOutput.textContent = `${error.name}: ${error.message}`;
-      renderExerciseResults([], false);
+      renderExerciseResults([], false, lesson.id, "dom-tests");
     });
 }
 
