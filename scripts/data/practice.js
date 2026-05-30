@@ -208,6 +208,28 @@ Object.assign(learningRoot.LEARNING_DATA, {
           assertion: { type: "text", selector: "#contador" },
           expected: "0",
         },
+        {
+          label: "No duplica listeners si se conecta dos veces",
+          actions: [
+            { type: "call", name: "conectarContador" },
+            { type: "call", name: "conectarContador" },
+            { type: "click", selector: "#sumar" },
+          ],
+          assertion: { type: "text", selector: "#contador" },
+          expected: "1",
+        },
+        {
+          label: "Sigue sumando bien después de resetear",
+          actions: [
+            { type: "call", name: "conectarContador" },
+            { type: "click", selector: "#sumar" },
+            { type: "click", selector: "#sumar" },
+            { type: "click", selector: "#reset" },
+            { type: "click", selector: "#sumar" },
+          ],
+          assertion: { type: "text", selector: "#contador" },
+          expected: "1",
+        },
       ],
     }),
     "js-forms": exercise({
@@ -253,6 +275,39 @@ Object.assign(learningRoot.LEARNING_DATA, {
           ],
           assertion: { type: "text", selector: "#feedback" },
           expected: "Tarea guardada: Practicar fetch",
+        },
+        {
+          label: "No duplica el submit si se activa dos veces",
+          actions: [
+            { type: "call", name: "activarFormularioTarea" },
+            { type: "call", name: "activarFormularioTarea" },
+            { type: "set-value", selector: "#taskTitle", value: "Practicar DOM" },
+            { type: "submit", selector: "#taskForm" },
+          ],
+          assertion: { type: "text", selector: "#feedback" },
+          expected: "Tarea guardada: Practicar DOM",
+        },
+        {
+          label: "Limpia el input tras un envío válido",
+          actions: [
+            { type: "call", name: "activarFormularioTarea" },
+            { type: "set-value", selector: "#taskTitle", value: "Repasar arrays" },
+            { type: "submit", selector: "#taskForm" },
+          ],
+          assertion: { type: "value", selector: "#taskTitle" },
+          expected: "",
+        },
+        {
+          label: "No limpia el input si el siguiente envío es inválido",
+          actions: [
+            { type: "call", name: "activarFormularioTarea" },
+            { type: "set-value", selector: "#taskTitle", value: "Practicar fetch" },
+            { type: "submit", selector: "#taskForm" },
+            { type: "set-value", selector: "#taskTitle", value: "   " },
+            { type: "submit", selector: "#taskForm" },
+          ],
+          assertion: { type: "text", selector: "#feedback" },
+          expected: "El título es obligatorio.",
         },
       ],
     }),
@@ -3792,12 +3847,14 @@ function connectCounter() {
         "Asegúrate de que la vista se puede repintar varias veces sin incoherencias.",
         "Comprueba que no se dispara el incremento dos veces por un listener duplicado.",
         "Revisa que todos los cambios visibles salgan de una misma función de actualización.",
+        "Prueba volver a sumar después de resetear para confirmar que contador y estado siguen sincronizados en el siguiente ciclo.",
       ],
       [
         "La interacción responde al clic con cambios visibles inmediatos y predecibles.",
         "Los nodos se seleccionan una vez con intención clara y no de forma caótica.",
         "Contador y mensaje se mantienen sincronizados en cada acción.",
         "La pieza ya sirve como base para formularios, toggles y paneles más ricos.",
+        "La práctica ya obliga a pensar que reinicializar una pieza DOM no debería deformar el comportamiento por duplicación de listeners.",
       ],
     ),
     "js-forms": projectBrief(
@@ -3838,12 +3895,14 @@ function connectCounter() {
         "Asegúrate de que el mensaje cambia entre error y éxito sin quedarse congelado.",
         "Prueba varios submits seguidos para confirmar que no duplicas eventos.",
         "Revisa que la lógica de validación no dependa de texto hardcodeado repartido por varios sitios.",
+        "Prueba un envío válido seguido de otro inválido para confirmar que el formulario solo se limpia cuando toca y no pierde control del feedback.",
       ],
       [
         "El formulario responde al submit sin recargar la página.",
         "Error y éxito tienen contratos visibles distintos y fáciles de reconocer.",
         "La limpieza de campos ocurre solo cuando toca.",
         "La pieza ya sirve como base para entradas más ricas y validaciones posteriores.",
+        "La práctica ya obliga a pensar que reinicializar el formulario no debería duplicar listeners ni alterar el ciclo de feedback.",
       ],
     ),
     "js-components": projectBrief(

@@ -1194,6 +1194,18 @@ o sesión futura.
 - Añadidos casos para `items` no array y pendientes sin título útil, manteniendo orden y resumen estable
 - La idea es cerrar mejor el contrato entre carga asíncrona, recuento y títulos pendientes sin aceptar datos deformados como si fueran válidos
 
+## Fase 163 — Cobertura extra para DOM base
+
+- Reforzado `js-dom` en `scripts/data/practice.js`
+- Añadidos casos para evitar listeners duplicados, mantener el flujo tras reset y reforzar la sincronía entre contador y estado visible
+- La idea es cerrar mejor el contrato mínimo de eventos y actualización de vista antes de seguir subiendo a formularios y estado local
+
+## Fase 164 — Cobertura extra para formularios base
+
+- Reforzado `js-forms` en `scripts/data/practice.js`
+- Añadidos casos para evitar submit duplicado, limpiar solo tras éxito y mantener feedback estable en envíos consecutivos
+- La idea es cerrar mejor el contrato mínimo de validación y limpieza antes de pasar a formularios con más estado
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`
