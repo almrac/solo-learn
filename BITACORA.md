@@ -1117,6 +1117,11 @@ o sesión futura.
 - `Misiones semanales` ya adapta su eyebrow base cuando el frente activo es `practice` o `exam`
 - La idea es cerrar la coherencia de rotulación entre superficies principales sin meter aún otra capa de lógica
 
+## Fase 150 — Track activo alineado con el frente de trabajo
+
+- El bloque de track activo ya menciona también si ahora mismo el frente principal es estudio, práctica o comprobación
+- La idea es que incluso la lectura más resumida del dashboard quede alineada con `workMode`
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`

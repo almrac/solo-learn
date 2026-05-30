@@ -142,11 +142,16 @@ function renderActiveTrack(track) {
     : state.learningAreaFilter;
   const learningAreaLabel = effectiveArea === "frontend" ? "Frontend" : "Backend";
   const roomLabel = state.studyMode === "all" ? "Vista global" : `Sala ${track.label}`;
+  const workModeLabel = state.workMode === "practice"
+    ? "frente de práctica"
+    : state.workMode === "exam"
+      ? "frente de comprobación"
+      : "frente de estudio";
   elements.activeTrack.innerHTML = `
     <p class="eyebrow">${roomLabel}</p>
     <strong class="language-mark language-mark--${state.activeTrack}">${track.label}</strong>
     <span>${track.title}</span>
-    <small>${state.studyMode === "all" ? "Puedes revisar ambos lenguajes sin perder el track activo." : `Aprendizaje: ${learningAreaLabel}`}</small>
+    <small>${state.studyMode === "all" ? `Puedes revisar ambos lenguajes sin perder el track activo. Ahora mismo estás en ${workModeLabel}.` : `Aprendizaje: ${learningAreaLabel} · ${workModeLabel}`}</small>
   `;
 }
 
