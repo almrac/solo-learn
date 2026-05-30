@@ -2253,16 +2253,19 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Cambia nombre, edad y nota y comprueba que la salida sigue siendo legible.",
         "Verifica que el boolean no se pierda o se mezcle con el texto.",
         "Asegúrate de que cada dato aparece una sola vez en la ficha final.",
+        "Comprueba que el dato derivado no obliga a reinterpretar tipos básicos que ya estaban bien elegidos.",
       ],
       "Haz una segunda version con varios estudiantes y extrae un metodo `imprimirFicha(...)` para no duplicar la salida.",
       [
         "Edad 0 o una nota media con decimales largos para comprobar el formateo.",
         "Texto vacio en el nombre para ver si la salida sigue siendo legible.",
+        "Horas de estudio en 0 para decidir si el dato derivado sigue teniendo sentido o si conviene expresarlo de otra forma.",
       ],
       [
         "Empieza declarando cada dato con el tipo que mejor represente su valor.",
         "Construye primero una salida simple con todos los campos antes de pensar en el formato final.",
         "Si la linea queda confusa, introduce separadores claros entre cada dato.",
+        "Si añades un dato derivado, intenta que siga saliendo del mismo conjunto de variables y no de un parche textual improvisado.",
       ],
     ),
     "java-methods": guide(
@@ -2351,18 +2354,24 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Comprueba que siempre salen exactamente tres mensajes de repaso.",
         "Verifica que no se imprimen dos clasificaciones para la misma nota.",
         "Añade pruebas con 0, 5, 7 y 9 para fijar los bordes exactos de cada salto de tramo.",
+        "Comprueba que una nota inválida no entra por accidente en una rama válida por el orden de las condiciones.",
+        "Prueba también valores pegados al umbral, como 4 y 5 o 6 y 7, para confirmar que el salto de tramo expresa una regla clara y no un accidente de comparación.",
       ],
       "Sustituye la variable fija por una lista de notas y clasifica varias en el mismo programa sin repetir bloques `if` enteros.",
       [
         "Nota 5 y nota 9 para comprobar dos bordes de tramo.",
         "Nota fuera de rango, como -1 u 11, para decidir si la validas antes de clasificar.",
         "Una nota exactamente 10 para fijar si el último tramo incluye el máximo sin casos especiales escondidos.",
+        "Dos notas consecutivas dentro del mismo tramo para comprobar que no estás distinguiendo de más donde no toca.",
+        "Dos notas pegadas a un mismo límite para revisar si la frontera entre ramas está explicada con intención y no solo porque el programa compila.",
       ],
       [
         "Ordena las condiciones de la mas exigente a la mas amplia para no tapar casos.",
         "Haz primero que solo salga una clasificacion correcta.",
         "Despues anade el bucle de tres mensajes sin duplicar `println` manuales.",
         "Si validas rango, hazlo antes de la clasificacion principal para no mezclar error con tramos válidos.",
+        "Si una rama imprime un mensaje especial, revisa que no estés acoplando clasificación y salida hasta volverlo difícil de ampliar.",
+        "Si luego resumes varias notas, intenta que la misma regla de clasificación alimente también el contador o el mensaje final en vez de inventar una segunda versión del criterio.",
       ],
     ),
     "java-arrays": guide(
@@ -2402,6 +2411,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Verifica que cambiar el tamaño del array no obliga a tocar el bucle.",
         "Añade un caso con todas las notas iguales para comprobar que la máxima y la media siguen siendo consistentes.",
         "Decide qué significa destacar una posición si varias notas comparten el mismo valor máximo.",
+        "Prueba también un array con valores crecientes y otro decreciente para confirmar que no dependes por accidente de la posición inicial de la referencia.",
       ],
       "Amplia el resumen para contar tambien cuantas notas estan aprobadas y cuantas suspendidas en el mismo recorrido.",
       [
@@ -2416,6 +2426,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Calcula la media solo cuando ya hayas terminado de acumular el total.",
         "Si proteges el caso vacío, hazlo antes de leer la primera posición para no esconder un fallo de índice.",
         "Si más adelante devuelves también un índice destacado, procura que esa decisión salga del mismo recorrido y no de una segunda pasada innecesaria.",
+        "Si dos métricas dependen del mismo recorrido, revisa que no estén tomando decisiones distintas sobre el caso vacío o sobre qué máximo conservar.",
       ],
     ),
     "java-oop": guide(
@@ -2457,6 +2468,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Verifica que la lógica depende del estado del libro y no de datos externos.",
         "Prueba el borde exacto de 400 páginas para fijar la regla con precisión.",
         "Decide si un libro con páginas inválidas se permite igual o si esa protección debería aparecer ya en el modelo.",
+        "Prueba dos libros con el mismo título pero distinto número de páginas para confirmar que el comportamiento sigue colgado del estado de cada objeto y no de una variable externa reutilizada.",
       ],
       "Anade un metodo `resumen()` que devuelva una cadena legible con los datos del libro sin imprimir directamente en la clase.",
       [
@@ -2471,6 +2483,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "El metodo `esLargo()` solo necesita mirar `pages` y devolver un boolean.",
         "Si detectas un caso raro como paginas negativas, decide si lo modelas ya o si lo dejas explícitamente fuera del alcance.",
         "Intenta que la clase `Book` no cargue responsabilidades de catálogo o búsqueda que pertenecen a otra pieza.",
+        "Si añades un método de resumen o validación, revisa que siga respetando la misma idea de objeto: el libro conoce su estado, pero no decide cómo se organiza toda la biblioteca.",
       ],
     ),
     "java-inheritance": guide(
@@ -2512,6 +2525,7 @@ class SmsNotifier implements Notificable {
         "Añade un tercer notificador pequeño para comprobar que el diseño aguanta.",
         "Prueba un mensaje con espacios exteriores y decide si todas las implementaciones lo muestran igual o lo limpian antes.",
         "Decide si la validación del mensaje vive antes de llegar al canal o si cada implementación asume esa responsabilidad por separado.",
+        "Prueba el mismo mensaje en varios canales para confirmar que el cambio de formato no altera la regla común sobre cuándo un envío es válido.",
       ],
       "Crea un metodo que reciba un `Notificable` por parametro y lo use sin saber si es Email, SMS o cualquier otra implementacion.",
       [
@@ -2526,6 +2540,7 @@ class SmsNotifier implements Notificable {
         "Comprueba despues que una variable del tipo interfaz puede apuntar a cualquiera de las dos.",
         "Si anades validacion del mensaje, procura que no dependa de una sola clase concreta ni rompa el uso polimorfico.",
         "Si introduces un coordinador que recorra notificadores, intenta que sea él quien decida el flujo y no cada canal por su cuenta.",
+        "Si un canal necesita un formato especial, revisa que esa diferencia no termine creando contratos incompatibles con el resto.",
       ],
     ),
     "java-collections": guide(
@@ -2819,12 +2834,14 @@ class TaskService {
         "Asegúrate de que el cálculo derivado no obliga a convertir tipos sin sentido.",
         "Revisa que `boolean` y `double` aparezcan con intención real y no solo por meter más tipos.",
         "Piensa un caso con pocas horas o nota suspensa para confirmar que el formato sigue siendo estable.",
+        "Comprueba que el dato derivado no termina duplicando un valor que ya estaba claro en otra variable base.",
       ],
       [
         "La base de tipos y variables deja de ser teoría aislada y pasa a una ficha de datos con sentido.",
         "Los nombres elegidos ayudan a leer intención y no solo sintaxis.",
         "La salida final ya prepara el paso a decisiones, métodos y modelado posterior.",
         "La pieza cierra mejor el arranque de Java antes de subir a control y arrays.",
+        "La pieza ya obliga a pensar que una variable bien elegida también reduce ruido en el formato final.",
       ],
     ),
     "java-methods": projectBrief(
@@ -2926,6 +2943,8 @@ class TaskService {
         "Revisa que la clasificación de una sesión corta o incompleta tenga una regla visible y defendible.",
         "Prueba un valor justo en el umbral de sesión larga para fijar si entra o no en esa categoría.",
         "Si hay arrays paralelos, piensa qué ocurre si uno tiene menos elementos que el otro antes de asumir que siempre encajan.",
+        "Comprueba que el texto final del resumen coincide de verdad con las ramas que has contado y no con una interpretación distinta.",
+        "Prueba dos sesiones muy parecidas a ambos lados del umbral para confirmar que la diferencia de resultado es intencional y fácil de explicar.",
       ],
       [
         "La lógica de control deja de ser sintaxis suelta y pasa a resolver un flujo reconocible.",
@@ -2933,6 +2952,8 @@ class TaskService {
         "La pieza prepara bien el salto a arrays, recorridos y validación más rica.",
         "El código obliga a pensar en casos límite antes de crecer en complejidad.",
         "El ejemplo ya fuerza a decidir contratos simples de integridad de datos en vez de confiar en entradas siempre felices.",
+        "La pieza ya obliga a alinear decisión, contador y mensaje final en vez de tratarlos como tres cosas sueltas.",
+        "La práctica ya empuja a que la frontera entre ramas se lea como política explícita del programa y no como una suma de comparaciones sueltas.",
       ],
     ),
     "java-arrays": projectBrief(
@@ -2982,6 +3003,7 @@ class TaskService {
         "Prueba un array con un solo elemento para confirmar que máximo y promedio coinciden con ese dato sin pasos especiales rotos.",
         "Prueba varios máximos repetidos para decidir si te basta con el valor o si también quieres fijar qué posición destacar primero.",
         "Si usas arrays paralelos, comprueba que nunca lees una posición de uno cuando el otro ya no tiene ese índice disponible.",
+        "Comprueba que el resumen final no cambia de criterio entre la sesión más larga y el promedio, por ejemplo tratando el vacío de una forma en un método y de otra en el siguiente.",
       ],
       [
         "El array deja de ser solo teoría y pasa a una herramienta para resumir datos reales.",
@@ -2990,6 +3012,7 @@ class TaskService {
         "Los casos borde básicos quedan visibles antes de crecer en estructura.",
         "El ejemplo ya obliga a tomar decisiones coherentes de contrato en vez de asumir entradas siempre cómodas.",
         "La pieza ya empieza a fijar qué papel tiene el índice y no solo cómo recorrerlo sin romper nada.",
+        "La práctica ya empuja a que métricas hermanas compartan el mismo criterio de recorrido y no evolucionen como reglas desconectadas.",
       ],
     ),
     "java-oop": projectBrief(
@@ -3058,6 +3081,7 @@ class Library {
         "Prueba una búsqueda de título inexistente para fijar el contrato de no encontrado.",
         "Prueba una búsqueda con espacios o distinto uso de mayúsculas si decides normalizar ese acceso en la biblioteca.",
         "Prueba qué ocurre si intentas devolver un libro ya disponible para fijar la semántica del dominio.",
+        "Comprueba que dos libros con el mismo título no rompen por accidente tu criterio de búsqueda o te obligan a decidir explícitamente qué significa duplicado en este catálogo.",
       ],
       [
         "El libro cambia de disponible a prestado y vuelve a disponible sin estados ambiguos.",
@@ -3067,6 +3091,7 @@ class Library {
         "La demo final enseña una secuencia completa, no solo una impresión aislada.",
         "El caso de libro no encontrado ya forma parte del contrato del coordinador, no queda implícito.",
         "La pieza ya obliga a pensar en contrato de búsqueda y en invariantes del catálogo, no solo en tener una lista de libros.",
+        "La práctica ya obliga a distinguir mejor qué reglas viven en `Book` y cuáles pertenecen al coordinador `Library`.",
       ],
     ),
     "java-collections": projectBrief(
@@ -3166,6 +3191,7 @@ List<Notificable> canales = new ArrayList<>();`,
         "Prueba un mensaje con solo espacios y confirma que todas las implementaciones respetan la misma decisión de contrato.",
         "Prueba un mensaje `null` o vacío y decide si el descarte ocurre antes del envío o dentro de cada canal, pero deja el criterio estable.",
         "Prueba si el coordinador puede seguir funcionando igual aunque cambies un canal por otro sin tocar el bucle principal.",
+        "Lanza primero un mensaje inválido y luego uno válido para comprobar que el coordinador no arrastra un estado extraño entre envíos.",
       ],
       [
         "El envío funciona para varios canales sin cambiar el código que los recorre.",
@@ -3173,6 +3199,7 @@ List<Notificable> canales = new ArrayList<>();`,
         "Agregar otro notificador es un cambio local, no una reescritura del flujo.",
         "La validación del mensaje no queda escondida ni duplicada sin criterio entre canales.",
         "La pieza ya obliga a decidir dónde vive el contrato común y dónde empieza la variación concreta de cada canal.",
+        "La práctica ya empuja a separar mejor formato específico del canal y regla compartida de aceptación del mensaje.",
       ],
     ),
     "java-exceptions": projectBrief(

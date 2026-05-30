@@ -1128,6 +1128,36 @@ o sesión futura.
 - Añadido más foco en reutilización real, contrato entre métodos y coordinación limpia desde `main`
 - La idea es que métodos no se quede en “extraer funciones”, sino que empiece a fijar mejor qué piezas son realmente reutilizables
 
+## Fase 152 — Más densidad para variables en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-variables` en `scripts/data/practice.js`
+- Añadido más foco en formateo estable, sentido del dato derivado y separación entre variable base y ruido de salida
+- La idea es cerrar mejor la base más temprana de Java sin convertir todavía la pieza en otro ejercicio de métodos
+
+## Fase 153 — Más densidad para control de flujo en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-control` en `scripts/data/practice.js`
+- Añadido más foco en umbrales legibles, ramas con intención y coherencia entre clasificación, contadores y resumen
+- La idea es que control de flujo deje más claro cuándo una frontera entre casos responde a una regla real y no solo al orden accidental de las comparaciones
+
+## Fase 154 — Más densidad para arrays en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-arrays` en `scripts/data/practice.js`
+- Añadido más foco en recorridos consistentes, máximos repetidos y contrato común entre promedio, máximo y caso vacío
+- La idea es que arrays no se quede en “recorrer y sumar”, sino que fije mejor cuándo varias métricas deben compartir la misma regla de lectura
+
+## Fase 155 — Más densidad para POO en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-oop` en `scripts/data/practice.js`
+- Añadido más foco en invariantes del objeto, contrato de búsqueda y semántica de préstamo y devolución
+- La idea es que POO no se quede en “crear clases”, sino que deje más claro qué reglas pertenecen al objeto y cuáles al coordinador
+
+## Fase 156 — Más densidad para interfaces en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-inheritance` en `scripts/data/practice.js`
+- Añadido más foco en contrato compartido entre canales, validación consistente y separación entre formato del canal y regla común de envío
+- La idea es que interfaces no se quede en polimorfismo de escaparate, sino que deje más claro qué se comparte y qué puede variar sin romper el sistema
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`
