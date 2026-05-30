@@ -1122,6 +1122,12 @@ o sesión futura.
 - El bloque de track activo ya menciona también si ahora mismo el frente principal es estudio, práctica o comprobación
 - La idea es que incluso la lectura más resumida del dashboard quede alineada con `workMode`
 
+## Fase 151 — Más densidad para métodos en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-methods` en `scripts/data/practice.js`
+- Añadido más foco en reutilización real, contrato entre métodos y coordinación limpia desde `main`
+- La idea es que métodos no se quede en “extraer funciones”, sino que empiece a fijar mejor qué piezas son realmente reutilizables
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`

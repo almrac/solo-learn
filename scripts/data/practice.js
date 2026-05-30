@@ -2300,18 +2300,21 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Verifica que el nivel empieza en 1 y no en 0.",
         "Comprueba que mover la impresión fuera del método no cambia el cálculo.",
         "Añade un caso como 300 para fijar el borde exacto de un segundo salto completo.",
+        "Comprueba si el método sigue siendo reutilizable cuando cambias el sitio desde el que se imprime o se consume el valor.",
       ],
       "Anade un segundo metodo que reciba tambien el tamano del bloque de XP para hacer el calculo configurable.",
       [
         "XP exactamente en el borde de cambio de nivel, como 150 o 300.",
         "XP negativo para decidir si lo normalizas, lo rechazas o documentas que no se contempla.",
         "Un tamano de bloque 0 o negativo si haces la version configurable y quieres fijar un contrato minimo razonable.",
+        "Dos llamadas seguidas con bloques distintos para comprobar que el método no depende de estado escondido entre invocaciones.",
       ],
       [
         "Piensa cuantos bloques completos de 150 hay dentro del XP recibido.",
         "Recuerda que el primer nivel existe incluso cuando el XP es 0.",
         "Prueba el metodo con valores justo antes y justo despues del cambio de tramo.",
         "Si extraes una version configurable, evita que el metodo dependa de constantes escondidas fuera de sus parametros.",
+        "Si `main` solo coordina, debería poder cambiar el orden de impresión sin tocar la lógica del cálculo.",
       ],
     ),
     "java-control": guide(
@@ -2871,6 +2874,7 @@ class TaskService {
         "Piensa un caso con cero minutos o cero retos para confirmar que el contrato sigue siendo razonable.",
         "Prueba un nombre vacío o con espacios y decide si el resumen lo conserva, lo limpia o muestra un valor por defecto.",
         "Prueba un valor negativo en minutos o retos y deja claro si se corrige, se rechaza o queda fuera de alcance.",
+        "Comprueba que podrías reutilizar `calculateXp` desde otro flujo sin arrastrar detalles de formato o consola.",
       ],
       [
         "La estructura ya enseña a repartir trabajo fuera de `main`.",
@@ -2878,6 +2882,7 @@ class TaskService {
         "La pieza prepara bien el paso a validación, control de flujo y colecciones.",
         "La lectura del código mejora porque cada bloque tiene una intención concreta.",
         "El ejemplo ya obliga a pensar en contrato y no solo en extraer trozos de código por estética.",
+        "La pieza ya fuerza a comprobar si la extracción a métodos ha mejorado de verdad la reutilización y no solo la apariencia.",
       ],
     ),
     "java-control": projectBrief(
