@@ -164,6 +164,47 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "count", selector: "#lessonList li", expected: 0 },
           ],
         },
+        {
+          label: "Sustituye la lista anterior por vacío sin dejar residuos",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarLessons",
+              args: [[
+                { title: "map y filter", language: "JavaScript", level: "Base" },
+                { title: "Clases y objetos", language: "Java", level: "Intermedio" },
+              ]],
+            },
+            {
+              type: "call",
+              name: "renderizarLessons",
+              args: [[]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#lessonList li", expected: 0 },
+          ],
+        },
+        {
+          label: "Tolera entradas no array devolviendo una lista vacía",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarLessons",
+              args: [[
+                { title: "map y filter", language: "JavaScript", level: "Base" },
+              ]],
+            },
+            {
+              type: "call",
+              name: "renderizarLessons",
+              args: [null],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#lessonList li", expected: 0 },
+          ],
+        },
       ],
     }),
     "js-dom": exercise({
@@ -508,6 +549,49 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "count", selector: "#taskList li", expected: 1 },
             { type: "text", selector: "#taskList li:first-child", expected: "Estado local" },
             { type: "text", selector: "#taskCount", expected: "Pendientes: 1" },
+          ],
+        },
+        {
+          label: "Vacia lista y contador al renderizar un array vacío tras un lote anterior",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarTareas",
+              args: [[
+                { title: "Repasar arrays", completada: false },
+                { title: "Practicar fetch", completada: true },
+              ]],
+            },
+            {
+              type: "call",
+              name: "renderizarTareas",
+              args: [[]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#taskList li", expected: 0 },
+            { type: "text", selector: "#taskCount", expected: "Pendientes: 0" },
+          ],
+        },
+        {
+          label: "Tolera entradas no array devolviendo vista vacía",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarTareas",
+              args: [[
+                { title: "Repasar arrays", completada: false },
+              ]],
+            },
+            {
+              type: "call",
+              name: "renderizarTareas",
+              args: [null],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#taskList li", expected: 0 },
+            { type: "text", selector: "#taskCount", expected: "Pendientes: 0" },
           ],
         },
       ],
@@ -3610,12 +3694,14 @@ function persistState() {
         "Asegúrate de que el filtro `all / pending / done` no duplica lógica en varios sitios.",
         "Recarga la app y confirma que `localStorage` devuelve la misma vista que dejaste.",
         "Comprueba que renderizar dos veces seguidas no deja nodos viejos ni contadores desfasados.",
+        "Prueba un estado vacío o una recuperación defectuosa para confirmar que la interfaz vuelve a cero sin residuos ni contadores falsos.",
       ],
       [
         "Toda la interfaz sale de una única fuente de verdad fácil de localizar.",
         "Actualizar una tarea obliga a tocar estado y render, no a parchear varios nodos manualmente.",
         "La persistencia queda acotada y no contamina la lógica de filtrado o pintado.",
         "La pieza ya se parece a una mini app y no solo a una práctica DOM aislada.",
+        "La práctica ya obliga a decidir cómo responde la vista cuando el estado recuperado no tiene la forma feliz esperada.",
       ],
     ),
     "js-objects": projectBrief(
@@ -3795,12 +3881,14 @@ function renderPracticeList(items) {
         "Asegúrate de que una segunda llamada no deja elementos anteriores colgados.",
         "Comprueba que el orden visible coincide con el orden del array de entrada.",
         "Revisa que el formato de cada fila siga siendo legible aunque cambie el lenguaje o el nivel.",
+        "Prueba una llamada con array vacío o valor no array para confirmar que la lista y el resumen vuelven a cero sin residuos.",
       ],
       [
         "El render convierte datos en interfaz sin mezclar fetch, estado global ni listeners innecesarios.",
         "La lista se puede volver a pintar varias veces sin arrastrar residuos.",
         "El usuario puede escanear título, lenguaje y nivel de un vistazo.",
         "La pieza ya prepara bien el salto posterior hacia filtros y estado local.",
+        "La práctica ya obliga a mantener alineados lote visible y resumen incluso cuando la entrada deja de estar en el caso feliz.",
       ],
     ),
     "js-dom": projectBrief(

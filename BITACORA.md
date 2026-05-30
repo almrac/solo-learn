@@ -1206,6 +1206,18 @@ o sesión futura.
 - Añadidos casos para evitar submit duplicado, limpiar solo tras éxito y mantener feedback estable en envíos consecutivos
 - La idea es cerrar mejor el contrato mínimo de validación y limpieza antes de pasar a formularios con más estado
 
+## Fase 165 — Cobertura extra para estado local
+
+- Reforzado `js-state` en `scripts/data/practice.js`
+- Añadidos casos para rerender vacío, entrada no array y coherencia del contador al recuperar un estado no feliz
+- La idea es cerrar mejor el contrato entre fuente de verdad, render completo y recuperación de estado antes de seguir creciendo en interfaz
+
+## Fase 166 — Cobertura extra para listas renderizadas
+
+- Reforzado `js-render-lists` en `scripts/data/practice.js`
+- Añadidos casos para entrada no array, sustitución por vacío y alineación entre lista visible y resumen
+- La idea es cerrar mejor el contrato mínimo de render por lotes antes de pasar a vistas con filtros y estado más rico
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`
