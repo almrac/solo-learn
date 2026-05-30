@@ -1158,6 +1158,24 @@ o sesión futura.
 - Añadido más foco en contrato compartido entre canales, validación consistente y separación entre formato del canal y regla común de envío
 - La idea es que interfaces no se quede en polimorfismo de escaparate, sino que deje más claro qué se comparte y qué puede variar sin romper el sistema
 
+## Fase 157 — Más densidad para colecciones en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-collections` en `scripts/data/practice.js`
+- Añadido más foco en convención de claves, cruce explícito entre `List` y `Map` y coherencia del resumen final
+- La idea es que colecciones no se quede en “usar `ArrayList` y `HashMap`”, sino que fije mejor cómo se coordinan estructuras distintas sin derivar en texto libre
+
+## Fase 158 — Más densidad para excepciones en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-exceptions` en `scripts/data/practice.js`
+- Añadido más foco en separar parseo, rango y lectura del descarte sin romper el contrato simple de retorno
+- La idea es que excepciones no se quede en `try/catch` mecánico, sino que deje más claro qué error se absorbe, cómo se resume y qué capa decide cada cosa
+
+## Fase 159 — Más densidad para testing en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-testing` en `scripts/data/practice.js`
+- Añadido más foco en borde exacto, nombres de test legibles y responsabilidad acotada del validador
+- La idea es que testing no se quede en escribir asserts sueltos, sino que deje más claro qué contrato cubre cada test y qué ruido queda fuera de esa utilidad
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`

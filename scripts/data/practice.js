@@ -2582,6 +2582,7 @@ public class ProgressRegistry {
         "Cambia el orden de inserción y comprueba que el programa sigue teniendo sentido.",
         "Prueba a pedir XP de un lenguaje ausente y decide si devuelves 0, mensaje o valor por defecto.",
         "Comprueba que varias tareas del mismo lenguaje no te obligan a duplicar entradas del mapa si ese mapa solo guarda XP acumulado.",
+        "Prueba dos claves casi iguales, como `Java` y `java`, para confirmar que tu convención de nombres evita duplicados invisibles.",
       ],
       "Calcula tambien cuantas tareas pertenecen a cada lenguaje para cruzar una `List` de tareas con el `Map` de XP.",
       [
@@ -2596,6 +2597,7 @@ public class ProgressRegistry {
         "Recorre cada estructura por separado y solo al final compone el resumen.",
         "Mantén la misma convención de claves (`java`, `javascript`) en escritura y lectura para no fabricar bugs invisibles.",
         "Si decides priorizar tareas, procura que esa prioridad viva en la tarea o en una vista derivada, no escondida dentro del mapa de XP.",
+        "Si un resumen necesita datos de lista y mapa, intenta cruzarlos con una regla explícita en vez de improvisar texto que luego no puedas mantener.",
       ],
     ),
     "java-exceptions": guide(
@@ -2633,6 +2635,7 @@ public class ProgressRegistry {
         "Verifica que el contrato `-1` se mantiene igual en todos los fallos.",
         "Decide si `trim()` forma parte del contrato antes de parsear y comprueba ese caso de forma explícita.",
         "Comprueba si te conviene separar un test mental para parseo inválido y otro para rango inválido para no mezclar causas distintas.",
+        "Prueba una cadena que primero falla por formato y otra que falla por rango para confirmar que no has mezclado ambas decisiones en el mismo bloque sin darte cuenta.",
       ],
       "Extrae una segunda funcion que valide si la nota esta entre 0 y 10 para separar parseo y regla de negocio.",
       [
@@ -2647,6 +2650,7 @@ public class ProgressRegistry {
         "Si anades validacion de rango, separala en otra funcion para no mezclar responsabilidades.",
         "No escondas entradas descartadas: aunque devuelvas `-1`, deja claro en `main` qué pasó con cada caso si montas una demo.",
         "Si varias entradas inválidas terminan igual, intenta aun así distinguir en tu razonamiento si falló el formato o la regla de dominio.",
+        "Si más tarde cuentas descartes, procura que la observabilidad del error no te fuerce a romper la simplicidad del contrato principal del método.",
       ],
     ),
     "java-testing": guide(
@@ -2692,6 +2696,7 @@ public class ProgressRegistry {
         "Anota cómo quedarían esos casos en tres métodos JUnit con nombres distintos.",
         "Decide si notas fuera de 0-10 forman parte del contrato o si las dejas fuera por ahora, pero hazlo explícito.",
         "Comprueba si te compensa separar un test por borde exacto y otro por rango inválido para no mezclar motivos de fallo.",
+        "Prueba dos valores contiguos como 4 y 5 y revisa que el nombre de cada test deje claro por qué uno falla y el otro pasa.",
       ],
       "Escribe el esqueleto de una clase de test JUnit con tres metodos separados para borde, suspenso y caso claramente aprobado.",
       [
@@ -2708,6 +2713,7 @@ public class ProgressRegistry {
         "Nombra cada test por comportamiento esperado, no por la implementación interna.",
         "Si añades casos fuera de rango, decide si esa validación vive en este método o en otra capa.",
         "Evita meter varias aserciones heterogéneas en el mismo test si luego no sabrás qué parte del contrato se ha roto.",
+        "Si el método sigue creciendo, revisa si estás metiendo dentro del validador decisiones que en realidad pertenecen a otra regla previa del flujo.",
       ],
     ),
     "java-spring-intro": guide(
@@ -3147,6 +3153,7 @@ xpByTrack.put("javascript", 160);
         "Verifica que las tareas más urgentes aparecen antes en la vista principal si decides priorizarlas.",
         "Prueba una tarea de un lenguaje sin XP cargado todavía y decide cómo aparece en el resumen.",
         "Prueba dos tareas del mismo lenguaje con estados distintos para confirmar que el resumen no mezcla pendiente, prioridad y XP como si fueran el mismo dato.",
+        "Prueba una clave de lenguaje con mayúsculas o espacios si decides normalizarla, para asegurarte de que no nace un segundo registro paralelo por accidente.",
       ],
       [
         "La salida final resume pendientes, completadas y XP sin depender de variables sueltas repetidas.",
@@ -3155,6 +3162,7 @@ xpByTrack.put("javascript", 160);
         "La agenda ya parece una herramienta de estudio y no solo una demo de colecciones.",
         "La ausencia de una clave en el mapa ya no rompe el flujo: también forma parte del contrato del programa.",
         "La pieza ya obliga a pensar en modelo de datos y no solo en usar `ArrayList` y `HashMap` porque toca.",
+        "La práctica ya empuja a decidir cómo se conectan estructura principal, metadatos y resumen sin convertir el flujo en una suma de atajos.",
       ],
     ),
     "java-inheritance": projectBrief(
@@ -3246,6 +3254,7 @@ public static void main(String[] args) {
         "Cuenta cuántas entradas descartas para confirmar que no desaparecen en silencio.",
         "Prueba una entrada con espacios exteriores y otra vacía para fijar el contrato de normalización.",
         "Prueba si una entrada como `12` y otra como `hola` terminan igual por simplificación o si conviene al menos distinguirlas en el resumen interno.",
+        "Comprueba que un valor válido después de varios descartes sigue entrando bien en la colección y no se ve afectado por el estado previo del bucle.",
       ],
       [
         "El contrato de error es estable: cualquier entrada inválida termina igual.",
@@ -3255,6 +3264,7 @@ public static void main(String[] args) {
         "Los casos manuales enseñan que el método falla de forma controlada, no ruidosa.",
         "La decisión sobre `trim()` o entrada vacía no queda implícita: forma parte visible del diseño.",
         "La pieza ya obliga a pensar en observabilidad del error y no solo en devolver `-1` para todo.",
+        "La práctica ya empuja a separar contrato simple de retorno y lectura más rica del descarte sin confundir ambas capas.",
       ],
     ),
     "java-testing": projectBrief(
@@ -3303,6 +3313,7 @@ public static void main(String[] args) {
         "Añade un caso nulo o no string si decides endurecer más el contrato.",
         "Añade un caso con exactamente tres caracteres útiles para fijar el borde de longitud mínima.",
         "Revisa si los nombres de tests permiten entender el contrato leyendo solo la suite sin abrir la implementación.",
+        "Prueba un título válido después de varios rechazados para confirmar que la suite sigue leyendo el contrato como reglas independientes y no como una secuencia con estado.",
       ],
       [
         "La función principal cabe en pocas líneas y su intención sigue siendo obvia.",
@@ -3311,6 +3322,7 @@ public static void main(String[] args) {
         "La suite JUnit se entiende leyendo solo los nombres de sus métodos.",
         "El borde exacto de longitud mínima ya no queda implícito: también está fijado por tests.",
         "La pieza ya enseña que probar no es repetir entradas, sino delimitar con claridad la responsabilidad del validador.",
+        "La práctica ya empuja a distinguir entre contrato del validador y ruido que debería resolverse antes o después de él.",
       ],
     ),
     "java-spring-intro": projectBrief(
