@@ -585,6 +585,16 @@ function renderWeeklyMissions() {
 function renderHistoryPanel() {
   const history = getHistorySnapshot(7);
   const recommendation = recommendNextSession();
+  const historyEyebrow = state.workMode === "practice"
+    ? "Historial de práctica"
+    : state.workMode === "exam"
+      ? "Historial de comprobación"
+      : "Historial reciente";
+  const reentryLabel = state.workMode === "practice"
+    ? "Reentrada útil en práctica"
+    : state.workMode === "exam"
+      ? "Reentrada útil para examen"
+      : "Reentrada útil ahora";
   const reentryText = !recommendation
     ? ""
     : recommendation.hint
@@ -592,7 +602,7 @@ function renderHistoryPanel() {
       : `${recommendation.lesson.title} · ${recommendation.kind.toLowerCase()}`;
 
   elements.historyPanel.innerHTML = `
-    <p class="eyebrow">Historial reciente</p>
+    <p class="eyebrow">${escapeHtml(historyEyebrow)}</p>
     <h3>${history.studiedDays.length}/7 días con actividad</h3>
     <p>${history.closedDays.length} cierres de sesión · ~${history.approxMinutes} min.</p>
     <p>${history.solvedChallengesCount} retos · ${history.solvedExercisesCount} tests validados</p>
@@ -639,7 +649,7 @@ function renderHistoryPanel() {
         .join("")}
     </div>
     <p>${history.topTopics.length ? `Temas tocados: ${escapeHtml(history.topTopics.join(", "))}.` : "Aún no hay temas suficientes para resumir."}</p>
-    ${reentryText ? `<p><strong>Reentrada útil ahora:</strong> ${escapeHtml(reentryText)}</p>` : ""}
+    ${reentryText ? `<p><strong>${escapeHtml(reentryLabel)}:</strong> ${escapeHtml(reentryText)}</p>` : ""}
   `;
 }
 

@@ -1107,6 +1107,11 @@ o sesión futura.
 - El bloque de `Repaso` ya adapta su eyebrow y su mensaje vacío según `study`, `practice` o `exam`
 - La idea es que también la lectura de deuda pendiente hable el mismo idioma que el frente activo y no quede como bloque neutro
 
+## Fase 148 — Historial alineado con el frente activo
+
+- El historial reciente ya adapta su eyebrow y su texto de reentrada según `study`, `practice` o `exam`
+- La idea es que también la lectura retrospectiva y el punto de reentrada usen el mismo marco operativo que el resto de superficies
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`
