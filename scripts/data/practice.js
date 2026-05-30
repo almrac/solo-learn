@@ -2345,6 +2345,7 @@ class SmsNotifier implements Notificable {
         "Usa ArrayList para guardar tareas.",
         "Usa HashMap para asociar lenguaje con XP.",
         "Recorre ambas estructuras y muestra un resumen legible.",
+        "Decide una convención estable para las claves del mapa antes de insertar y leer.",
       ],
       "Colecciones",
       "Intermedio",
@@ -2372,16 +2373,19 @@ public class ProgressRegistry {
         "Añade varias tareas y comprueba que el recuento final coincide con la lista.",
         "Verifica que cada clave del mapa devuelve el XP correcto.",
         "Cambia el orden de inserción y comprueba que el programa sigue teniendo sentido.",
+        "Prueba a pedir XP de un lenguaje ausente y decide si devuelves 0, mensaje o valor por defecto.",
       ],
       "Calcula tambien cuantas tareas pertenecen a cada lenguaje para cruzar una `List` de tareas con el `Map` de XP.",
       [
         "Una lista vacia para comprobar que el resumen no rompe el programa.",
         "Una clave de lenguaje que no exista en el mapa para decidir el valor por defecto.",
+        "Dos tareas del mismo lenguaje con nombres parecidos para decidir si el conteo se basa en estructura o en texto libre.",
       ],
       [
         "Decide primero que guarda la lista y que guarda el mapa para no mezclar responsabilidades.",
         "Rellena unas pocas tareas y un par de claves de XP antes de imprimir nada.",
         "Recorre cada estructura por separado y solo al final compone el resumen.",
+        "Mantén la misma convención de claves (`java`, `javascript`) en escritura y lectura para no fabricar bugs invisibles.",
       ],
     ),
     "java-exceptions": guide(
@@ -2416,16 +2420,19 @@ public class ProgressRegistry {
         "Prueba un número válido, texto no numérico y un valor fuera del formato esperado.",
         "Comprueba que los casos inválidos no rompen el programa principal.",
         "Verifica que el contrato `-1` se mantiene igual en todos los fallos.",
+        "Decide si `trim()` forma parte del contrato antes de parsear y comprueba ese caso de forma explícita.",
       ],
       "Extrae una segunda funcion que valide si la nota esta entre 0 y 10 para separar parseo y regla de negocio.",
       [
         "Texto con espacios alrededor, como ` 8 `, para decidir si haces trim antes del parseo.",
         "Valores numericos fuera de rango, como 12 o -3, si anades validacion de dominio.",
+        "String vacio o null para decidir si lo tratas como parseo inválido o añades una protección previa.",
       ],
       [
         "Primero resuelve solo el parseo con `Integer.parseInt` dentro de `try/catch`.",
         "Haz que todos los fallos de parseo vuelvan al mismo valor acordado, `-1`.",
         "Si anades validacion de rango, separala en otra funcion para no mezclar responsabilidades.",
+        "No escondas entradas descartadas: aunque devuelvas `-1`, deja claro en `main` qué pasó con cada caso si montas una demo.",
       ],
     ),
     "java-testing": guide(
@@ -2468,18 +2475,21 @@ public class ProgressRegistry {
         "Comprueba un caso claramente inválido y otro claramente válido.",
         "Asegúrate de que el método devuelve boolean y no texto de consola.",
         "Anota cómo quedarían esos casos en tres métodos JUnit con nombres distintos.",
+        "Decide si notas fuera de 0-10 forman parte del contrato o si las dejas fuera por ahora, pero hazlo explícito.",
       ],
       "Escribe el esqueleto de una clase de test JUnit con tres metodos separados para borde, suspenso y caso claramente aprobado.",
       [
         "La nota 0 para confirmar un suspenso claro.",
         "La nota 5 exacta para fijar el borde que mas suele romperse.",
         "La nota 10 para comprobar un caso claramente aprobado y sin ambigüedad.",
+        "Una nota fuera de rango, como -1 u 11, para decidir si tu contrato la considera simplemente no aprobada.",
       ],
       [
         "Reduce la regla a una condicion simple que devuelva boolean.",
         "Prueba primero el caso 5, que es el borde mas importante.",
         "Separa los casos en comprobaciones independientes para que el fallo sea legible.",
         "Nombra cada test por comportamiento esperado, no por la implementación interna.",
+        "Si añades casos fuera de rango, decide si esa validación vive en este método o en otra capa.",
       ],
     ),
     "java-spring-intro": guide(
@@ -2543,6 +2553,7 @@ class TaskService {
         "Decide qué código HTTP devolverías en alta válida, validación fallida y tarea inexistente.",
         "Decide si `PATCH /complete` devuelve la tarea actualizada, `204` sin cuerpo o un error de dominio si ya estaba completada.",
         "Decide si el listado usa el mismo DTO que el detalle o uno más pequeño para no exponer más de la cuenta.",
+        "Prueba qué harías con un título en blanco o con espacios para fijar si normalizas antes de validar.",
       ],
       "Anade una cuarta operacion para filtrar tareas pendientes y decide si encaja mejor como query param en GET o como endpoint aparte.",
       [
@@ -2551,6 +2562,7 @@ class TaskService {
         "Enviar un titulo con espacios para decidir si normalizas antes de validar o rechazas tal cual.",
         "Completar una tarea ya hecha para decidir si repites `200`, devuelves `409` o simplemente no haces nada.",
         "Listar con `?done=true` o `?done=false` para decidir si el filtrado vive en controller o en service.",
+        "Crear dos tareas con el mismo título para decidir si el dominio lo permite o si defines un conflicto explícito.",
       ],
       [
         "Piensa primero en los recursos y acciones que vera el cliente, no en las clases internas.",
@@ -2559,6 +2571,7 @@ class TaskService {
         "Fija primero el contrato HTTP y luego adapta la implementación interna a ese contrato.",
         "Si introduces errores de dominio, dales nombre y forma estable antes de pensar en excepciones genéricas.",
         "Usa query params para filtros simples del listado antes de inventar rutas nuevas.",
+        "Decide pronto si normalizas espacios en el request o si esa regla pertenece a una capa anterior.",
       ],
     ),
   },
@@ -2831,6 +2844,7 @@ class Library {
         "Añade operaciones mínimas para crear tarea, completarla, priorizarla y listar estado actual.",
         "Separa pendientes y completadas en el resumen final.",
         "Muestra un resumen final recorriendo las estructuras.",
+        "Decide qué valor por defecto devuelve el mapa cuando un lenguaje aún no tiene XP registrado.",
       ],
       [
         "Lista principal de tareas",
@@ -2870,12 +2884,14 @@ xpByTrack.put("javascript", 160);
         "Comprueba que completar una tarea cambia su estado sin duplicarla ni perderla.",
         "Añade un tercer dato y confirma que el resumen sigue saliendo legible.",
         "Verifica que las tareas más urgentes aparecen antes en la vista principal si decides priorizarlas.",
+        "Prueba una tarea de un lenguaje sin XP cargado todavía y decide cómo aparece en el resumen.",
       ],
       [
         "La salida final resume pendientes, completadas y XP sin depender de variables sueltas repetidas.",
         "Crear o completar tareas es un cambio local, no un parche repartido por todo `main`.",
         "Lista y mapa tienen responsabilidades distintas y eso se nota en el código.",
         "La agenda ya parece una herramienta de estudio y no solo una demo de colecciones.",
+        "La ausencia de una clave en el mapa ya no rompe el flujo: también forma parte del contrato del programa.",
       ],
     ),
     "java-inheritance": projectBrief(
@@ -2923,6 +2939,7 @@ List<Notificable> canales = new ArrayList<>();`,
         "Muestra un resumen final con cuántas notas válidas aceptaste y su media.",
         "Prueba varios casos desde `main`, incluidos vacío, texto y nota válida.",
         "Cuenta también cuántas entradas inválidas descartaste para no perder visibilidad del error.",
+        "Decide si los espacios exteriores se limpian antes de validar o si cuentan como entrada inválida y mantenlo estable en todo el flujo.",
       ],
       [
         "Método de parseo",
@@ -2952,6 +2969,7 @@ public static void main(String[] args) {
         "Verifica que no capturas una excepción genérica si no hace falta.",
         "Comprueba que la media final solo use las notas aceptadas.",
         "Cuenta cuántas entradas descartas para confirmar que no desaparecen en silencio.",
+        "Prueba una entrada con espacios exteriores y otra vacía para fijar el contrato de normalización.",
       ],
       [
         "El contrato de error es estable: cualquier entrada inválida termina igual.",
@@ -2959,6 +2977,7 @@ public static void main(String[] args) {
         "La colección final solo contiene datos válidos y el resumen se calcula sobre ella.",
         "El informe final deja claro qué aceptaste y qué descartaste, no solo la media.",
         "Los casos manuales enseñan que el método falla de forma controlada, no ruidosa.",
+        "La decisión sobre `trim()` o entrada vacía no queda implícita: forma parte visible del diseño.",
       ],
     ),
     "java-testing": projectBrief(
@@ -2969,6 +2988,7 @@ public static void main(String[] args) {
         "Escribe al menos tres tests: válido, vacío y demasiado corto.",
         "Añade un test de valor nulo o no válido para fijar el contrato de error.",
         "Refactoriza nombres o duplicaciones después de que los tests pasen.",
+        "Decide también si un título con exactamente 3 caracteres útiles es válido y deja ese borde cubierto.",
       ],
       [
         "Clase de validación",
@@ -3002,12 +3022,14 @@ public static void main(String[] args) {
         "Comprueba que un cambio de nombre o trim no rompe los tests.",
         "Mantén cada test con una sola intención para que el fallo sea fácil de localizar.",
         "Añade un caso nulo o no string si decides endurecer más el contrato.",
+        "Añade un caso con exactamente tres caracteres útiles para fijar el borde de longitud mínima.",
       ],
       [
         "La función principal cabe en pocas líneas y su intención sigue siendo obvia.",
         "Los casos de prueba cubren contrato normal, borde y error sin mezclar objetivos.",
         "Cambiar la implementación sin romper comportamiento sería ahora mucho más seguro.",
         "La suite JUnit se entiende leyendo solo los nombres de sus métodos.",
+        "El borde exacto de longitud mínima ya no queda implícito: también está fijado por tests.",
       ],
     ),
     "java-spring-intro": projectBrief(
@@ -3020,6 +3042,7 @@ public static void main(String[] args) {
         "Añade validación básica y decide respuestas HTTP para alta inválida o id inexistente.",
         "Diseña también `PATCH /api/tasks/{id}/complete` y un DTO de error mínimo para respuestas fallidas.",
         "Permite filtrar el listado por `done` con query param y decide si la lista devuelve un DTO más corto que el detalle.",
+        "Decide qué harías con títulos repetidos o con espacios exteriores y deja ese contrato por escrito en el diseño.",
       ],
       [
         "Modelo simple",
@@ -3060,6 +3083,7 @@ class TaskController {
         "Decide qué devolvería `PATCH /api/tasks/{id}/complete` si la tarea no existe.",
         "Comprueba que los errores de validación o conflicto tengan un cuerpo estable si decides devolver JSON de error.",
         "Decide si el listado necesita un DTO corto distinto del detalle para no arrastrar datos innecesarios.",
+        "Añade un caso de título duplicado o con espacios para fijar si la API normaliza, acepta o rechaza esa entrada.",
       ],
       [
         "La API se entiende por recursos y casos de uso, no por acciones técnicas sueltas.",
@@ -3068,6 +3092,7 @@ class TaskController {
         "DTOs, validación y respuestas HTTP ya están alineados aunque la persistencia siga en memoria.",
         "El contrato de error ya no es improvisado: también tiene forma y intención claras.",
         "El filtrado simple entra por query params y no deforma el diseño de rutas.",
+        "Las decisiones de normalización y conflicto ya forman parte del contrato, no quedan como ambigüedad futura.",
       ],
     ),
     "js-values": projectBrief(

@@ -939,6 +939,30 @@ o sesión futura.
 - El foco está en tipos básicos, nombres con intención, salida legible y un dato derivado simple
 - La idea es cerrar mejor la base de Java antes de seguir subiendo a métodos, control y arrays
 
+## Fase 119 — Más densidad para colecciones en Java
+
+- Reforzada la práctica guiada de `java-collections` en `scripts/data/practice.js`
+- Añadidos casos recomendados sobre claves ausentes, convención estable de `Map` y ausencia de XP para un lenguaje
+- La idea es que colecciones no se quede en demo de `List` y `Map`, sino que empiece a tocar también contrato y consistencia de datos
+
+## Fase 120 — Más densidad para excepciones en Java
+
+- Reforzada la guía y el mini proyecto de `java-exceptions` en `scripts/data/practice.js`
+- Añadidos casos recomendados sobre `trim()`, string vacío, `null` y contrato de descarte visible
+- La idea es que excepciones no se quede en `try/catch` mecánico y empiece a tocar decisiones de contrato y normalización
+
+## Fase 121 — Más densidad para testing en Java
+
+- Reforzada la guía y el mini proyecto de `java-testing` en `scripts/data/practice.js`
+- Añadido más foco en borde exacto, valores fuera de rango y longitud mínima útil en validadores
+- La idea es que testing no se quede en ejemplo mínimo de JUnit y empiece a fijar mejor contratos y casos borde
+
+## Fase 122 — Más densidad para Spring en Java
+
+- Reforzada la guía y el mini proyecto de `java-spring-intro` en `scripts/data/practice.js`
+- Añadido más foco en normalización de títulos, duplicados, conflicto y contrato de query params
+- La idea es que Spring no se quede en estructura de capas y empiece a tocar decisiones de contrato HTTP y reglas de dominio
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`
