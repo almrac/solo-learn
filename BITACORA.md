@@ -1035,6 +1035,42 @@ o sesión futura.
 - Añadido más foco en responsabilidades separadas entre `List` y `Map`, claves consistentes, prioridad explícita y resumen estable al crecer
 - La idea es que colecciones deje de sentirse como demo de estructuras y pase a empujar ya decisiones básicas de modelado
 
+## Fase 135 — Más densidad para Spring en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-spring-intro` en `scripts/data/practice.js`
+- Añadido más foco en separación entre DTO de lista y detalle, conflicto al completar dos veces, query params ambiguos y cuerpo de error consistente
+- La idea es que Spring deje de ser solo estructura por capas y empiece a fijar mejor semántica HTTP y contratos de dominio
+
+## Fase 136 — Más densidad para testing en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-testing` en `scripts/data/practice.js`
+- Añadido más foco en responsabilidad del validador, nombres de test, borde exacto y separación entre rango inválido y caso normal
+- La idea es que testing deje de ser solo sintaxis de JUnit y empiece a fijar mejor qué contrato valida cada pieza
+
+## Fase 137 — Más densidad para excepciones en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-exceptions` en `scripts/data/practice.js`
+- Añadido más foco en separar parseo de regla de dominio, distinguir descartes por formato y rango, y hacer visible qué tipo de error estás absorbiendo
+- La idea es que excepciones deje de ser solo `try/catch` con `-1` y empiece a empujar lectura útil del fallo
+
+## Fase 138 — Más densidad para POO en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-oop` en `scripts/data/practice.js`
+- Añadido más foco en invariantes del objeto, contrato de búsqueda, duplicados y semántica de préstamo o devolución en estados no ideales
+- La idea es que POO deje de ser solo encapsulación básica y empiece a fijar mejor coordinación entre entidad y catálogo
+
+## Fase 139 — Más densidad para interfaces en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-inheritance` en `scripts/data/practice.js`
+- Añadido más foco en dónde vive la validación compartida, qué parte decide el coordinador y cómo mantener contrato común con canales distintos
+- La idea es que interfaces deje de ser solo polimorfismo de escaparate y empiece a fijar mejor frontera entre contrato común y comportamiento concreto
+
+## Fase 140 — Más densidad para arrays en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-arrays` en `scripts/data/practice.js`
+- Añadido más foco en máximos repetidos, papel del índice destacado, coherencia entre arrays paralelos y estabilidad del resumen
+- La idea es que arrays deje de ser solo recorrido seguro y empiece a fijar mejor qué contrato sale realmente de esa iteración
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`

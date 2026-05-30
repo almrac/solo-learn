@@ -2398,18 +2398,21 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Comprueba que la media usa todas las notas y no solo parte del recorrido.",
         "Verifica que cambiar el tamaño del array no obliga a tocar el bucle.",
         "Añade un caso con todas las notas iguales para comprobar que la máxima y la media siguen siendo consistentes.",
+        "Decide qué significa destacar una posición si varias notas comparten el mismo valor máximo.",
       ],
       "Amplia el resumen para contar tambien cuantas notas estan aprobadas y cuantas suspendidas en el mismo recorrido.",
       [
         "Todas las notas iguales para comprobar que maxima y media siguen siendo coherentes.",
         "Un array con una sola nota para ver si la inicializacion y el bucle siguen teniendo sentido.",
         "Un array vacio para decidir si muestras aviso, devuelves 0 o proteges el acceso de otra forma explícita.",
+        "Un array con máximos repetidos para fijar si te quedas con el primer hallazgo o si ese detalle no importa en esta fase.",
       ],
       [
         "Usa la primera nota como referencia inicial para la maxima.",
         "En el mismo bucle, suma y compara, en vez de hacer dos recorridos separados.",
         "Calcula la media solo cuando ya hayas terminado de acumular el total.",
         "Si proteges el caso vacío, hazlo antes de leer la primera posición para no esconder un fallo de índice.",
+        "Si más adelante devuelves también un índice destacado, procura que esa decisión salga del mismo recorrido y no de una segunda pasada innecesaria.",
       ],
     ),
     "java-oop": guide(
@@ -2450,18 +2453,21 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Comprueba que el constructor deja el objeto listo sin pasos extra.",
         "Verifica que la lógica depende del estado del libro y no de datos externos.",
         "Prueba el borde exacto de 400 páginas para fijar la regla con precisión.",
+        "Decide si un libro con páginas inválidas se permite igual o si esa protección debería aparecer ya en el modelo.",
       ],
       "Anade un metodo `resumen()` que devuelva una cadena legible con los datos del libro sin imprimir directamente en la clase.",
       [
         "Un libro de exactamente 400 paginas para fijar bien el borde de la regla.",
         "Titulos o autores con espacios para comprobar que el constructor conserva bien el texto.",
         "Un valor 0 o negativo en paginas para decidir si ese caso forma parte del contrato o queda fuera por ahora.",
+        "Dos libros con el mismo título para decidir si ese problema pertenece al libro o a una capa coordinadora como la biblioteca.",
       ],
       [
         "Decide primero que estado minimo debe guardar un libro para ser util.",
         "Haz que el constructor deje esos datos listos en los atributos privados.",
         "El metodo `esLargo()` solo necesita mirar `pages` y devolver un boolean.",
         "Si detectas un caso raro como paginas negativas, decide si lo modelas ya o si lo dejas explícitamente fuera del alcance.",
+        "Intenta que la clase `Book` no cargue responsabilidades de catálogo o búsqueda que pertenecen a otra pieza.",
       ],
     ),
     "java-inheritance": guide(
@@ -2502,18 +2508,21 @@ class SmsNotifier implements Notificable {
         "Verifica que el contrato de la interfaz obliga a mantener la misma firma.",
         "Añade un tercer notificador pequeño para comprobar que el diseño aguanta.",
         "Prueba un mensaje con espacios exteriores y decide si todas las implementaciones lo muestran igual o lo limpian antes.",
+        "Decide si la validación del mensaje vive antes de llegar al canal o si cada implementación asume esa responsabilidad por separado.",
       ],
       "Crea un metodo que reciba un `Notificable` por parametro y lo use sin saber si es Email, SMS o cualquier otra implementacion.",
       [
         "Mensaje vacio para decidir si lo permites, lo transformas o lo rechazas.",
         "Una tercera implementacion muy corta para comprobar que el consumo polimorfico no cambia.",
         "Mensaje `null` si quieres fijar ya un contrato claro sobre entradas invalidas antes de crecer a mas canales.",
+        "Dos canales que formateen distinto el mismo mensaje para confirmar que comparten contrato sin perder identidad.",
       ],
       [
         "Empieza por una interfaz con una sola firma y una sola responsabilidad.",
         "Haz una implementacion minima de Email y otra de SMS cambiando solo el comportamiento.",
         "Comprueba despues que una variable del tipo interfaz puede apuntar a cualquiera de las dos.",
         "Si anades validacion del mensaje, procura que no dependa de una sola clase concreta ni rompa el uso polimorfico.",
+        "Si introduces un coordinador que recorra notificadores, intenta que sea él quien decida el flujo y no cada canal por su cuenta.",
       ],
     ),
     "java-collections": guide(
@@ -2579,6 +2588,7 @@ public class ProgressRegistry {
         "Usa Integer.parseInt dentro de try.",
         "Captura NumberFormatException en catch.",
         "Devuelve -1 cuando la entrada no sea válida.",
+        "Decide si `null` y string vacío caen en el mismo contrato de descarte o si necesitan protección previa distinta.",
       ],
       "Excepciones",
       "Intermedio",
@@ -2604,18 +2614,21 @@ public class ProgressRegistry {
         "Comprueba que los casos inválidos no rompen el programa principal.",
         "Verifica que el contrato `-1` se mantiene igual en todos los fallos.",
         "Decide si `trim()` forma parte del contrato antes de parsear y comprueba ese caso de forma explícita.",
+        "Comprueba si te conviene separar un test mental para parseo inválido y otro para rango inválido para no mezclar causas distintas.",
       ],
       "Extrae una segunda funcion que valide si la nota esta entre 0 y 10 para separar parseo y regla de negocio.",
       [
         "Texto con espacios alrededor, como ` 8 `, para decidir si haces trim antes del parseo.",
         "Valores numericos fuera de rango, como 12 o -3, si anades validacion de dominio.",
         "String vacio o null para decidir si lo tratas como parseo inválido o añades una protección previa.",
+        "Un texto como `08` o `5 ` para decidir si mantienes una normalización mínima estable o si rechazas formatos ambiguos.",
       ],
       [
         "Primero resuelve solo el parseo con `Integer.parseInt` dentro de `try/catch`.",
         "Haz que todos los fallos de parseo vuelvan al mismo valor acordado, `-1`.",
         "Si anades validacion de rango, separala en otra funcion para no mezclar responsabilidades.",
         "No escondas entradas descartadas: aunque devuelvas `-1`, deja claro en `main` qué pasó con cada caso si montas una demo.",
+        "Si varias entradas inválidas terminan igual, intenta aun así distinguir en tu razonamiento si falló el formato o la regla de dominio.",
       ],
     ),
     "java-testing": guide(
@@ -2626,6 +2639,7 @@ public class ProgressRegistry {
         "Separa la lógica en una función pequeña.",
         "Piensa un caso que falla y dos que pasan.",
         "Escribe qué comprobarías en JUnit con `@Test`, `assertTrue` y `assertFalse` aunque no ejecutes el test aquí.",
+        "Decide si las notas fuera de rango significan simplemente `false` o si esa validación debería vivir en otra capa distinta.",
       ],
       "Testing",
       "Avanzado",
@@ -2659,6 +2673,7 @@ public class ProgressRegistry {
         "Asegúrate de que el método devuelve boolean y no texto de consola.",
         "Anota cómo quedarían esos casos en tres métodos JUnit con nombres distintos.",
         "Decide si notas fuera de 0-10 forman parte del contrato o si las dejas fuera por ahora, pero hazlo explícito.",
+        "Comprueba si te compensa separar un test por borde exacto y otro por rango inválido para no mezclar motivos de fallo.",
       ],
       "Escribe el esqueleto de una clase de test JUnit con tres metodos separados para borde, suspenso y caso claramente aprobado.",
       [
@@ -2666,6 +2681,7 @@ public class ProgressRegistry {
         "La nota 5 exacta para fijar el borde que mas suele romperse.",
         "La nota 10 para comprobar un caso claramente aprobado y sin ambigüedad.",
         "Una nota fuera de rango, como -1 u 11, para decidir si tu contrato la considera simplemente no aprobada.",
+        "Dos notas contiguas como 4 y 5 para fijar de un vistazo dónde cambia realmente la regla.",
       ],
       [
         "Reduce la regla a una condicion simple que devuelva boolean.",
@@ -2673,6 +2689,7 @@ public class ProgressRegistry {
         "Separa los casos en comprobaciones independientes para que el fallo sea legible.",
         "Nombra cada test por comportamiento esperado, no por la implementación interna.",
         "Si añades casos fuera de rango, decide si esa validación vive en este método o en otra capa.",
+        "Evita meter varias aserciones heterogéneas en el mismo test si luego no sabrás qué parte del contrato se ha roto.",
       ],
     ),
     "java-spring-intro": guide(
@@ -2686,6 +2703,7 @@ public class ProgressRegistry {
         "Decide dónde vive la validación del título y cómo se traduce a respuesta HTTP.",
         "Añade un caso de `PATCH /complete` y decide qué devolver si la tarea no existe o ya estaba completada.",
         "Diseña un `GET` con query param `done` para no crear endpoints duplicados solo por filtrado.",
+        "Decide también si listar y detalle comparten DTO o si el listado merece uno más corto y explícito.",
       ],
       "Spring",
       "Avanzado",
@@ -2737,6 +2755,7 @@ class TaskService {
         "Decide si `PATCH /complete` devuelve la tarea actualizada, `204` sin cuerpo o un error de dominio si ya estaba completada.",
         "Decide si el listado usa el mismo DTO que el detalle o uno más pequeño para no exponer más de la cuenta.",
         "Prueba qué harías con un título en blanco o con espacios para fijar si normalizas antes de validar.",
+        "Piensa si dos peticiones iguales de completar una tarea deben responder siempre igual o si el segundo intento expresa conflicto.",
       ],
       "Anade una cuarta operacion para filtrar tareas pendientes y decide si encaja mejor como query param en GET o como endpoint aparte.",
       [
@@ -2746,6 +2765,7 @@ class TaskService {
         "Completar una tarea ya hecha para decidir si repites `200`, devuelves `409` o simplemente no haces nada.",
         "Listar con `?done=true` o `?done=false` para decidir si el filtrado vive en controller o en service.",
         "Crear dos tareas con el mismo título para decidir si el dominio lo permite o si defines un conflicto explícito.",
+        "Pedir el listado sin query params y con `?done=` vacío para decidir si ese filtro se ignora, se valida o se trata como error de contrato.",
       ],
       [
         "Piensa primero en los recursos y acciones que vera el cliente, no en las clases internas.",
@@ -2755,6 +2775,7 @@ class TaskService {
         "Si introduces errores de dominio, dales nombre y forma estable antes de pensar en excepciones genéricas.",
         "Usa query params para filtros simples del listado antes de inventar rutas nuevas.",
         "Decide pronto si normalizas espacios en el request o si esa regla pertenece a una capa anterior.",
+        "Si eliges respuestas distintas para conflicto, validación y no encontrado, intenta que el cuerpo de error tenga forma coherente en todos los casos.",
       ],
     ),
   },
@@ -2920,6 +2941,7 @@ class TaskService {
         "Evita lógica duplicada dentro del bucle si el mismo cálculo se puede centralizar.",
         "Piensa qué ocurre con arrays vacíos, con un solo elemento o con todos los valores iguales.",
         "Si separas el cálculo en métodos, evita que cada uno tome decisiones incompatibles sobre el caso vacío.",
+        "Si trabajas con arrays paralelos, deja claro cuál manda cuando una posición es válida en uno y problemática en otro.",
       ],
       [
         "Array de entrada",
@@ -2954,6 +2976,7 @@ class TaskService {
         "Revisa que el índice solo se usa cuando aporta algo y que la lógica principal sigue siendo legible.",
         "Prueba un array con un solo elemento para confirmar que máximo y promedio coinciden con ese dato sin pasos especiales rotos.",
         "Prueba varios máximos repetidos para decidir si te basta con el valor o si también quieres fijar qué posición destacar primero.",
+        "Si usas arrays paralelos, comprueba que nunca lees una posición de uno cuando el otro ya no tiene ese índice disponible.",
       ],
       [
         "El array deja de ser solo teoría y pasa a una herramienta para resumir datos reales.",
@@ -2961,11 +2984,12 @@ class TaskService {
         "La pieza prepara bien el salto a `ArrayList` y colecciones más expresivas.",
         "Los casos borde básicos quedan visibles antes de crecer en estructura.",
         "El ejemplo ya obliga a tomar decisiones coherentes de contrato en vez de asumir entradas siempre cómodas.",
+        "La pieza ya empieza a fijar qué papel tiene el índice y no solo cómo recorrerlo sin romper nada.",
       ],
     ),
     "java-oop": projectBrief(
       "Modela una biblioteca pequeña con objetos reales, catálogo y operaciones básicas de préstamo.",
-      "Definir clases con atributos privados y comportamientos claros para dejar atrás soluciones planas con variables sueltas y empezar a pensar en reglas de dominio y coordinación entre objetos.",
+      "Definir clases con atributos privados y comportamientos claros para dejar atrás soluciones planas con variables sueltas y empezar a pensar en reglas de dominio, coordinación entre objetos e invariantes mínimas del catálogo.",
       [
         "Crea una clase `Book` con título, autor y disponibilidad.",
         "Añade métodos como `borrow()` y `giveBack()` con mensajes o estados distintos según la situación.",
@@ -2973,6 +2997,7 @@ class TaskService {
         "Añade una búsqueda simple por título o autor antes de prestar.",
         "Instancia varios libros y muestra una secuencia de préstamo y devolución desde `main`.",
         "Decide qué devuelve la biblioteca cuando no encuentra un libro y cómo comunicas ese caso sin romper el flujo.",
+        "Decide también si la búsqueda por título es sensible a mayúsculas, espacios exteriores o duplicados y mantén ese criterio estable.",
       ],
       [
         "Clase `Book`",
@@ -3026,6 +3051,8 @@ class Library {
         "Verifica que el catálogo se siga entendiendo al añadir dos o tres libros.",
         "Desde `main`, imprime el estado antes y después de cada operación.",
         "Prueba una búsqueda de título inexistente para fijar el contrato de no encontrado.",
+        "Prueba una búsqueda con espacios o distinto uso de mayúsculas si decides normalizar ese acceso en la biblioteca.",
+        "Prueba qué ocurre si intentas devolver un libro ya disponible para fijar la semántica del dominio.",
       ],
       [
         "El libro cambia de disponible a prestado y vuelve a disponible sin estados ambiguos.",
@@ -3034,6 +3061,7 @@ class Library {
         "La biblioteca puede listar varios libros sin duplicar lógica de impresión por cada uno.",
         "La demo final enseña una secuencia completa, no solo una impresión aislada.",
         "El caso de libro no encontrado ya forma parte del contrato del coordinador, no queda implícito.",
+        "La pieza ya obliga a pensar en contrato de búsqueda y en invariantes del catálogo, no solo en tener una lista de libros.",
       ],
     ),
     "java-collections": projectBrief(
@@ -3132,17 +3160,19 @@ List<Notificable> canales = new ArrayList<>();`,
         "Añade una tercera implementación pequeña para comprobar que el diseño escala.",
         "Prueba un mensaje con solo espacios y confirma que todas las implementaciones respetan la misma decisión de contrato.",
         "Prueba un mensaje `null` o vacío y decide si el descarte ocurre antes del envío o dentro de cada canal, pero deja el criterio estable.",
+        "Prueba si el coordinador puede seguir funcionando igual aunque cambies un canal por otro sin tocar el bucle principal.",
       ],
       [
         "El envío funciona para varios canales sin cambiar el código que los recorre.",
         "La interfaz expresa una capacidad concreta y no una jerarquía artificial.",
         "Agregar otro notificador es un cambio local, no una reescritura del flujo.",
         "La validación del mensaje no queda escondida ni duplicada sin criterio entre canales.",
+        "La pieza ya obliga a decidir dónde vive el contrato común y dónde empieza la variación concreta de cada canal.",
       ],
     ),
     "java-exceptions": projectBrief(
       "Crea un mini gestor de notas resistente a entradas inválidas y con informe final claro.",
-      "Unir parseo, validación de rango y tratamiento claro del error en una utilidad pequeña pero ya cercana a un flujo real de captura de datos y resumen final.",
+      "Unir parseo, validación de rango y tratamiento claro del error en una utilidad pequeña pero ya cercana a un flujo real de captura de datos y resumen final, dejando visible además qué parte falla por formato y cuál por regla de dominio.",
       [
         "Escribe un método `parseGrade(String text)` que convierta texto a entero.",
         "Devuelve `-1` si el valor no es numérico o cae fuera del rango 0-10.",
@@ -3151,6 +3181,7 @@ List<Notificable> canales = new ArrayList<>();`,
         "Prueba varios casos desde `main`, incluidos vacío, texto y nota válida.",
         "Cuenta también cuántas entradas inválidas descartaste para no perder visibilidad del error.",
         "Decide si los espacios exteriores se limpian antes de validar o si cuentan como entrada inválida y mantenlo estable en todo el flujo.",
+        "Si te ayuda, separa también cuántos descartes vienen por formato inválido y cuántos por rango para no perder lectura del problema.",
       ],
       [
         "Método de parseo",
@@ -3159,6 +3190,7 @@ List<Notificable> canales = new ArrayList<>();`,
         "Resumen final",
         "Conteo de descartes",
         "Casos de prueba manuales",
+        "Lectura del descarte",
       ],
       `import java.util.ArrayList;
 import java.util.List;
@@ -3181,6 +3213,7 @@ public static void main(String[] args) {
         "Comprueba que la media final solo use las notas aceptadas.",
         "Cuenta cuántas entradas descartas para confirmar que no desaparecen en silencio.",
         "Prueba una entrada con espacios exteriores y otra vacía para fijar el contrato de normalización.",
+        "Prueba si una entrada como `12` y otra como `hola` terminan igual por simplificación o si conviene al menos distinguirlas en el resumen interno.",
       ],
       [
         "El contrato de error es estable: cualquier entrada inválida termina igual.",
@@ -3189,22 +3222,25 @@ public static void main(String[] args) {
         "El informe final deja claro qué aceptaste y qué descartaste, no solo la media.",
         "Los casos manuales enseñan que el método falla de forma controlada, no ruidosa.",
         "La decisión sobre `trim()` o entrada vacía no queda implícita: forma parte visible del diseño.",
+        "La pieza ya obliga a pensar en observabilidad del error y no solo en devolver `-1` para todo.",
       ],
     ),
     "java-testing": projectBrief(
       "Refactoriza una utilidad de validación y cúbrela con JUnit.",
-      "Separar lógica de validación de entrada, escribir tests de caso normal, borde y error, y dejar una API pequeña y clara.",
+      "Separar lógica de validación de entrada, escribir tests de caso normal, borde y error, y dejar una API pequeña y clara, fijando además qué parte del contrato vive en esta utilidad y cuál debería vivir fuera.",
       [
         "Diseña una clase `TaskValidator` con una responsabilidad concreta.",
         "Escribe al menos tres tests: válido, vacío y demasiado corto.",
         "Añade un test de valor nulo o no válido para fijar el contrato de error.",
         "Refactoriza nombres o duplicaciones después de que los tests pasen.",
         "Decide también si un título con exactamente 3 caracteres útiles es válido y deja ese borde cubierto.",
+        "Evita que la clase mezcle reglas de longitud, formato y persistencia si solo quieres validar título de entrada.",
       ],
       [
         "Clase de validación",
         "Suite JUnit",
         "Notas breves sobre decisiones de diseño",
+        "Límite claro de responsabilidad",
       ],
       `class TaskValidator {
   boolean isValidTitle(String title) {
@@ -3234,6 +3270,7 @@ public static void main(String[] args) {
         "Mantén cada test con una sola intención para que el fallo sea fácil de localizar.",
         "Añade un caso nulo o no string si decides endurecer más el contrato.",
         "Añade un caso con exactamente tres caracteres útiles para fijar el borde de longitud mínima.",
+        "Revisa si los nombres de tests permiten entender el contrato leyendo solo la suite sin abrir la implementación.",
       ],
       [
         "La función principal cabe en pocas líneas y su intención sigue siendo obvia.",
@@ -3241,11 +3278,12 @@ public static void main(String[] args) {
         "Cambiar la implementación sin romper comportamiento sería ahora mucho más seguro.",
         "La suite JUnit se entiende leyendo solo los nombres de sus métodos.",
         "El borde exacto de longitud mínima ya no queda implícito: también está fijado por tests.",
+        "La pieza ya enseña que probar no es repetir entradas, sino delimitar con claridad la responsabilidad del validador.",
       ],
     ),
     "java-spring-intro": projectBrief(
       "Diseña una API REST mínima para tareas de estudio.",
-      "Levantar una estructura básica con `Controller`, `Service` y una lista en memoria para exponer tareas por HTTP.",
+      "Levantar una estructura básica con `Controller`, `Service` y una lista en memoria para exponer tareas por HTTP, dejando claros los contratos de validación, conflicto, filtrado y DTOs de salida.",
       [
         "Define una entidad simple `Task` con `id`, `title` y `done`.",
         "Crea un endpoint GET para listar tareas y un POST para crear una nueva.",
@@ -3254,6 +3292,7 @@ public static void main(String[] args) {
         "Diseña también `PATCH /api/tasks/{id}/complete` y un DTO de error mínimo para respuestas fallidas.",
         "Permite filtrar el listado por `done` con query param y decide si la lista devuelve un DTO más corto que el detalle.",
         "Decide qué harías con títulos repetidos o con espacios exteriores y deja ese contrato por escrito en el diseño.",
+        "Decide también qué expresa una segunda petición de completar la misma tarea: éxito repetido, no-op o conflicto explícito.",
       ],
       [
         "Modelo simple",
@@ -3263,6 +3302,7 @@ public static void main(String[] args) {
         "Controller con endpoints",
         "Service con lógica básica",
         "Contratos HTTP y validación",
+        "Conflictos y query params",
       ],
       `@RestController
 @RequestMapping("/api/tasks")
@@ -3295,6 +3335,7 @@ class TaskController {
         "Comprueba que los errores de validación o conflicto tengan un cuerpo estable si decides devolver JSON de error.",
         "Decide si el listado necesita un DTO corto distinto del detalle para no arrastrar datos innecesarios.",
         "Añade un caso de título duplicado o con espacios para fijar si la API normaliza, acepta o rechaza esa entrada.",
+        "Prueba qué significa repetir `PATCH /complete` sobre la misma tarea para no dejar ambigua la semántica del endpoint.",
       ],
       [
         "La API se entiende por recursos y casos de uso, no por acciones técnicas sueltas.",
@@ -3304,6 +3345,7 @@ class TaskController {
         "El contrato de error ya no es improvisado: también tiene forma y intención claras.",
         "El filtrado simple entra por query params y no deforma el diseño de rutas.",
         "Las decisiones de normalización y conflicto ya forman parte del contrato, no quedan como ambigüedad futura.",
+        "La pieza ya obliga a pensar en semántica HTTP y no solo en anotar clases con Spring.",
       ],
     ),
     "js-values": projectBrief(
