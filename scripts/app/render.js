@@ -15,6 +15,7 @@ function render() {
   document.body.classList.toggle("exam-mode", state.examMode.active);
   document.body.dataset.studyMode = state.studyMode;
   document.body.dataset.activeTrack = state.activeTrack;
+  document.body.dataset.workMode = state.workMode;
   renderTrackProgress();
   renderQuickstart();
   renderNextSession();
@@ -23,8 +24,11 @@ function render() {
   renderHistoryPanel();
   renderReviewBox();
 
-  elements.tabs.forEach((tab) => {
+  elements.studyModeTabs.forEach((tab) => {
     tab.classList.toggle("is-active", tab.dataset.studyMode === state.studyMode);
+  });
+  elements.workModeTabs.forEach((tab) => {
+    tab.classList.toggle("is-active", tab.dataset.workMode === state.workMode);
   });
   elements.filters.forEach((filter) => {
     filter.classList.toggle("is-active", filter.dataset.filter === state.filter);
@@ -48,6 +52,7 @@ function render() {
   }
   renderActiveTrack(track);
   renderRoomGuide();
+  renderWorkModePanel();
 
   renderPlan();
   renderLessons();
@@ -58,6 +63,57 @@ function render() {
   // Esta llamada alimenta el easter egg que explica cómo se relaciona
   // el frontend real con la ruta de aprendizaje de JavaScript.
   renderBlueprint();
+}
+
+function renderWorkModePanel() {
+  const guide = getWorkModeGuide();
+  if (elements.workModeSummary) {
+    elements.workModeSummary.textContent = guide.summary;
+  }
+
+  if (!elements.workModeActions) return;
+
+  elements.workModeActions.innerHTML = `
+    ${guide.actions.map((action) => `
+      <button
+        type="button"
+        data-work-action="${escapeHtml(action.type)}"
+        ${action.target ? `data-target="${action.target}"` : ""}
+      >
+        ${escapeHtml(action.label)}
+      </button>
+    `).join("")}
+  `;
+}
+
+function getWorkModeGuide() {
+  if (state.workMode === "practice") {
+    return {
+      summary: "Runner, banco y secuencia corta de prácticas como frente principal.",
+      actions: [
+        { type: "jump", target: "practice-bank", label: "Ir al banco" },
+        { type: "jump", target: "runner", label: "Abrir runner" },
+      ],
+    };
+  }
+
+  if (state.workMode === "exam") {
+    return {
+      summary: "Reto activo, modo examen y repaso de fallos como superficie principal.",
+      actions: [
+        { type: "jump", target: "challenge", label: "Abrir examen" },
+        { type: "jump", target: "review", label: "Ver repaso" },
+      ],
+    };
+  }
+
+  return {
+    summary: "Lección activa, teoría y siguiente sesión como continuidad principal de la ruta.",
+    actions: [
+      { type: "jump", target: "study", label: "Seguir lección" },
+      { type: "jump", target: "dashboard", label: "Ver catálogo" },
+    ],
+  };
 }
 
 function getTrackHeadingState(track) {
@@ -1494,6 +1550,7 @@ function renderPracticeBankPhases(entries) {
 
 function renderPracticeBankSpotlight(entries) {
   const recommended = getPracticeSpotlightEntry(entries);
+  const suggestedPath = getPracticeSuggestedPath(entries);
   const priorityTopic = getPriorityPracticeTopic(entries);
   if (!recommended) {
     elements.practiceBankSpotlight.innerHTML = "";
@@ -1525,6 +1582,31 @@ function renderPracticeBankSpotlight(entries) {
         : ""}
       ${spotlightTopic
         ? `<p><strong>Tema empujado ahora:</strong> ${escapeHtml(spotlightTopic)}.</p>`
+        : ""}
+      ${suggestedPath.length
+        ? `
+          <div class="practice-route">
+            <h4>Ruta sugerida</h4>
+            <div class="practice-route__list">
+              ${suggestedPath.map((step) => `
+                <article class="practice-route__step">
+                  <div class="practice-route__step-meta">
+                    <span class="badge">${escapeHtml(step.label)}</span>
+                    <span class="badge practice-card__status practice-card__status--${step.entry.progressState.key}">${escapeHtml(step.entry.progressState.label)}</span>
+                  </div>
+                  <strong>${escapeHtml(step.entry.title)}</strong>
+                  <p>${escapeHtml(step.reason)}</p>
+                  <div class="practice-route__step-actions">
+                    <button type="button" data-practice-lesson="${step.entry.lessonId}" data-practice-target="${step.entry.target}">
+                      ${step.entry.target === "practice" ? "Abrir práctica" : "Abrir problema"}
+                    </button>
+                    ${step.entry.hasEvolution ? `<button type="button" class="practice-card__secondary" data-base-lesson="${step.entry.evolutionBaseLessonId}">Ver base</button>` : ""}
+                  </div>
+                </article>
+              `).join("")}
+            </div>
+          </div>
+        `
         : ""}
       <div class="practice-spotlight__actions">
         <button type="button" data-practice-lesson="${recommended.lessonId}" data-practice-target="${recommended.target}">

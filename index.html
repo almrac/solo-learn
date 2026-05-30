@@ -111,6 +111,19 @@ const progreso = retos.filter(r => r.done);</code></pre>
             </div>
           </section>
 
+          <section class="work-mode-panel" aria-label="Modo de trabajo">
+            <div class="work-mode-panel__header">
+              <span class="eyebrow">Modo de trabajo</span>
+              <p id="workModeSummary">Estudio activo y continuidad de ruta</p>
+            </div>
+            <div class="language-tabs language-tabs--study-mode" role="tablist" aria-label="Frente actual">
+              <button class="language-tabs__button is-active" type="button" data-work-mode="study">Estudiar</button>
+              <button class="language-tabs__button" type="button" data-work-mode="practice">Practicar</button>
+              <button class="language-tabs__button" type="button" data-work-mode="exam">Examinarse</button>
+            </div>
+            <div class="work-mode-panel__actions" id="workModeActions"></div>
+          </section>
+
           <div class="progress-summary">
             <div class="progress-summary__label">
               <span>Progreso total</span>

@@ -1017,6 +1017,18 @@ o sesión futura.
 - Añadidos casos para `data` sin `items` y para `stats.xp` ausente o indefinido sin romper el formato
 - La idea es cerrar mejor el contrato de salida HTML ante estructuras parciales y evitar soluciones demasiado optimistas
 
+## Fase 132 — Ruta sugerida en el banco de práctica
+
+- El banco de práctica ahora construye una ruta sugerida de varios pasos a partir de la misma prioridad compartida que ya usaban spotlight, orden y recaídas
+- El spotlight puede proponer práctica principal, consolidación y cierre o repaso, cada una con motivo y acción directa
+- La idea es que el banco deje de ser solo un listado inteligente y pase a proponer una secuencia corta de trabajo real
+
+## Fase 133 — Separación funcional de estudiar, practicar y examinarse
+
+- La app guarda ahora un `modo de trabajo` persistido con tres frentes: `study`, `practice` y `exam`
+- Se añadió un panel lateral para cambiar de frente y saltar directamente a la superficie principal de cada uno
+- `Continuar ruta` ya no empuja siempre al mismo sitio: ahora respeta el frente activo para preparar mejor el rediseño posterior sin tocar aún la estructura visual grande
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`

@@ -78,6 +78,7 @@ const achievements = [
 const defaultState = {
   activeTrack: "java",
   studyMode: "all",
+  workMode: "study",
   learningAreaFilter: "all",
   filter: "all",
   lessonSort: "default",
@@ -157,8 +158,11 @@ const elements = {
   activeTrack: document.querySelector("#activeTrack"),
   roomGuide: document.querySelector("#roomGuide"),
   studyModeSummary: document.querySelector("#studyModeSummary"),
+  workModeSummary: document.querySelector("#workModeSummary"),
+  workModeActions: document.querySelector("#workModeActions"),
   focusModeButton: document.querySelector("#focusModeButton"),
-  tabs: document.querySelectorAll(".language-tabs__button"),
+  studyModeTabs: document.querySelectorAll("[data-study-mode]"),
+  workModeTabs: document.querySelectorAll("[data-work-mode]"),
   filters: document.querySelectorAll(".level-filters__button"),
   learningAreaFilter: document.querySelector("#learningAreaFilter"),
   learningAreaFilterLabel: document.querySelector("#learningAreaFilterLabel"),
@@ -501,6 +505,39 @@ function applyStudyMode(studyMode) {
   }
 
   state.activeLessonId = firstVisibleLesson()?.id ?? tracks[state.activeTrack].lessons[0].id;
+}
+
+function applyWorkMode(workMode) {
+  state.workMode = ["study", "practice", "exam"].includes(workMode)
+    ? workMode
+    : defaultState.workMode;
+}
+
+function getWorkModeTarget(workMode = state.workMode) {
+  if (workMode === "practice") {
+    return {
+      selector: ".practice-bank",
+      label: "Ir al banco",
+      secondarySelector: ".runner",
+      secondaryLabel: "Abrir runner",
+    };
+  }
+
+  if (workMode === "exam") {
+    return {
+      selector: ".challenge",
+      label: "Abrir examen",
+      secondarySelector: ".review-box",
+      secondaryLabel: "Ver repaso",
+    };
+  }
+
+  return {
+    selector: ".study",
+    label: "Seguir lección",
+    secondarySelector: ".dashboard",
+    secondaryLabel: "Ver catálogo",
+  };
 }
 
 function getExamCurrentLesson() {
@@ -1077,6 +1114,9 @@ function normalizeState(value) {
   const studyMode = ["all", "java", "javascript"].includes(value?.studyMode)
     ? value.studyMode
     : defaultState.studyMode;
+  const workMode = ["study", "practice", "exam"].includes(value?.workMode)
+    ? value.workMode
+    : defaultState.workMode;
   const lessonIds = allLessons().map((lesson) => lesson.id);
   const learningAreaFilter = ["all", "frontend", "backend"].includes(value?.learningAreaFilter)
     ? value.learningAreaFilter
@@ -1140,6 +1180,7 @@ function normalizeState(value) {
   return {
     activeTrack,
     studyMode,
+    workMode,
     learningAreaFilter: normalizedLearningArea,
     filter,
     lessonSort,
@@ -1622,14 +1663,7 @@ function getPracticeSpotlightEntry(entries) {
   const actionableEntries = entries.filter((entry) => !entry.isDone);
   if (!actionableEntries.length) return entries[0] ?? null;
 
-  return [...actionableEntries].sort((left, right) => {
-    const leftPriority = getPracticeEntryPriority(left);
-    const rightPriority = getPracticeEntryPriority(right);
-    return rightPriority.failureWeight - leftPriority.failureWeight ||
-      rightPriority.isStarted - leftPriority.isStarted ||
-      rightPriority.impactScore - leftPriority.impactScore ||
-      left.title.localeCompare(right.title);
-  })[0] ?? null;
+  return sortPracticeEntriesByPriority(actionableEntries)[0] ?? null;
 }
 
 function getPracticeEntryPriority(entry) {
@@ -1640,6 +1674,133 @@ function getPracticeEntryPriority(entry) {
     isStarted: signal.isStarted,
     isDone: Number(Boolean(entry?.isDone)),
   };
+}
+
+function sortPracticeEntriesByPriority(entries) {
+  return [...entries].sort((left, right) => {
+    const leftPriority = getPracticeEntryPriority(left);
+    const rightPriority = getPracticeEntryPriority(right);
+    return rightPriority.failureWeight - leftPriority.failureWeight ||
+      rightPriority.isStarted - leftPriority.isStarted ||
+      rightPriority.impactScore - leftPriority.impactScore ||
+      left.title.localeCompare(right.title);
+  });
+}
+
+function getPracticeRouteReason(stepKey, entry, primaryEntry) {
+  if (!entry) return "";
+
+  if (stepKey === "main") {
+    return getPracticeSpotlightReason(entry);
+  }
+
+  if (stepKey === "consolidation") {
+    if (primaryEntry?.hasEvolution && !primaryEntry.evolutionBaseCovered && entry.lessonId === primaryEntry.evolutionBaseLessonId) {
+      return `Te conviene cubrir antes la base: ${entry.title}. Así la práctica principal deja de apoyarse en una pieza todavía floja.`;
+    }
+
+    if (primaryEntry && entry.topics.some((topic) => primaryEntry.topics.includes(topic))) {
+      return "Consolida el mismo frente técnico para no cortar el hilo justo después de la práctica principal.";
+    }
+
+    if (primaryEntry && entry.family === primaryEntry.family) {
+      return "Mantiene la misma familia de trabajo y ayuda a fijar patrón antes de cambiar de contexto.";
+    }
+
+    if (entry.progressState.key === "started") {
+      return "Ya la tienes empezada. Sirve para consolidar cerrando una pieza abierta antes de saltar a otra.";
+    }
+
+    return "Es la mejor pieza de continuidad después del primer paso dentro del filtro activo.";
+  }
+
+  if (entry.progressState.key === "started") {
+    return "Buen cierre para la sesión: rematas una pieza abierta y reduces deuda real de práctica.";
+  }
+
+  if (entry.isDone) {
+    return "Sirve como repaso corto al final para comprobar si el patrón ya queda más estable.";
+  }
+
+  const failureSignal = getPracticeFailureSignal(entry);
+  if (failureSignal) {
+    return `Buen cierre si quieres volver sobre el bloqueo "${failureSignal.label}" con una pieza todavía pendiente.`;
+  }
+
+  return "Cierra la ruta con una práctica breve de contraste para no quedarte solo en el primer caso.";
+}
+
+function getPracticeSuggestedPath(entries) {
+  if (!entries.length) return [];
+
+  const ranked = sortPracticeEntriesByPriority(entries);
+  const actionable = ranked.filter((entry) => !entry.isDone);
+  const doneEntries = ranked.filter((entry) => entry.isDone);
+  const primary = actionable[0] ?? ranked[0] ?? null;
+  if (!primary) return [];
+
+  const used = new Set([primary.lessonId]);
+  const steps = [
+    {
+      key: "main",
+      label: "Práctica principal",
+      entry: primary,
+      reason: getPracticeRouteReason("main", primary, primary),
+    },
+  ];
+
+  const consolidationCandidates = ranked
+    .filter((entry) => !used.has(entry.lessonId))
+    .map((entry) => {
+      let score = 0;
+      if (primary.hasEvolution && !primary.evolutionBaseCovered && entry.lessonId === primary.evolutionBaseLessonId) {
+        score += 8;
+      }
+      if (entry.topics.some((topic) => primary.topics.includes(topic))) score += 5;
+      if (entry.family === primary.family) score += 4;
+      if (entry.progressState.key === "started") score += 3;
+      if (!entry.isDone) score += 2;
+      if (entry.trackId === primary.trackId) score += 1;
+      return { entry, score };
+    })
+    .sort((left, right) => right.score - left.score || left.entry.title.localeCompare(right.entry.title));
+
+  const consolidation = consolidationCandidates[0]?.entry ?? null;
+  if (consolidation) {
+    used.add(consolidation.lessonId);
+    steps.push({
+      key: "consolidation",
+      label: "Consolidación",
+      entry: consolidation,
+      reason: getPracticeRouteReason("consolidation", consolidation, primary),
+    });
+  }
+
+  const closureCandidates = ranked
+    .filter((entry) => !used.has(entry.lessonId))
+    .map((entry) => {
+      const failureSignal = getPracticeFailureSignal(entry);
+      let score = 0;
+      if (entry.progressState.key === "started") score += 6;
+      if (failureSignal) score += 4 + failureSignal.weight;
+      if (entry.isDone) score += 3;
+      if (entry.topics.some((topic) => primary.topics.includes(topic))) score += 2;
+      if (entry.family === primary.family) score += 1;
+      return { entry, score };
+    })
+    .sort((left, right) => right.score - left.score || left.entry.title.localeCompare(right.entry.title));
+
+  const closure = closureCandidates[0]?.entry ?? null;
+  if (closure) {
+    steps.push({
+      key: "closure",
+      label: closure.isDone ? "Repaso de cierre" : "Cierre útil",
+      entry: closure,
+      reason: getPracticeRouteReason("closure", closure, primary),
+    });
+  }
+
+  return steps;
 }
 
 function getPracticeProgressState(lessonId, trackId) {

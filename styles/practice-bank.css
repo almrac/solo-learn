@@ -202,6 +202,48 @@
   line-height: 1.55;
 }
 
+.practice-route {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: var(--border-width) solid var(--line);
+}
+
+.practice-route h4 {
+  color: var(--forest);
+  font-size: 0.95rem;
+}
+
+.practice-route__list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.practice-route__step {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.practice-route__step strong {
+  color: var(--ink);
+}
+
+.practice-route__step-meta,
+.practice-route__step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.practice-route__step-actions button {
+  min-height: var(--space-10);
+}
+
 .practice-spotlight button {
   min-height: var(--space-10);
   border: var(--border-width) solid var(--forest);

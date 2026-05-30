@@ -58,9 +58,17 @@ elements.quickstart.addEventListener("click", (event) => {
   render();
 });
 
-elements.tabs.forEach((tab) => {
+elements.studyModeTabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     applyStudyMode(tab.dataset.studyMode);
+    persist();
+    render();
+  });
+});
+
+elements.workModeTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    applyWorkMode(tab.dataset.workMode);
     persist();
     render();
   });
@@ -158,6 +166,41 @@ elements.practiceResetFilters.addEventListener("click", () => {
   state.practiceSort = "pending";
   persist();
   render();
+});
+
+elements.workModeActions?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-work-action]");
+  if (!button) return;
+
+  const target = button.dataset.target;
+  if (target === "practice-bank") {
+    document.querySelector(".practice-bank")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (target === "runner") {
+    document.querySelector(".runner")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (target === "challenge") {
+    document.querySelector(".challenge")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (target === "review") {
+    elements.reviewBox?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (target === "study") {
+    document.querySelector(".study")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (target === "dashboard") {
+    document.querySelector(".dashboard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 });
 
 elements.studyEvolutionJump.addEventListener("click", () => {
@@ -500,14 +543,15 @@ elements.challengeMeta.addEventListener("change", (event) => {
 });
 
 elements.continueButton.addEventListener("click", () => {
-  const nextLesson = allLessons().find((lesson) => !state.completed.includes(lesson.id));
-  if (!nextLesson) return;
-
-  openLesson(nextLesson.id);
-  state.filter = "all";
+  const nextLesson = firstVisibleLesson() ?? allLessons().find((lesson) => !state.completed.includes(lesson.id));
+  if (nextLesson) {
+    openLesson(nextLesson.id);
+    state.filter = "all";
+  }
   persist();
   render();
-  document.querySelector(".dashboard").scrollIntoView({ behavior: "smooth" });
+  const target = getWorkModeTarget();
+  document.querySelector(target.selector)?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 elements.resetButton.addEventListener("click", () => {

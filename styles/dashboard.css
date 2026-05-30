@@ -35,7 +35,21 @@
   background: rgba(255, 255, 255, 0.78);
 }
 
+.work-mode-panel {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.78);
+}
+
 .study-mode-panel__header {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.work-mode-panel__header {
   display: grid;
   gap: 0.2rem;
 }
@@ -45,6 +59,29 @@
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.4;
+}
+
+.work-mode-panel__header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.work-mode-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.work-mode-panel__actions button {
+  min-height: 2.5rem;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius);
+  padding: 0 var(--space-4);
+  background: var(--panel);
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .progress-summary__label {
@@ -254,6 +291,7 @@ body[data-study-mode="javascript"] .achievements {
 }
 
 body[data-study-mode="java"] .study-mode-panel,
+body[data-study-mode="java"] .work-mode-panel,
 body[data-study-mode="java"] .active-track,
 body[data-study-mode="java"] .daily-queue,
 body[data-study-mode="java"] .room-guide {
@@ -261,6 +299,7 @@ body[data-study-mode="java"] .room-guide {
 }
 
 body[data-study-mode="javascript"] .study-mode-panel,
+body[data-study-mode="javascript"] .work-mode-panel,
 body[data-study-mode="javascript"] .active-track,
 body[data-study-mode="javascript"] .daily-queue,
 body[data-study-mode="javascript"] .room-guide {
