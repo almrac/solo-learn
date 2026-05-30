@@ -1176,6 +1176,24 @@ o sesión futura.
 - Añadido más foco en borde exacto, nombres de test legibles y responsabilidad acotada del validador
 - La idea es que testing no se quede en escribir asserts sueltos, sino que deje más claro qué contrato cubre cada test y qué ruido queda fuera de esa utilidad
 
+## Fase 160 — Más densidad para Spring en Java
+
+- Reforzada otra vez la guía y el mini proyecto de `java-spring-intro` en `scripts/data/practice.js`
+- Añadido más foco en DTO de lista frente a detalle, conflicto explícito y cuerpo de error coherente
+- La idea es que Spring no se quede en anotar endpoints, sino que deje más claro qué contrato HTTP se publica y cómo se sostiene entre éxito, filtro y error
+
+## Fase 161 — Cobertura extra para JSON a DOM
+
+- Reforzado `js-json-to-dom` en `scripts/data/practice.js`
+- Añadidos casos para ausencia de `items`, limpieza tras render anterior y `featured` truthy no booleano
+- La idea es cerrar mejor el contrato entre filtro real y render visible para que no pasen soluciones laxas o con residuos
+
+## Fase 162 — Cobertura extra para asincronía base
+
+- Reforzado `js-async` en `scripts/data/practice.js`
+- Añadidos casos para `items` no array y pendientes sin título útil, manteniendo orden y resumen estable
+- La idea es cerrar mejor el contrato entre carga asíncrona, recuento y títulos pendientes sin aceptar datos deformados como si fueran válidos
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`

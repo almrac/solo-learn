@@ -343,6 +343,34 @@ Object.assign(learningRoot.LEARNING_DATA, {
             pendingTitles: [],
           },
         },
+        {
+          label: "Ignora pendientes sin título útil pero mantiene total y orden de las válidas",
+          args: [async () => ({
+            items: [
+              { title: "Primera útil", done: false },
+              { title: "   ", done: false },
+              { done: false },
+              { title: "Completada", done: true },
+              { title: "Segunda útil", done: false },
+            ],
+          })],
+          expected: {
+            total: 5,
+            pendingCount: 4,
+            pendingTitles: ["Primera útil", "Segunda útil"],
+          },
+        },
+        {
+          label: "Devuelve resumen vacío si items no es un array",
+          args: [async () => ({
+            items: { title: "no iterable" },
+          })],
+          expected: {
+            total: 0,
+            pendingCount: 0,
+            pendingTitles: [],
+          },
+        },
       ],
     }),
     "js-state": exercise({
@@ -895,6 +923,48 @@ Object.assign(learningRoot.LEARNING_DATA, {
           assertions: [
             { type: "count", selector: "#featuredList li", expected: 1 },
             { type: "text", selector: "#featuredList li:first-child", expected: "APIs | JavaScript | Avanzado" },
+          ],
+        },
+        {
+          label: "No rompe si data no trae items y limpia renders anteriores",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  { title: "Testing", language: "JavaScript", level: "Avanzado", featured: true },
+                ],
+              }],
+            },
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{}],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#featuredList li", expected: 0 },
+          ],
+        },
+        {
+          label: "Ignora featured truthy no booleano y pinta solo true real",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarDestacados",
+              args: [{
+                items: [
+                  { title: "DOM", language: "JavaScript", level: "Base", featured: true },
+                  { title: "APIs", language: "JavaScript", level: "Avanzado", featured: "true" },
+                  { title: "Colecciones", language: "Java", level: "Intermedio", featured: 1 },
+                ],
+              }],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#featuredList li", expected: 1 },
+            { type: "text", selector: "#featuredList li:first-child", expected: "DOM | JavaScript | Base" },
           ],
         },
       ],
@@ -2780,6 +2850,7 @@ class TaskService {
         "Decide si el listado usa el mismo DTO que el detalle o uno más pequeño para no exponer más de la cuenta.",
         "Prueba qué harías con un título en blanco o con espacios para fijar si normalizas antes de validar.",
         "Piensa si dos peticiones iguales de completar una tarea deben responder siempre igual o si el segundo intento expresa conflicto.",
+        "Comprueba que los errores de validación, conflicto y no encontrado puedan leerse con el mismo esquema de respuesta aunque cambie el código HTTP.",
       ],
       "Anade una cuarta operacion para filtrar tareas pendientes y decide si encaja mejor como query param en GET o como endpoint aparte.",
       [
@@ -2800,6 +2871,7 @@ class TaskService {
         "Usa query params para filtros simples del listado antes de inventar rutas nuevas.",
         "Decide pronto si normalizas espacios en el request o si esa regla pertenece a una capa anterior.",
         "Si eliges respuestas distintas para conflicto, validación y no encontrado, intenta que el cuerpo de error tenga forma coherente en todos los casos.",
+        "Si distingues DTO de lista y DTO de detalle, revisa que esa diferencia responda a una intención de contrato y no solo a gusto por crear más clases.",
       ],
     ),
   },
@@ -3380,6 +3452,7 @@ class TaskController {
         "Decide si el listado necesita un DTO corto distinto del detalle para no arrastrar datos innecesarios.",
         "Añade un caso de título duplicado o con espacios para fijar si la API normaliza, acepta o rechaza esa entrada.",
         "Prueba qué significa repetir `PATCH /complete` sobre la misma tarea para no dejar ambigua la semántica del endpoint.",
+        "Comprueba que un `GET` filtrado y un `GET` sin filtro siguen devolviendo la misma forma de lista aunque cambie el conjunto de datos.",
       ],
       [
         "La API se entiende por recursos y casos de uso, no por acciones técnicas sueltas.",
@@ -3390,6 +3463,7 @@ class TaskController {
         "El filtrado simple entra por query params y no deforma el diseño de rutas.",
         "Las decisiones de normalización y conflicto ya forman parte del contrato, no quedan como ambigüedad futura.",
         "La pieza ya obliga a pensar en semántica HTTP y no solo en anotar clases con Spring.",
+        "La práctica ya empuja a distinguir mejor qué cambia entre listado, detalle y error sin romper coherencia del contrato público.",
       ],
     ),
     "js-values": projectBrief(
@@ -3888,12 +3962,14 @@ function renderFeaturedItems(data) {
         "Asegúrate de que el filtro sale del propio objeto `data` y no de variables sueltas externas.",
         "Comprueba que el orden visible respeta el orden original de `data.items`.",
         "Revisa que el render siga siendo legible aunque mezcle Java y JavaScript.",
+        "Prueba un objeto sin `items` y confirma que el render vuelve a estado vacío sin romper ni dejar residuos.",
       ],
       [
         "El filtro de destacados y el render están separados con intención clara.",
         "La vista se puede volver a pintar con otro objeto sin arrastrar restos.",
         "Resumen y lista salen del mismo subconjunto de datos.",
         "La pieza ya prepara bien el salto posterior hacia `fetch` y cargas asíncronas.",
+        "La práctica ya obliga a decidir qué cuenta como destacado real y qué entradas simplemente deben ignorarse sin ruido.",
       ],
     ),
     "js-modules": projectBrief(
