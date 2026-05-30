@@ -45,6 +45,16 @@ elements.roomGuide.addEventListener("click", (event) => {
     return;
   }
 
+  if (button.dataset.roomAction === "exam") {
+    document.querySelector(".challenge")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (button.dataset.roomAction === "review") {
+    elements.reviewBox?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
   if (button.dataset.roomAction === "study") {
     document.querySelector(".study").scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -172,7 +182,10 @@ elements.workModeActions?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-work-action]");
   if (!button) return;
 
-  const target = button.dataset.target;
+  jumpToWorkTarget(button.dataset.target);
+});
+
+function jumpToWorkTarget(target) {
   if (target === "practice-bank") {
     document.querySelector(".practice-bank")?.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
@@ -201,6 +214,18 @@ elements.workModeActions?.addEventListener("click", (event) => {
   if (target === "dashboard") {
     document.querySelector(".dashboard")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+}
+
+elements.nextSession.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-work-jump]");
+  if (!button) return;
+  jumpToWorkTarget(button.dataset.workJump);
+});
+
+elements.dailyQueue.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-work-jump]");
+  if (!button) return;
+  jumpToWorkTarget(button.dataset.workJump);
 });
 
 elements.studyEvolutionJump.addEventListener("click", () => {

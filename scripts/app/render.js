@@ -240,6 +240,11 @@ function renderRoomGuide() {
 
 function getRoomGuide() {
   if (state.studyMode === "all") {
+    const workModeValue = state.workMode === "practice"
+      ? "priorizar runner y banco"
+      : state.workMode === "exam"
+        ? "preparar examen y repaso"
+        : "comparar rutas y seguir lección";
     return {
       eyebrow: "Mapa lateral",
       title: "Vista global",
@@ -248,6 +253,7 @@ function getRoomGuide() {
         { label: "Java", value: "backend, modelado y problemas guiados" },
         { label: "JavaScript", value: "runner, DOM, fetch y tests" },
         { label: "Todo", value: "planificación y visión de conjunto" },
+        { label: "Ahora", value: workModeValue },
       ],
       actions: [
         { type: "study-mode", studyMode: "java", label: "Entrar en Java" },
@@ -257,6 +263,40 @@ function getRoomGuide() {
   }
 
   if (state.activeTrack === "javascript") {
+    if (state.workMode === "practice") {
+      return {
+        eyebrow: "Mapa lateral",
+        title: "Sala JavaScript · práctica",
+        summary: "Ahora conviene trabajar con banco, runner y validación rápida antes de abrir teoría nueva.",
+        signals: [
+          { label: "Sala", value: "Frontend ejecutable" },
+          { label: "Superficie fuerte", value: "Banco + runner" },
+          { label: "Ritmo útil", value: "cargar, ejecutar, corregir y cerrar" },
+        ],
+        actions: [
+          { type: "practice-bank", target: "practice-bank", label: "Ir al banco JS" },
+          { type: "runner", target: "practice", label: "Abrir runner" },
+        ],
+      };
+    }
+
+    if (state.workMode === "exam") {
+      return {
+        eyebrow: "Mapa lateral",
+        title: "Sala JavaScript · examen",
+        summary: "Aquí conviene medir cierre real: examen corto, repaso de recaídas y vuelta a la práctica si algo cae.",
+        signals: [
+          { label: "Sala", value: "Frontend ejecutable" },
+          { label: "Superficie fuerte", value: "Examen + repaso" },
+          { label: "Ritmo útil", value: "responder, revisar y corregir" },
+        ],
+        actions: [
+          { type: "exam", target: "challenge", label: "Abrir examen" },
+          { type: "review", target: "review", label: "Ver repaso" },
+        ],
+      };
+    }
+
     return {
       eyebrow: "Mapa lateral",
       title: "Sala JavaScript",
@@ -269,6 +309,40 @@ function getRoomGuide() {
       actions: [
         { type: "runner", target: "practice", label: "Abrir runner" },
         { type: "practice-bank", target: "practice-bank", label: "Ir al banco JS" },
+      ],
+    };
+  }
+
+  if (state.workMode === "practice") {
+    return {
+      eyebrow: "Mapa lateral",
+      title: "Sala Java · práctica",
+      summary: "Ahora conviene bajar a problema guiado y mini proyecto antes de abrir otra teoría o pieza arquitectónica.",
+      signals: [
+        { label: "Sala", value: "Backend y diseño" },
+        { label: "Superficie fuerte", value: "Problemas guiados + banco" },
+        { label: "Ritmo útil", value: "plantear, contrastar y cerrar" },
+      ],
+      actions: [
+        { type: "study", target: "study", label: "Abrir problema Java" },
+        { type: "practice-bank", target: "practice-bank", label: "Ir al banco Java" },
+      ],
+    };
+  }
+
+  if (state.workMode === "exam") {
+    return {
+      eyebrow: "Mapa lateral",
+      title: "Sala Java · examen",
+      summary: "Aquí conviene comprobar comprensión de reglas, modelado y contratos antes de seguir escalando.",
+      signals: [
+        { label: "Sala", value: "Backend y diseño" },
+        { label: "Superficie fuerte", value: "Examen + repaso" },
+        { label: "Ritmo útil", value: "responder, revisar y afinar" },
+      ],
+      actions: [
+        { type: "exam", target: "challenge", label: "Abrir examen" },
+        { type: "review", target: "review", label: "Ver repaso" },
       ],
     };
   }
@@ -316,13 +390,18 @@ function getQuickstartGuide() {
   });
 
   if (!hasCompleted && !hasPractice) {
+    const practiceStep = state.workMode === "practice"
+      ? "Empieza por el banco o el runner antes de abrir muchas superficies a la vez."
+      : state.workMode === "exam"
+        ? "No fuerces examen todavía: usa primero lección y práctica para construir base."
+        : "Abre una lección y recorre teoría, práctica, reto y, si existe, tests.";
     return {
       eyebrow: "Como usar Solo Learn",
       title: "Empieza simple",
       summary: "La idea es avanzar por una lección pequeña cada vez, no intentar abarcar toda la app de golpe.",
       steps: [
         "Elige Java o JavaScript y filtra por nivel si lo necesitas.",
-        "Abre una lección y recorre teoría, práctica, reto y, si existe, tests.",
+        practiceStep,
         "Usa Siguiente sesión y Plan de hoy para no perder tiempo decidiendo por dónde empezar.",
         "En JavaScript, carga ejercicios en el laboratorio; en Java, usa problemas guiados y mini proyectos.",
       ],
@@ -356,16 +435,51 @@ function getQuickstartGuide() {
   };
 }
 
+function getWorkModeCopy() {
+  if (state.workMode === "practice") {
+    return {
+      nextEyebrow: "Siguiente práctica",
+      nextEmpty: "Hoy conviene cerrar práctica o repasar runner, no abrir teoría nueva porque sí.",
+      dailyEyebrow: "Plan de práctica",
+      dailyEmpty: "Hoy no hay bloqueos críticos. Puedes cerrar práctica abierta o repetir una pieza corta.",
+      jumpLabel: "Ir al banco",
+      jumpTarget: "practice-bank",
+    };
+  }
+
+  if (state.workMode === "exam") {
+    return {
+      nextEyebrow: "Siguiente comprobación",
+      nextEmpty: "Ahora mismo puedes repetir examen corto o revisar fallos recientes para medir cierre real.",
+      dailyEyebrow: "Plan de examen",
+      dailyEmpty: "Hoy no hay bloqueos críticos. Puedes montar un examen corto o repasar recaídas.",
+      jumpLabel: "Abrir examen",
+      jumpTarget: "challenge",
+    };
+  }
+
+  return {
+    nextEyebrow: "Siguiente sesión",
+    nextEmpty: "Repite retos fallados o empieza un proyecto propio.",
+    dailyEyebrow: "Plan de hoy",
+    dailyEmpty: "Hoy no hay bloqueos críticos. Puedes avanzar por la ruta o repetir práctica.",
+    jumpLabel: "Ver catálogo",
+    jumpTarget: "dashboard",
+  };
+}
+
 function renderNextSession() {
   const recommendation = recommendNextSession();
   const pattern = getLearningDifficultyPattern();
   const lastSession = state.lastTrackActivity[state.activeTrack];
+  const workModeCopy = getWorkModeCopy();
   if (!recommendation) {
     elements.nextSession.innerHTML = `
-      <p class="eyebrow">Siguiente sesión</p>
+      <p class="eyebrow">${escapeHtml(workModeCopy.nextEyebrow)}</p>
       <h3>Ruta completada</h3>
       <p><strong>Última sesión ${tracks[state.activeTrack].label}:</strong> ${escapeHtml(formatStudyDate(lastSession))}.</p>
-      <p>Repite retos fallados o empieza un proyecto propio.</p>
+      <p>${escapeHtml(workModeCopy.nextEmpty)}</p>
+      <button type="button" data-work-jump="${escapeHtml(workModeCopy.jumpTarget)}">${escapeHtml(workModeCopy.jumpLabel)}</button>
     `;
     return;
   }
@@ -373,14 +487,17 @@ function renderNextSession() {
   const nextLesson = recommendation.lesson;
   const track = tracks[getTrackIdByLesson(nextLesson.id)];
   elements.nextSession.innerHTML = `
-    <p class="eyebrow">Siguiente sesión</p>
+    <p class="eyebrow">${escapeHtml(workModeCopy.nextEyebrow)}</p>
     <h3>${nextLesson.title}</h3>
     <p>${track.label} · ${nextLesson.level} · ${nextLesson.xp} XP</p>
     <p><strong>Última sesión ${tracks[state.activeTrack].label}:</strong> ${escapeHtml(formatStudyDate(lastSession))}.</p>
     ${pattern ? `<p><strong>Foco actual:</strong> ${escapeHtml(pattern.label)}.</p>` : ""}
     <p><strong>${recommendation.kind}:</strong> ${escapeHtml(recommendation.reason)}</p>
     ${recommendation.hint ? `<p><strong>Entrada útil:</strong> ${escapeHtml(recommendation.hint)}</p>` : ""}
-    <button type="button" data-lesson-id="${nextLesson.id}" data-target="${recommendation.target}">${recommendation.target === "practice" ? "Abrir práctica" : "Abrir lección"}</button>
+    <div class="next-session__actions">
+      <button type="button" data-lesson-id="${nextLesson.id}" data-target="${recommendation.target}">${recommendation.target === "practice" ? "Abrir práctica" : "Abrir lección"}</button>
+      <button type="button" data-work-jump="${escapeHtml(workModeCopy.jumpTarget)}">${escapeHtml(workModeCopy.jumpLabel)}</button>
+    </div>
   `;
 }
 
@@ -579,6 +696,7 @@ function getReviewEntryLeadHint(entry) {
 
 function renderDailyQueue() {
   const queue = buildDailyQueue();
+  const workModeCopy = getWorkModeCopy();
   const todayKey = getTodayKey();
   const doneToday = state.dailyQueueLog[todayKey] ?? [];
   const sessionCompletedToday = state.completedDailySessions.includes(todayKey);
@@ -596,21 +714,25 @@ function renderDailyQueue() {
   );
   if (!queue.length) {
     elements.dailyQueue.innerHTML = `
-      <p class="eyebrow">Plan de hoy</p>
+      <p class="eyebrow">${escapeHtml(workModeCopy.dailyEyebrow)}</p>
       <h3>Sesión libre</h3>
-      <p>Hoy no hay bloqueos críticos. Puedes avanzar por la ruta o repetir práctica.</p>
+      <p>${escapeHtml(workModeCopy.dailyEmpty)}</p>
+      <button type="button" data-work-jump="${escapeHtml(workModeCopy.jumpTarget)}">${escapeHtml(workModeCopy.jumpLabel)}</button>
     `;
     return;
   }
 
   elements.dailyQueue.innerHTML = `
-    <p class="eyebrow">Plan de hoy</p>
+    <p class="eyebrow">${escapeHtml(workModeCopy.dailyEyebrow)}</p>
     <h3>${queue.length} ${queue.length === 1 ? "paso recomendado" : "pasos recomendados"}</h3>
     <p><strong>${sessionProfile.label}:</strong> ${sessionProfile.description}</p>
     ${renderDifficultyPatternNotice(pattern)}
     ${renderSaturationNotice(saturation)}
     <p>${doneToday.length}/${queue.length} pasos marcados hoy</p>
     ${doneToday.length >= queue.length ? `<p>${sessionCompletedToday ? "Sesion de hoy cerrada." : "Sesion lista para cerrar."}</p>` : ""}
+    <div class="daily-queue__toolbar">
+      <button type="button" data-work-jump="${escapeHtml(workModeCopy.jumpTarget)}">${escapeHtml(workModeCopy.jumpLabel)}</button>
+    </div>
     ${queue
       .map((item) => {
         const itemKey = dailyQueueItemKey(item);

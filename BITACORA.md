@@ -1071,6 +1071,22 @@ o sesión futura.
 - Añadido más foco en máximos repetidos, papel del índice destacado, coherencia entre arrays paralelos y estabilidad del resumen
 - La idea es que arrays deje de ser solo recorrido seguro y empiece a fijar mejor qué contrato sale realmente de esa iteración
 
+## Fase 141 — Mapa lateral sensible al modo de trabajo
+
+- `roomGuide` y el arranque guiado ya no dependen solo de la sala Java o JavaScript: ahora también responden al frente `study`, `practice` o `exam`
+- La sidebar puede empujar banco, runner, examen o repaso según el trabajo real que toque hacer
+- La idea es profundizar la separación funcional antes del rediseño visual completo, sin quedarse en un selector decorativo
+
+## Fase 142 — Siguiente sesión y plan sensibles al frente activo
+
+- `Siguiente sesión` y `Plan de hoy` ya ajustan su rotulación base según `study`, `practice` o `exam`
+- La idea es que el nuevo modo de trabajo no solo cambie botones laterales, sino también la lectura operativa de por dónde conviene entrar en la app
+
+## Fase 143 — Saltos directos al frente activo
+
+- `Siguiente sesión` y `Plan de hoy` ya pueden abrir directamente la superficie principal del frente activo (`banco`, `examen` o `catálogo`)
+- La navegación por `workMode` empieza así a ser realmente operativa y no solo textual
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`
