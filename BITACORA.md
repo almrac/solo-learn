@@ -969,6 +969,54 @@ o sesión futura.
 - Añadido más foco en borde exacto de reglas, páginas inválidas y contrato de libro no encontrado en la biblioteca
 - La idea es que POO no se quede en ejemplo de clase mínima y empiece a fijar mejor invariantes y coordinación entre objetos
 
+## Fase 124 — Más densidad para interfaces en Java
+
+- Reforzada la guía y el mini proyecto de `java-inheritance` en `scripts/data/practice.js`
+- Añadido más foco en mensajes vacíos, espacios exteriores, `null` y consistencia del contrato entre implementaciones
+- La idea es que interfaces no se quede en polimorfismo de escaparate y empiece a fijar también decisiones estables de validación y consumo
+
+## Fase 125 — Más densidad para métodos en Java
+
+- Reforzada la guía y el mini proyecto de `java-methods` en `scripts/data/practice.js`
+- Añadido más foco en bordes de nivel, XP negativo, parámetros inválidos y separación clara entre cálculo y formato
+- La idea es que métodos no se quede en extraer lógica por estética y empiece a fijar también contratos y casos borde desde una fase temprana
+
+## Fase 126 — Más densidad para control de flujo en Java
+
+- Reforzada la guía y el mini proyecto de `java-control` en `scripts/data/practice.js`
+- Añadido más foco en bordes de clasificación, notas fuera de rango, umbrales exactos y coherencia entre arrays paralelos
+- La idea es que control de flujo no se quede en `if/else` y bucles de escaparate, sino que empiece a fijar decisiones visibles de contrato y resumen
+
+## Fase 127 — Más densidad para arrays en Java
+
+- Reforzada la guía y el mini proyecto de `java-arrays` en `scripts/data/practice.js`
+- Añadido más foco en arrays vacíos, máximos inicializados con criterio, promedios defendibles y coherencia del recorrido por índice
+- La idea es que arrays no se quede en sumar y recorrer, sino que empiece a fijar también contratos básicos y casos borde antes del salto a colecciones
+
+## Fase 128 — Cobertura extra para fetch y DOM
+
+- Reforzado `js-fetch-to-dom` en `scripts/data/practice.js`
+- Añadidos casos para respuesta sin `items`, sustitución limpia tras lote vacío y conservación del orden útil al descartar elementos no relevantes
+- La idea es cerrar mejor el contrato de recarga y evitar soluciones que solo funcionan con respuestas felices de la API
+
+## Fase 129 — Cobertura extra para datos a DOM
+
+- Reforzado `js-data-to-dom` en `scripts/data/practice.js`
+- Añadidos casos para array vacío con limpieza de render previo y tandas mixtas con campos extra o faltantes en los elementos descartados
+- La idea es cerrar mejor el contrato de filtrado y evitar soluciones que solo funcionan con lotes homogéneos y completamente felices
+
+## Fase 130 — Cobertura extra para estados de UI
+
+- Reforzado `js-ui-states` en `scripts/data/practice.js`
+- Añadido un caso de recuperación desde respuesta incompleta hacia render válido sin arrastrar restos
+- La idea es seguir cerrando transiciones frágiles entre vacío, respuesta parcial y recuperación posterior
+
+## Fase 131 — Cobertura extra para JSON local
+
+- Reforzado `js-json-fetch` en `scripts/data/practice.js`
+- Añadidos casos para `data` sin `items` y para `stats.xp` ausente o indefinido sin romper el formato
+- La idea es cerrar mejor el contrato de salida HTML ante estructuras parciales y evitar soluciones demasiado optimistas
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`

@@ -634,6 +634,45 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "text", selector: "#resultList li:first-child", expected: "Eventos | JavaScript | Intermedio" },
           ],
         },
+        {
+          label: "No rompe si recibe un array vacío y limpia cualquier render anterior",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "Eventos", language: "JavaScript", level: "Intermedio", visible: true },
+              ]],
+            },
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#resultList li", expected: 0 },
+          ],
+        },
+        {
+          label: "Mantiene solo los visibles aunque haya campos extra o faltantes en los descartados",
+          actions: [
+            {
+              type: "call",
+              name: "renderizarItemsVisibles",
+              args: [[
+                { title: "Estado local", language: "JavaScript", level: "Intermedio", visible: true, stats: { xp: 90 } },
+                { title: "API", language: "Java", visible: false },
+                { title: "DOM", language: "JavaScript", level: "Base", visible: true, tags: ["dom"] },
+              ]],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#resultList li", expected: 2 },
+            { type: "text", selector: "#resultList li:first-child", expected: "Estado local | JavaScript | Intermedio" },
+            { type: "text", selector: "#resultList li:last-child", expected: "DOM | JavaScript | Base" },
+          ],
+        },
       ],
     }),
     "js-json-to-dom": exercise({
@@ -1031,6 +1070,65 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "text", selector: "#fetchList li:last-child", expected: "Estado UI | Avanzado" },
           ],
         },
+        {
+          label: "No rompe si la respuesta no trae items y deja la lista vacía",
+          actions: [
+            {
+              type: "call",
+              name: "cargarYRenderizar",
+              args: [async () => ({})],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#fetchList li", expected: 0 },
+          ],
+        },
+        {
+          label: "Ignora items no válidos sin alterar el orden útil de JavaScript",
+          actions: [
+            {
+              type: "call",
+              name: "cargarYRenderizar",
+              args: [async () => ({
+                items: [
+                  { title: "Spring", language: "Java", level: "Avanzado" },
+                  { title: "Render limpio", language: "JavaScript", level: "Intermedio" },
+                  { title: "Colecciones", language: "Java", level: "Base" },
+                  { title: "Eventos DOM", language: "JavaScript", level: "Base" },
+                ],
+              })],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#fetchList li", expected: 2 },
+            { type: "text", selector: "#fetchList li:first-child", expected: "Render limpio | Intermedio" },
+            { type: "text", selector: "#fetchList li:last-child", expected: "Eventos DOM | Base" },
+          ],
+        },
+        {
+          label: "Sustituye una carga previa válida aunque la nueva respuesta tenga items vacíos",
+          actions: [
+            {
+              type: "call",
+              name: "cargarYRenderizar",
+              args: [async () => ({
+                items: [
+                  { title: "Async", language: "JavaScript", level: "Intermedio" },
+                ],
+              })],
+            },
+            {
+              type: "call",
+              name: "cargarYRenderizar",
+              args: [async () => ({
+                items: [],
+              })],
+            },
+          ],
+          assertions: [
+            { type: "count", selector: "#fetchList li", expected: 0 },
+          ],
+        },
       ],
     }),
     "js-ui-states": exercise({
@@ -1291,6 +1389,34 @@ Object.assign(learningRoot.LEARNING_DATA, {
             { type: "count", selector: "#courseList li", expected: 0 },
           ],
         },
+        {
+          label: "Recupera desde una respuesta incompleta y vuelve a pintar sin restos",
+          actions: [
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                meta: { source: "cache" },
+              })],
+            },
+            {
+              type: "call",
+              name: "cargarCursos",
+              args: [async () => ({
+                items: [
+                  { title: "DOM", level: "Base" },
+                  { title: "Estado local", level: "Intermedio" },
+                ],
+              })],
+            },
+          ],
+          assertions: [
+            { type: "text", selector: "#status", expected: "Resultados listos." },
+            { type: "count", selector: "#courseList li", expected: 2 },
+            { type: "text", selector: "#courseList li:first-child", expected: "DOM | Base" },
+            { type: "text", selector: "#courseList li:last-child", expected: "Estado local | Intermedio" },
+          ],
+        },
       ],
     }),
     "js-json-fetch": exercise({
@@ -1489,6 +1615,40 @@ Object.assign(learningRoot.LEARNING_DATA, {
           }],
           expected:
             "<li>Primer render | JavaScript | Base | dom, listas | 0 XP</li><li>DTOs | Java | Avanzado |  | 0 XP</li><li>Panel semanal | JavaScript | Avanzado | plan, ritmo, repaso | 130 XP</li>",
+          compare: "html",
+        },
+        {
+          label: "Devuelve cadena vacía si data no trae items",
+          args: [{
+            course: "Solo Learn",
+            meta: { source: "local" },
+          }],
+          expected: "",
+          compare: "html",
+        },
+        {
+          label: "Mantiene el formato si stats existe pero xp viene ausente o indefinido",
+          args: [{
+            course: "Solo Learn",
+            items: [
+              {
+                title: "Eventos",
+                language: "JavaScript",
+                level: "Intermedio",
+                tags: ["dom"],
+                stats: {},
+              },
+              {
+                title: "Servicios",
+                language: "Java",
+                level: "Avanzado",
+                tags: ["api"],
+                stats: { xp: undefined },
+              },
+            ],
+          }],
+          expected:
+            "<li>Eventos | JavaScript | Intermedio | dom | 0 XP</li><li>Servicios | Java | Avanzado | api | 0 XP</li>",
           compare: "html",
         },
       ],
@@ -2113,6 +2273,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Crea un método separado de main.",
         "Haz que el método reciba xp y devuelva un int.",
         "Prueba varios casos desde main e imprime el resultado.",
+        "Decide qué pasa con un XP negativo y deja esa regla fija en el método en vez de repartirla por `main`.",
       ],
       "Métodos",
       "Cero",
@@ -2138,16 +2299,19 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Prueba 0, 149, 150 y 320 para comprobar bien los saltos de nivel.",
         "Verifica que el nivel empieza en 1 y no en 0.",
         "Comprueba que mover la impresión fuera del método no cambia el cálculo.",
+        "Añade un caso como 300 para fijar el borde exacto de un segundo salto completo.",
       ],
       "Anade un segundo metodo que reciba tambien el tamano del bloque de XP para hacer el calculo configurable.",
       [
         "XP exactamente en el borde de cambio de nivel, como 150 o 300.",
         "XP negativo para decidir si lo normalizas, lo rechazas o documentas que no se contempla.",
+        "Un tamano de bloque 0 o negativo si haces la version configurable y quieres fijar un contrato minimo razonable.",
       ],
       [
         "Piensa cuantos bloques completos de 150 hay dentro del XP recibido.",
         "Recuerda que el primer nivel existe incluso cuando el XP es 0.",
         "Prueba el metodo con valores justo antes y justo despues del cambio de tramo.",
+        "Si extraes una version configurable, evita que el metodo dependa de constantes escondidas fuera de sus parametros.",
       ],
     ),
     "java-control": guide(
@@ -2158,6 +2322,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Usa if / else if / else para clasificar.",
         "Añade un bucle para mostrar tres líneas de repaso.",
         "Evita duplicar condiciones que se pisan entre sí.",
+        "Decide también qué ocurre con una nota fuera de rango antes de entrar en la clasificación normal.",
       ],
       "Control de flujo",
       "Base",
@@ -2182,16 +2347,19 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Prueba una nota de cada tramo: suspenso, aprobado, notable y sobresaliente.",
         "Comprueba que siempre salen exactamente tres mensajes de repaso.",
         "Verifica que no se imprimen dos clasificaciones para la misma nota.",
+        "Añade pruebas con 0, 5, 7 y 9 para fijar los bordes exactos de cada salto de tramo.",
       ],
       "Sustituye la variable fija por una lista de notas y clasifica varias en el mismo programa sin repetir bloques `if` enteros.",
       [
         "Nota 5 y nota 9 para comprobar dos bordes de tramo.",
         "Nota fuera de rango, como -1 u 11, para decidir si la validas antes de clasificar.",
+        "Una nota exactamente 10 para fijar si el último tramo incluye el máximo sin casos especiales escondidos.",
       ],
       [
         "Ordena las condiciones de la mas exigente a la mas amplia para no tapar casos.",
         "Haz primero que solo salga una clasificacion correcta.",
         "Despues anade el bucle de tres mensajes sin duplicar `println` manuales.",
+        "Si validas rango, hazlo antes de la clasificacion principal para no mezclar error con tramos válidos.",
       ],
     ),
     "java-arrays": guide(
@@ -2202,6 +2370,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Recorre el array para sumar notas.",
         "Guarda la nota máxima mientras iteras.",
         "Usa notas.length para no fijar el tamaño a mano.",
+        "Decide también qué haces si el array llega vacío antes de acceder a `notas[0]`.",
       ],
       "Arrays",
       "Base",
@@ -2228,16 +2397,19 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Prueba con la nota máxima en primera y última posición del array.",
         "Comprueba que la media usa todas las notas y no solo parte del recorrido.",
         "Verifica que cambiar el tamaño del array no obliga a tocar el bucle.",
+        "Añade un caso con todas las notas iguales para comprobar que la máxima y la media siguen siendo consistentes.",
       ],
       "Amplia el resumen para contar tambien cuantas notas estan aprobadas y cuantas suspendidas en el mismo recorrido.",
       [
         "Todas las notas iguales para comprobar que maxima y media siguen siendo coherentes.",
         "Un array con una sola nota para ver si la inicializacion y el bucle siguen teniendo sentido.",
+        "Un array vacio para decidir si muestras aviso, devuelves 0 o proteges el acceso de otra forma explícita.",
       ],
       [
         "Usa la primera nota como referencia inicial para la maxima.",
         "En el mismo bucle, suma y compara, en vez de hacer dos recorridos separados.",
         "Calcula la media solo cuando ya hayas terminado de acumular el total.",
+        "Si proteges el caso vacío, hazlo antes de leer la primera posición para no esconder un fallo de índice.",
       ],
     ),
     "java-oop": guide(
@@ -2300,6 +2472,7 @@ Object.assign(learningRoot.LEARNING_DATA, {
         "Declara una interfaz pequeña con una sola responsabilidad.",
         "Haz que dos clases usen `implements`.",
         "Sobrescribe el mismo método con comportamientos distintos.",
+        "Decide si normalizas espacios o mensajes vacíos antes de enviarlos y mantén esa regla igual en todos los canales.",
       ],
       "Interfaces y herencia",
       "Intermedio",
@@ -2328,16 +2501,19 @@ class SmsNotifier implements Notificable {
         "Llama al mismo método desde ambas implementaciones y comprueba que la salida cambia.",
         "Verifica que el contrato de la interfaz obliga a mantener la misma firma.",
         "Añade un tercer notificador pequeño para comprobar que el diseño aguanta.",
+        "Prueba un mensaje con espacios exteriores y decide si todas las implementaciones lo muestran igual o lo limpian antes.",
       ],
       "Crea un metodo que reciba un `Notificable` por parametro y lo use sin saber si es Email, SMS o cualquier otra implementacion.",
       [
         "Mensaje vacio para decidir si lo permites, lo transformas o lo rechazas.",
         "Una tercera implementacion muy corta para comprobar que el consumo polimorfico no cambia.",
+        "Mensaje `null` si quieres fijar ya un contrato claro sobre entradas invalidas antes de crecer a mas canales.",
       ],
       [
         "Empieza por una interfaz con una sola firma y una sola responsabilidad.",
         "Haz una implementacion minima de Email y otra de SMS cambiando solo el comportamiento.",
         "Comprueba despues que una variable del tipo interfaz puede apuntar a cualquiera de las dos.",
+        "Si anades validacion del mensaje, procura que no dependa de una sola clase concreta ni rompa el uso polimorfico.",
       ],
     ),
     "java-collections": guide(
@@ -2625,7 +2801,7 @@ class TaskService {
     ),
     "java-methods": projectBrief(
       "Separa un resumen de estudio en métodos pequeños con parámetros claros.",
-      "Pasar de resolver todo dentro de `main` a dividir una tarea simple en métodos reutilizables con entrada, proceso y retorno bien definidos.",
+      "Pasar de resolver todo dentro de `main` a dividir una tarea simple en métodos reutilizables con entrada, proceso y retorno bien definidos, fijando además contratos razonables para casos borde y evitando fórmulas escondidas en varios sitios.",
       [
         "Parte de datos simples como nombre de alumno, minutos estudiados y retos completados.",
         "Crea un método para calcular una métrica útil, por ejemplo puntos o nivel de sesión.",
@@ -2633,6 +2809,7 @@ class TaskService {
         "Haz que `main` quede como coordinador y no como sitio donde vive toda la lógica.",
         "Evita duplicar fórmulas o concatenaciones en varios sitios.",
         "Prueba mentalmente qué ocurre con minutos a cero o con una sesión muy corta para comprobar el contrato.",
+        "Decide también qué haces con retos negativos o nombres vacíos y mantén ese criterio en una sola capa del programa.",
       ],
       [
         "Método de cálculo",
@@ -2640,6 +2817,7 @@ class TaskService {
         "main coordinador",
         "Parámetros claros",
         "Return coherente",
+        "Casos borde visibles",
       ],
       `class SessionSummaryApp {
   static int calculateXp(int minutes, int completedChallenges) {
@@ -2666,17 +2844,20 @@ class TaskService {
         "Asegúrate de que nombres de parámetros y métodos expliquen intención, no solo tipo.",
         "Revisa que el valor devuelto por un método se use realmente y no se pierda por el camino.",
         "Piensa un caso con cero minutos o cero retos para confirmar que el contrato sigue siendo razonable.",
+        "Prueba un nombre vacío o con espacios y decide si el resumen lo conserva, lo limpia o muestra un valor por defecto.",
+        "Prueba un valor negativo en minutos o retos y deja claro si se corrige, se rechaza o queda fuera de alcance.",
       ],
       [
         "La estructura ya enseña a repartir trabajo fuera de `main`.",
         "Los métodos reciben datos claros y devuelven resultados reutilizables.",
         "La pieza prepara bien el paso a validación, control de flujo y colecciones.",
         "La lectura del código mejora porque cada bloque tiene una intención concreta.",
+        "El ejemplo ya obliga a pensar en contrato y no solo en extraer trozos de código por estética.",
       ],
     ),
     "java-control": projectBrief(
       "Construye un evaluador simple de progreso con decisiones y repetición controlada.",
-      "Practicar `if`, `else`, bucles y acumulación básica con una pieza que clasifique sesiones y recorra varios datos sin quedarse en ejemplos artificiales.",
+      "Practicar `if`, `else`, bucles y acumulación básica con una pieza que clasifique sesiones y recorra varios datos sin quedarse en ejemplos artificiales, fijando además reglas visibles para límites, sesiones vacías y coherencia entre datos relacionados.",
       [
         "Parte de una colección pequeña de sesiones o notas de práctica.",
         "Usa condicionales para clasificar cada entrada, por ejemplo `completa`, `en progreso` o `pendiente`.",
@@ -2684,6 +2865,7 @@ class TaskService {
         "Calcula al final un pequeño resumen con número de pendientes, completadas o sesiones largas.",
         "Evita condiciones duplicadas o mal ordenadas que hagan imposible entender por qué cae en cada rama.",
         "Prueba mentalmente qué ocurre con una lista vacía o con entradas que caen justo en el límite de una condición.",
+        "Si usas arrays paralelos, deja claro que ambos tienen el mismo tamaño o decide cómo reaccionas cuando no coinciden.",
       ],
       [
         "Condicional principal",
@@ -2691,6 +2873,7 @@ class TaskService {
         "Contadores acumulados",
         "Resumen final",
         "Casos borde de control",
+        "Coherencia de datos",
       ],
       `class StudyProgressControl {
   static String classifySession(int minutes, boolean completed) {
@@ -2711,17 +2894,20 @@ class TaskService {
         "Asegúrate de que cada contador se actualiza en la rama correcta y no en varias a la vez.",
         "Piensa el caso de cero sesiones para confirmar que el resumen sigue siendo coherente.",
         "Revisa que la clasificación de una sesión corta o incompleta tenga una regla visible y defendible.",
+        "Prueba un valor justo en el umbral de sesión larga para fijar si entra o no en esa categoría.",
+        "Si hay arrays paralelos, piensa qué ocurre si uno tiene menos elementos que el otro antes de asumir que siempre encajan.",
       ],
       [
         "La lógica de control deja de ser sintaxis suelta y pasa a resolver un flujo reconocible.",
         "Las ramas y contadores se leen con intención clara.",
         "La pieza prepara bien el salto a arrays, recorridos y validación más rica.",
         "El código obliga a pensar en casos límite antes de crecer en complejidad.",
+        "El ejemplo ya fuerza a decidir contratos simples de integridad de datos en vez de confiar en entradas siempre felices.",
       ],
     ),
     "java-arrays": projectBrief(
       "Construye un analizador básico de sesiones usando arrays y recorrido por índice.",
-      "Practicar acceso por posición, recorrido completo y acumulación sobre arrays simples antes de pasar a colecciones más ricas.",
+      "Practicar acceso por posición, recorrido completo y acumulación sobre arrays simples antes de pasar a colecciones más ricas, fijando además un contrato claro para arrays vacíos, máximos y promedios defendibles.",
       [
         "Parte de arrays paralelos o de un array con valores homogéneos como minutos, notas o XP por sesión.",
         "Recorre todas las posiciones válidas sin salirte del índice.",
@@ -2729,6 +2915,7 @@ class TaskService {
         "Muestra o devuelve también qué posición o valor destaca más si eso ayuda a entender el recorrido.",
         "Evita lógica duplicada dentro del bucle si el mismo cálculo se puede centralizar.",
         "Piensa qué ocurre con arrays vacíos, con un solo elemento o con todos los valores iguales.",
+        "Si separas el cálculo en métodos, evita que cada uno tome decisiones incompatibles sobre el caso vacío.",
       ],
       [
         "Array de entrada",
@@ -2736,6 +2923,7 @@ class TaskService {
         "Acumulación de métricas",
         "Detección de máximo o promedio",
         "Casos borde básicos",
+        "Contrato para vacío",
       ],
       `class StudyArrayStats {
   static int findLongestSession(int[] minutes) {
@@ -2760,12 +2948,15 @@ class TaskService {
         "Asegúrate de que el valor máximo o la sesión más larga se inicializa de forma razonable.",
         "Piensa el caso de array vacío antes de decidir qué devolver o cómo proteger la operación.",
         "Revisa que el índice solo se usa cuando aporta algo y que la lógica principal sigue siendo legible.",
+        "Prueba un array con un solo elemento para confirmar que máximo y promedio coinciden con ese dato sin pasos especiales rotos.",
+        "Prueba varios máximos repetidos para decidir si te basta con el valor o si también quieres fijar qué posición destacar primero.",
       ],
       [
         "El array deja de ser solo teoría y pasa a una herramienta para resumir datos reales.",
         "El recorrido por índice se entiende con intención clara.",
         "La pieza prepara bien el salto a `ArrayList` y colecciones más expresivas.",
         "Los casos borde básicos quedan visibles antes de crecer en estructura.",
+        "El ejemplo ya obliga a tomar decisiones coherentes de contrato en vez de asumir entradas siempre cómodas.",
       ],
     ),
     "java-oop": projectBrief(
@@ -2902,16 +3093,19 @@ xpByTrack.put("javascript", 160);
     ),
     "java-inheritance": projectBrief(
       "Diseña un sistema simple de notificaciones por interfaz.",
-      "Practicar contratos pequeños y polimorfismo sin forzar una jerarquía artificial de clases base.",
+      "Practicar contratos pequeños y polimorfismo sin forzar una jerarquía artificial de clases base, fijando además un contrato visible para mensajes vacíos, espacios y entradas no válidas.",
       [
         "Define una interfaz `Notificable` con un método `enviar(String mensaje)`.",
         "Implementa al menos dos clases, por ejemplo `EmailNotifier` y `SmsNotifier`.",
         "Recorre una lista de notificadores y lanza el mismo mensaje a todos.",
+        "Decide si limpias espacios exteriores antes de enviar y aplica esa regla de forma consistente.",
+        "Haz visible en consola cuándo un mensaje no se envía por ser vacío o inválido.",
       ],
       [
         "Interfaz pequeña",
         "Dos implementaciones",
         "Demo polimórfica desde `main`",
+        "Contrato de validación visible",
       ],
       `interface Notificable {
   void enviar(String mensaje);
@@ -2928,11 +3122,14 @@ List<Notificable> canales = new ArrayList<>();`,
         "Recorre la colección y comprueba que cada implementación responde con su propio formato.",
         "Verifica que el código cliente usa `Notificable` y no depende de una clase concreta.",
         "Añade una tercera implementación pequeña para comprobar que el diseño escala.",
+        "Prueba un mensaje con solo espacios y confirma que todas las implementaciones respetan la misma decisión de contrato.",
+        "Prueba un mensaje `null` o vacío y decide si el descarte ocurre antes del envío o dentro de cada canal, pero deja el criterio estable.",
       ],
       [
         "El envío funciona para varios canales sin cambiar el código que los recorre.",
         "La interfaz expresa una capacidad concreta y no una jerarquía artificial.",
         "Agregar otro notificador es un cambio local, no una reescritura del flujo.",
+        "La validación del mensaje no queda escondida ni duplicada sin criterio entre canales.",
       ],
     ),
     "java-exceptions": projectBrief(
@@ -3672,6 +3869,7 @@ import { renderCatalog } from "./catalog-render.js";
         "Pinta una lista final con nombre y metadatos útiles en el DOM.",
         "Haz que una segunda carga sustituya siempre el contenido anterior completo.",
         "Añade una acción de recarga o cambio de filtro sin duplicar listeners ni nodos.",
+        "Decide qué haces cuando la respuesta no trae `items` o trae una lista vacía y mantén ese contrato visible.",
       ],
       [
         "Función async",
@@ -3691,12 +3889,14 @@ import { renderCatalog } from "./catalog-render.js";
         "Verifica que si la API devuelve más campos de los necesarios, la vista siga pintando solo lo importante.",
         "Asegúrate de que el filtro deja fuera los elementos no relevantes sin romper el orden útil.",
         "Prueba una recarga después de un lote vacío o distinto para confirmar que no quedan restos visuales.",
+        "Prueba una respuesta sin `items` para confirmar que el flujo no rompe y deja un estado vacío coherente.",
       ],
       [
         "La vista puede adaptarse a una API pública porque primero transforma la respuesta y luego renderiza.",
         "El render final no depende del formato bruto remoto, sino de una lista ya normalizada.",
         "Recargar datos vuelve a pintar la vista completa sin residuos del lote anterior.",
         "La recarga y el filtro viven en un flujo claro y no en parches repartidos por el archivo.",
+        "La pieza ya obliga a pensar en respuestas incompletas y no solo en el caso feliz de la API.",
       ],
     ),
     "js-ui-states": projectBrief(
