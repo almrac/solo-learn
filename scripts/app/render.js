@@ -1689,11 +1689,15 @@ function renderPracticeBankSpotlight(entries) {
   const spotlightTopic = priorityTopic && recommended.topics.includes(priorityTopic.topic)
     ? priorityTopic.topic
     : recommended.topics[0] ?? "";
+  const spotlightEyebrow = state.workMode === "practice" ? "Frente principal" : "Más útil ahora";
+  const spotlightReason = state.workMode === "practice"
+    ? `Si hoy toca práctica, esta es la mejor entrada operativa ahora mismo. ${getPracticeSpotlightReason(recommended)}`
+    : getPracticeSpotlightReason(recommended);
 
   elements.practiceBankSpotlight.innerHTML = `
     <article class="practice-spotlight">
       <div class="practice-spotlight__meta">
-        <span class="eyebrow">Más útil ahora</span>
+        <span class="eyebrow">${escapeHtml(spotlightEyebrow)}</span>
         <span class="badge">${escapeHtml(recommended.family)}</span>
         ${spotlightTopic ? `<span class="badge practice-card__topic">${escapeHtml(spotlightTopic)}</span>` : ""}
         <span class="badge">${escapeHtml(recommended.difficulty)}</span>
@@ -1704,7 +1708,7 @@ function renderPracticeBankSpotlight(entries) {
         <span class="badge">${escapeHtml(recommended.progressState.label)}</span>
       </div>
       <h3>${escapeHtml(recommended.title)}</h3>
-      <p>${escapeHtml(getPracticeSpotlightReason(recommended))}</p>
+      <p>${escapeHtml(spotlightReason)}</p>
       ${failureSignal
         ? `<p><strong>Bloqueo principal:</strong> ${escapeHtml(failureSignal.label)}.</p>`
         : ""}

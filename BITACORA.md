@@ -1092,6 +1092,11 @@ o sesión futura.
 - La superficie de examen ya adapta su CTA y su nota base cuando `workMode` está en `exam`
 - La idea es que la separación funcional también se note dentro del propio bloque de comprobación y no solo en navegación lateral o planes
 
+## Fase 145 — Banco alineado con el frente de práctica
+
+- El spotlight del banco ya adapta su rotulación y su lectura base cuando `workMode` está en `practice`
+- La idea es que el frente de práctica se note también dentro del propio banco y no solo en navegación y llamadas a la acción
+
 ## Fase 118 — Cobertura extra para dashboard final
 
 - Reforzada otra vez `js-project` en `scripts/data/practice.js`
