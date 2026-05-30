@@ -147,7 +147,7 @@ primera iteración aplicada. La separación de salas ya existe y filtra partes
 centrales; falta rematar estructura completa y lenguaje visual.
 
 - [~] sistema visual más consistente para Java y JavaScript
-- [ ] sin depender solo del color
+- [~] sin depender solo del color
 - [ ] posible iconografía o badges más fuertes
 - [~] separar por completo las "salas" Java y JavaScript en el rediseño
 - [x] usar un modo de estudio global con tres estados: `all`, `java`, `javascript`
@@ -166,7 +166,7 @@ centrales; falta rematar estructura completa y lenguaje visual.
 - [~] solo el lenguaje activo debe ser navegable
 - [x] la lección activa cambia según el modo
 - [~] brand, nav activa y acentos del header también se tiñen por modo
-- [ ] el lateral debe cambiar su contenido según el lenguaje activo
+- [~] el lateral debe cambiar su contenido según el lenguaje activo
 - ya existe una base funcional previa con filtro `Aprendizaje: frontend/backend`
   para no mezclar rutas innecesariamente antes del rediseño completo
 

@@ -4,9 +4,15 @@ Webapp estática para aprender Java y JavaScript por niveles, con lecciones,
 ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 `localStorage`.
 
+Pensada como herramienta personal de estudio: sin build step, sin dependencias
+y preparada para abrirse directamente desde `index.html` o desplegarse en un
+hosting estático simple como `GitHub Pages`.
+
 ## Qué incluye
 
 - Ruta separada para Java y JavaScript.
+- Modo global `Todo / Java / JavaScript` para estudiar por sala sin mezclar rutas.
+- Franja superior, tinte base y señales visuales que cambian según la sala activa.
 - Plan junio-agosto para llegar con soltura al final del verano.
 - Filtros por nivel: cero, base, intermedio y avanzado.
 - Vista de lección con teoría, pasos de estudio, ejemplo de código y práctica.
@@ -35,6 +41,7 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - La sidebar incluye una guía rápida inicial para entender cómo usar la app al entrar por primera vez.
 - Esa guía inicial ya se adapta al estado real: primera vez, progreso inicial o trabajo por progresión/evolución.
 - `Siguiente sesión` ya entiende también `Base previa` y `Escalada`, no solo desbloqueos generales.
+- El historial reciente de sesiones deja visible qué días se cerró el plan diario.
 - La lección activa puede incluir ya casos evolutivos guiados con versión base, versión avanzada y starter de código.
 - El primer caso evolutivo ya tiene también una tercera fase: pasar de un empleado individual a colecciones, filtros y resúmenes.
 - El banco de práctica muestra ya la fase evolutiva de esos casos: `Base`, `Refactor` o `Colección y resumen`.
@@ -82,6 +89,7 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 - El pie del plan diario añade una lectura semanal ligera: reenganche, estable, fuerte o limpieza.
 - Esa lectura semanal incluye también una recomendación concreta de ritmo.
 - También expone reglas visibles de ritmo semanal y suaviza la prioridad de lecciones avanzadas si toca contener carga.
+- El plan diario protege contra saturación cuando se acumulan demasiadas prácticas o repasos abiertos.
 - Métricas de progreso total, progreso por lenguaje y racha diaria.
 - Siguiente sesión recomendada para mantener avance diario.
 - Lección activa claramente destacada con pasos de teoría, práctica, reto y cierre.
@@ -133,6 +141,35 @@ ejemplos, prácticas, retos rápidos, XP, logros y progreso guardado en
 Abre `index.html` directamente en el navegador. No necesita instalación,
 compilación ni servidor local.
 
+## Flujo de uso recomendado
+
+1. Elige la sala activa en `Todo`, `Java` o `JavaScript` para acotar la sesión.
+2. Revisa `Siguiente sesión` para ver si conviene desbloqueo, repaso, rescate,
+   base previa o escalada.
+3. Entra en la lección activa y cierra, en este orden, teoría, práctica, reto y
+   ejercicio evaluable si existe.
+4. Si el atasco es de interfaz o datos, usa el runner y el preview DOM desde la
+   propia lección en vez de saltar a contenido nuevo.
+5. Si prefieres entrenar por familias o dificultad, usa el banco de práctica
+   como superficie principal y no solo como apoyo de la lección activa.
+6. Cierra el `Plan de hoy` cuando completes la tanda útil del día para dejar
+   rastro, XP y lectura semanal actualizada.
+
+Regla práctica: si la app bloquea teoría nueva o te empuja a repaso, conviene
+seguir esa señal. La lógica actual prioriza cerrar deuda real antes de abrir más
+frentes.
+
+## Superficies de la app
+
+| Superficie | Cuándo usarla | Qué resuelve |
+| --- | --- | --- |
+| `Siguiente sesión` | Cuando no quieres decidir por dónde empezar | Propone desbloqueo, repaso, base previa, escalada o rescate |
+| `Plan de hoy` | Cuando quieres una tanda corta y cerrable | Ordena pasos útiles, evita saturación y deja cierre diario |
+| `Banco de práctica` | Cuando quieres entrenar por familia, dificultad o fase | Convierte la práctica en una superficie propia, no dependiente de una sola lección |
+| `Runner` | Cuando toca validar JavaScript ejecutable | Sirve para funciones, tests automáticos, preview DOM y flujo async |
+| `Radiografía técnica` | Cuando quieres conectar la app con lo que estudias | Explica qué conceptos reales del frontend aparecen en el proyecto |
+| `Mapa lateral de sala` | Cuando cambias entre `Todo`, `Java` y `JavaScript` | Reorienta la sidebar según la sala activa y evita depender solo del color |
+
 ## Comprobación de humo
 
 Después de partir o mover archivos de `scripts/app/`, `scripts/data/`, CSS o
@@ -155,6 +192,8 @@ olvidadas durante una separación de archivos.
    - `scripts/`
    - `data/`
    - `README.md`
+   - `AGENT_CONTEXT.md`, `BACKLOG.md` y `BITACORA.md` solo si quieres conservar
+     también el contexto operativo dentro del repo remoto
 2. En GitHub, entra en `Settings > Pages`.
 3. En `Build and deployment`, selecciona `Deploy from a branch`.
 4. Elige la rama `main` y la carpeta `/root`.
